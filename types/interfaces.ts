@@ -30,6 +30,7 @@ export interface INeynarUserResponse {
   verified_addresses: VerifiedAddresses;
   active_status: string;
   power_badge: boolean;
+  followedAt: string;
 }
 
 export interface IChannelFollowersResponse {

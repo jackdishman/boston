@@ -41,7 +41,10 @@ export default async function Home() {
       const url = `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidString}`;
       const options = {
         method: "GET",
-        headers: { accept: "application/json", api_key: "NEYNAR_API_DOCS" },
+        headers: {
+          accept: "application/json",
+          api_key: process.env.NEYNAR_API_KEY ?? ``,
+        },
       };
       const response = await fetch(url, options);
       const data = await response.json();
@@ -52,7 +55,7 @@ export default async function Home() {
     }
   };
 
-  const fetchData = async (): Promise<INeynarUserResponse[]> => {
+  const fetchUsers = async (): Promise<INeynarUserResponse[]> => {
     let cursor: string | null = null;
     const allFollowers: IChannelUsersResponse[] = [];
     const allUsers: INeynarUserResponse[] = [];
@@ -69,13 +72,21 @@ export default async function Home() {
     for (let i = 0; i < fids.length; i += batchSize) {
       const batchFids = fids.slice(i, i + batchSize);
       const users = await getUsersByFids(batchFids);
+      users.forEach((user) => {
+        const follower = allFollowers.find(
+          (f) => f.fid === user.fid.toString()
+        );
+        if (follower) {
+          (user as any).followedAt = follower.followedAt;
+        }
+      });
       allUsers.push(...users);
     }
 
     return allUsers;
   };
 
-  const users = await fetchData();
+  const users = await fetchUsers();
 
   if (!users || users.length === 0) return <div>Error fetching users</div>;
 
