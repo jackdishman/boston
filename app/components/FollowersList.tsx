@@ -1,37 +1,31 @@
-// components/FollowersList.tsx
-
-"use client";
-
-import { INeynarUserResponse } from "@/types/interfaces";
 import React from "react";
+import { INeynarUserResponse } from "@/types/interfaces";
+import ImageCard from "./ImageCard";
 
-interface IProps {
+interface FollowersListProps {
   users: INeynarUserResponse[];
 }
 
-export default function FollowersList(props: IProps) {
-  const { users } = props;
+const truncateAddress = (address: string): string => {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {users.map((user) => (
-        <div
-          key={user.fid}
-          className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200"
-        >
-          <img
-            src={user.pfp_url}
-            alt={user.display_name}
-            className="w-full h-48 object-cover"
-          />
+        <div key={user.fid} className="">
+          <div className="h-64">
+            <ImageCard
+              imageUrl={user.pfp_url}
+              linkUrl={`https://warpcast.com/${user.username}`}
+            />
+          </div>
           <div className="p-4">
-            <h1 className="text-xl font-semibold text-gray-900 mb-2">
-              {user.display_name}
-            </h1>
-            <p className="text-gray-700 mb-4">{user.profile.bio.text}</p>
-            <p className="text-sm text-gray-500 mb-1">
-              <span className="font-medium">Active status:</span>{" "}
-              {user.active_status}
-            </p>
+            <h3 className="text-xl font-bold">{user.display_name}</h3>
+            <p>{user.profile.bio.text}</p>
+          </div>
+          <div className="p-4">
             <p className="text-sm text-gray-500 mb-1">
               <span className="font-medium">Followers:</span>{" "}
               {user.follower_count}
@@ -41,20 +35,43 @@ export default function FollowersList(props: IProps) {
               {user.following_count}
             </p>
             <p className="text-sm text-gray-500 mb-1">
-              <span className="font-medium">Verified:</span>{" "}
-              {user.verifications.join(", ")}
-            </p>
-            <p className="text-sm text-gray-500 mb-1">
               <span className="font-medium">Verified addresses:</span>{" "}
-              {user.verified_addresses.eth_addresses.join(", ")}
-            </p>
-            <p className="text-sm text-gray-500">
-              <span className="font-medium">Power badge:</span>{" "}
-              {user.power_badge ? "true" : "false"}
+              {user.verified_addresses.eth_addresses.map((address) => (
+                <span key={address} className="inline-block mr-2">
+                  <a
+                    href={`https://etherscan.io/address/${address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {truncateAddress(address)}
+                  </a>{" "}
+                  |{" "}
+                  <a
+                    href={`https://basescan.org/address/${address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    BaseScan
+                  </a>{" "}
+                  |{" "}
+                  <a
+                    href={`https://opensea.io/${address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    OpenSea
+                  </a>
+                </span>
+              ))}
             </p>
           </div>
         </div>
       ))}
     </div>
   );
-}
+};
+
+export default FollowersList;
