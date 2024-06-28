@@ -5,6 +5,40 @@ import {
   INeynarUserResponse,
 } from "@/types/interfaces";
 import FollowersList from "./components/FollowersList";
+import { title } from "process";
+
+export async function generateMetadata() {
+  const fcMetadata: Record<string, string> = {
+    "fc:frame": "vNext",
+    "fc:frame:image": "https://boston-five.vercel.app/boston.png",
+    "fc:frame:button:1": `Channel Site`,
+    "fc:frame:button:1:action": `link`,
+    "fc:frame:button:1:target": `https://boston-five.vercel.app`,
+  };
+
+  return {
+    title: "Boston Channel",
+    description:
+      "All things Boston Blockchain! Events, network, jobs, and more! 🦞",
+    openGraph: {
+      title: "Boston 🦞 FC",
+      description:
+        "All things Boston Blockchain! Events, network, jobs, and more! 🦞",
+      images: [
+        {
+          url: "https://boston-five.vercel.app/boston.png",
+          width: 800,
+          height: 600,
+          alt: "All things Boston Blockchain! Events, network, jobs, and more! 🦞",
+        },
+      ],
+    },
+    other: {
+      ...fcMetadata,
+    },
+    metadataBase: new URL("https://boston-five.vercel.app"),
+  };
+}
 
 export default async function Home() {
   const getChannelFids = async (
@@ -91,7 +125,7 @@ export default async function Home() {
   if (!users || users.length === 0) return <div>Error fetching users</div>;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24 overflow-x-hidden">
       <h1 className="text-4xl font-bold">Boston 🦞 FC</h1>
       <section className="flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold mb-5">Followers ({users.length})</h2>

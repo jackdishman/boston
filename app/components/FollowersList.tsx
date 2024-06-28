@@ -15,9 +15,10 @@ const truncateAddress = (address: string): string => {
 const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   const [sortOption, setSortOption] = useState<string>("dateJoined");
   const [sortedUsers, setSortedUsers] = useState<INeynarUserResponse[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
-    const sorted = [...users].sort((a, b) => {
+    let sorted = [...users].sort((a, b) => {
       if (sortOption === "alphabetical") {
         return a.display_name.localeCompare(b.display_name);
       }
@@ -30,35 +31,61 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
     });
 
     if (sortOption === "dateJoined") {
-      sorted.reverse(); // Show earliest joiners first
+      sorted = sorted.reverse(); // Show earliest joiners first
+    }
+
+    if (searchQuery) {
+      sorted = sorted.filter(
+        (user) =>
+          user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
     setSortedUsers(sorted);
-  }, [sortOption, users]);
+  }, [sortOption, users, searchQuery]);
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="mb-5">
-        <button
-          onClick={() => setSortOption("dateJoined")}
-          className={`px-4 py-2 mr-2 ${
-            sortOption === "dateJoined"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          Date Joined
-        </button>
-        <button
-          onClick={() => setSortOption("alphabetical")}
-          className={`px-4 py-2 ${
-            sortOption === "alphabetical"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          Alphabetical
-        </button>
+      {/* top header */}
+      <div className="flex justify-between w-full fixed top-0 z-10 p-5">
+        <div className="flex">
+          <h5 className="text-xl font-bold mb-5 self-center mr-2">
+            Filter by:
+          </h5>
+          {/* filters */}
+          <div className="mb-5">
+            <button
+              onClick={() => setSortOption("dateJoined")}
+              className={`px-4 py-2 mr-2 rounded ${
+                sortOption === "dateJoined"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 border border-blue-500"
+              }`}
+            >
+              Date Joined
+            </button>
+            <button
+              onClick={() => setSortOption("alphabetical")}
+              className={`px-4 py-2 rounded ${
+                sortOption === "alphabetical"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 border border-blue-500"
+              }`}
+            >
+              Alphabetical
+            </button>
+          </div>
+        </div>
+        <div className="mb-5">
+          <input
+            type="text"
+            placeholder="Search by username or display name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded w-full sm:w-64 lg:w-72 text-xs focus:outline-none focus:ring focus:ring-blue-500"
+          />
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {sortedUsers.map((user) => (
@@ -93,8 +120,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                       className="text-blue-500 hover:underline"
                     >
                       {truncateAddress(address)}
-                    </a>{" "}
-                    |{" "}
+                    </a>
                     <a
                       href={`https://basescan.org/address/${address}`}
                       target="_blank"
@@ -102,8 +128,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                       className="text-blue-500 hover:underline"
                     >
                       BaseScan
-                    </a>{" "}
-                    |{" "}
+                    </a>
                     <a
                       href={`https://opensea.io/${address}`}
                       target="_blank"
