@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Farcaster() {
   return (
-    <div className="w-12 h-12">
+    <div className="w-8 h-8">
       <svg viewBox="0 0 225 225" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="225" height="225" rx="50" fill="#855DCD" />
         <path

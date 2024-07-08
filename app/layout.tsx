@@ -43,9 +43,37 @@ export default function RootLayout({
             </div>
           </nav>
         </header>
-        <main className="flex justify-center w-full scrollable-content">
+        <main className="flex justify-center w-full scrollable-content min-h-screen">
           <div className="w-full max-w-7xl pt-20">{children}</div>
         </main>
+        {/* footer */}
+        <footer>
+          <div className="flex justify-center items-center w-full h-20 fixed-header">
+            <div className="flex justify-between w-full max-w-7xl items-center h-20">
+              <p className="text-sm flex items-center">
+                Made with <span className="text-2xl mx-1">❤️</span> by{" "}
+                <a
+                  href="https://jackdishman.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline ml-1"
+                >
+                  Jack Dishman
+                </a>
+              </p>
+              {/* join farcaster channel */}
+              <a
+                href="https://warpcast.com/~/channel/boston"
+                className="flex items-center"
+                target="_blank"
+                referrerPolicy="no-referrer"
+              >
+                <Farcaster />
+                <span className="ml-2 text-sm">Boston Channel</span>
+              </a>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );

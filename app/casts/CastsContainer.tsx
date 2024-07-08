@@ -49,33 +49,11 @@ function CastItem({ cast }: CastItemProps) {
         </div>
       )}
       <div className="mt-4">
-        <h4 className="font-bold">Stats</h4>
-        <div className="flex justify-between mt-2">
-          <p>
-            <strong>Likes:</strong> {cast.reactions.likes_count}
-          </p>
-          <p>
-            <strong>Recasts:</strong> {cast.reactions.recasts_count}
-          </p>
-        </div>
-        <div className="mt-2">
-          <strong>Channel:</strong> {cast.channel.name}
-        </div>
-        <div className="mt-2">
-          <strong>Profile Bio:</strong>{" "}
-          {typeof cast.author.profile.bio === "string"
-            ? cast.author.profile.bio
-            : "N/A"}
-        </div>
-        <div className="mt-2">
-          <strong>Follower Count:</strong> {cast.author.follower_count}
-        </div>
-        <div className="mt-2">
-          <strong>Following Count:</strong> {cast.author.following_count}
-        </div>
-        <div className="mt-2">
-          <strong>Active Status:</strong> {cast.author.active_status}
-        </div>
+        <h4 className="font-semibold text-lg">Stats</h4>
+        <p>
+          <span className="font-semibold">❤️</span> {cast.reactions.likes_count}{" "}
+          <span className="ml-4">🔁</span> {cast.reactions.recasts_count}
+        </p>
       </div>
     </div>
   );
