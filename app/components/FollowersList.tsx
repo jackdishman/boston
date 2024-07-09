@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "./ImageCard";
+import Az from "./icons/Az";
+import Calendar from "./icons/Calendar";
 
 interface FollowersListProps {
   users: INeynarUserResponse[];
@@ -48,56 +50,65 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   return (
     <div className="flex flex-col items-center justify-center">
       {/* top header */}
-      <div className="flex justify-between w-full fixed top-0 z-10 p-5">
-        <div className="flex">
-          <h5 className="text-xl font-bold mb-5 self-center mr-2">
-            Filter by:
-          </h5>
-          {/* filters */}
+      <div className="flex justify-center w-full fixed top-20 right-0 z-10">
+        <div className="flex justify-between w-full max-w-7xl items-center pt-2 px-2">
+          <div className="flex">
+            {/* filters */}
+            <div className="mb-5 flex">
+              <button
+                onClick={() => setSortOption("dateJoined")}
+                className={`px-4 py-2 rounded-l ${
+                  sortOption === "dateJoined"
+                    ? "bg-gray-200 border-2 border-blue-500 "
+                    : "bg-blue-500 text-white"
+                }`}
+              >
+                <span className="mr-2 hidden md:block">Date joined</span>
+                <div className="md:hidden">
+                  <Calendar />
+                </div>
+              </button>
+              <button
+                onClick={() => setSortOption("alphabetical")}
+                className={`px-4 py-2 rounded-r flex items-center ${
+                  sortOption === "alphabetical"
+                    ? "bg-gray-200 border-2 border-blue-500"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
+                <span className="mr-2 hidden md:block">Alphabetical</span>
+                <div className="md:hidden">
+                  <Az />
+                </div>
+              </button>
+            </div>
+          </div>
+
           <div className="mb-5">
-            <button
-              onClick={() => setSortOption("dateJoined")}
-              className={`px-4 py-2 mr-2 rounded ${
-                sortOption === "dateJoined"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 border border-blue-500"
-              }`}
-            >
-              Date Joined
-            </button>
-            <button
-              onClick={() => setSortOption("alphabetical")}
-              className={`px-4 py-2 rounded ${
-                sortOption === "alphabetical"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 border border-blue-500"
-              }`}
-            >
-              Alphabetical
-            </button>
+            <input
+              type="text"
+              placeholder="Search by username or display name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded w-full sm:w-64 lg:w-72 text-xs focus:outline-none focus:ring focus:ring-blue-500 ring-blue-200"
+            />
           </div>
         </div>
-        <div className="mb-5">
-          <input
-            type="text"
-            placeholder="Search by username or display name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded w-full sm:w-64 lg:w-72 text-xs focus:outline-none focus:ring focus:ring-blue-500"
-          />
-        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 pt-20">
         {sortedUsers.map((user) => (
-          <div key={user.fid} className="">
+          <div key={user.fid} className="bg-gray-200">
             <div className="h-64">
               <ImageCard
                 imageUrl={user.pfp_url}
                 linkUrl={`https://warpcast.com/${user.username}`}
               />
             </div>
-            <div className="p-4">
-              <h3 className="text-xl font-bold">{user.display_name}</h3>
+            <div className="px-4 pt-4">
+              <h3 className="text-xl font-bold break-words">
+                {user.display_name}
+              </h3>
               <p>{user.profile.bio.text}</p>
             </div>
             <div className="p-4">
@@ -109,37 +120,46 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                 <span className="font-medium">Following:</span>{" "}
                 {user.following_count}
               </p>
-              <p className="text-sm text-gray-500 mb-1">
-                <span className="font-medium">Verified addresses:</span>{" "}
-                {user.verified_addresses.eth_addresses.map((address) => (
-                  <span key={address} className="inline-block mr-2">
-                    <a
-                      href={`https://etherscan.io/address/${address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {truncateAddress(address)}
-                    </a>
-                    <a
-                      href={`https://basescan.org/address/${address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      BaseScan
-                    </a>
-                    <a
-                      href={`https://opensea.io/${address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      OpenSea
-                    </a>
-                  </span>
+              {user.verified_addresses.eth_addresses &&
+                user.verified_addresses.eth_addresses.map((address) => (
+                  <div className="w-full" key={address}>
+                    <p className="font-medium my-2">
+                      Verified addresses: {truncateAddress(address)}
+                    </p>
+                    <ul className="list-inside list-disc">
+                      <li>
+                        <a
+                          href={`https://etherscan.io/address/${address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          Etherscan
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href={`https://basescan.org/address/${address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          BaseScan
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href={`https://opensea.io/${address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          OpenSea
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 ))}
-              </p>
             </div>
           </div>
         ))}
