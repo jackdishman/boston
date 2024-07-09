@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@neynar/nodejs-sdk": "^1.36.1",
-    "@privy-io/react-auth": "^1.68.0",
+    "@privy-io/react-auth": "^1.73.2",
+    "@privy-io/server-auth": "^1.9.0",
+    "@supabase/supabase-js": "^2.44.3",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"

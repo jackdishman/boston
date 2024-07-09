@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "./ImageCard";
+import Az from "./icons/Az";
+import Calendar from "./icons/Calendar";
 
 interface FollowersListProps {
   users: INeynarUserResponse[];
@@ -48,30 +50,36 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   return (
     <div className="flex flex-col items-center justify-center">
       {/* top header */}
-      <div className="flex justify-center w-full fixed top-20 right-0 z-20">
-        <div className="flex justify-between w-full max-w-7xl items-center pt-2">
+      <div className="flex justify-center w-full fixed top-20 right-0 z-10">
+        <div className="flex justify-between w-full max-w-7xl items-center pt-2 px-2">
           <div className="flex">
             {/* filters */}
-            <div className="mb-5">
+            <div className="mb-5 flex">
               <button
                 onClick={() => setSortOption("dateJoined")}
-                className={`px-4 py-2 mr-2 rounded ${
+                className={`px-4 py-2 rounded-l ${
                   sortOption === "dateJoined"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 border border-blue-500"
+                    ? "bg-gray-200 border-2 border-blue-500 "
+                    : "bg-blue-500 text-white"
                 }`}
               >
-                Date Joined
+                <span className="mr-2 hidden md:block">Date joined</span>
+                <div className="md:hidden">
+                  <Calendar />
+                </div>
               </button>
               <button
                 onClick={() => setSortOption("alphabetical")}
-                className={`px-4 py-2 rounded ${
+                className={`px-4 py-2 rounded-r flex items-center ${
                   sortOption === "alphabetical"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 border border-blue-500"
+                    ? "bg-gray-200 border-2 border-blue-500"
+                    : "bg-blue-500 text-white"
                 }`}
               >
-                Alphabetical
+                <span className="mr-2 hidden md:block">Alphabetical</span>
+                <div className="md:hidden">
+                  <Az />
+                </div>
               </button>
             </div>
           </div>
