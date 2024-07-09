@@ -9,7 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Boston Farcaster Channel",
-  description: "Made with <3 by Jack Dishman",
+  description:
+    "Browse channel members, network with locals, and view recent casts. All things Boston Blockchain! Events, network, jobs, and more! 🦞",
 };
 
 export default function RootLayout({
@@ -40,7 +41,7 @@ export default function RootLayout({
                 <p className="text-sm flex items-center">
                   Made with <span className="text-2xl mx-1">❤️</span> by{" "}
                   <a
-                    href="https://jackdishman.com"
+                    href="https://warpcast.com/dish"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline ml-1"

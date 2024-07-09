@@ -8,6 +8,8 @@ import X from "./icons/X";
 import Members from "./icons/Members";
 import Calendar from "./icons/Calendar";
 import Cast from "./icons/Cast";
+import Connect from "./icons/Connect";
+import LinkAccount from "./icons/LinkAccount";
 
 export default function Header() {
   const { logout, ready, authenticated, getAccessToken, user } = usePrivy();
@@ -69,20 +71,29 @@ export default function Header() {
             </Link>
             {authenticated ? (
               <div className="flex space-x-4">
-                <button onClick={linkWallet} className="hover:underline">
-                  Link account
+                <button
+                  onClick={linkWallet}
+                  className="hover:underline flex items-center text-start"
+                >
+                  <LinkAccount />
+                  <span className="ml-2">Link account</span>
                 </button>
-                <button onClick={logout} className="hover:underline">
-                  Disconnect
+                <button
+                  onClick={logout}
+                  className="hover:underline flex items-center text-start"
+                >
+                  <Connect />
+                  <span className="ml-2">Disconnect</span>
                 </button>
               </div>
             ) : (
               <button
                 disabled={disableLogin}
                 onClick={login}
-                className="hover:underline"
+                className="hover:underline flex items-center text-start"
               >
-                Connect
+                <Connect />
+                <span className="ml-2">Connect</span>
               </button>
             )}
           </div>
@@ -94,14 +105,14 @@ export default function Header() {
         </nav>
       </header>
       {isOpen && (
-        <div className="md:hidden absolute flex flex-col items-center bg-white w-full py-4 space-y-4 shadow-md top-20 z-20">
+        <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-20 z-20">
           <Link
             href="/members"
             className="hover:underline flex items-center"
             onClick={() => setIsOpen(false)}
           >
             <Members />
-            <span className="ml-2 w-24">Members</span>
+            <span className="ml-2 w-32">Members</span>
           </Link>
           <Link
             href="/events"
@@ -109,7 +120,7 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
           >
             <Calendar />
-            <span className="ml-2 w-24">Events</span>
+            <span className="ml-2 w-32">Events</span>
           </Link>
           <Link
             href="/casts"
@@ -117,24 +128,33 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
           >
             <Cast />
-            <span className="ml-2 w-24">Casts</span>
+            <span className="ml-2 w-32">Casts</span>
           </Link>
           {authenticated ? (
             <div className="flex flex-col space-y-4">
-              <button onClick={linkWallet} className="hover:underline">
-                <span className="ml-2 w-24"> Link account</span>
+              <button
+                onClick={linkWallet}
+                className="hover:underline flex items-center text-start"
+              >
+                <LinkAccount />
+                <span className="ml-2 w-32"> Link account</span>
               </button>
-              <button onClick={logout} className="hover:underline">
-                <span className="ml-2 w-24">Disconnect</span>
+              <button
+                onClick={logout}
+                className="hover:underline flex items-center text-start"
+              >
+                <Connect />
+                <span className="ml-2 w-32">Disconnect</span>
               </button>
             </div>
           ) : (
             <button
               disabled={disableLogin}
               onClick={login}
-              className="hover:underline"
+              className="hover:underline flex items-center text-start"
             >
-              Log in
+              <Connect />
+              <span className="ml-2 w-32">Connect</span>
             </button>
           )}
         </div>
