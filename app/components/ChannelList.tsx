@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import PropTypes from "prop-types";
 import { IChannelResponse } from "@/types/interfaces";
 import Link from "next/link";
 
@@ -9,8 +8,7 @@ interface IChannelListProps {
   channels: IChannelResponse[];
 }
 
-const ChannelList = (props: IChannelListProps) => {
-  const { channels } = props;
+const ChannelList: React.FC<IChannelListProps> = ({ channels }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
@@ -79,22 +77,6 @@ const ChannelList = (props: IChannelListProps) => {
       </div>
     </div>
   );
-};
-
-ChannelList.propTypes = {
-  channels: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      description: PropTypes.string,
-      imageUrl: PropTypes.string,
-      leadFid: PropTypes.number,
-      hostFids: PropTypes.arrayOf(PropTypes.number),
-      createdAt: PropTypes.number,
-      followerCount: PropTypes.number,
-    })
-  ).isRequired,
 };
 
 export default ChannelList;
