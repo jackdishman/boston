@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Farcaster from "./components/icons/Farcaster";
 import Providers from "@/providers/privy";
 import Header from "./components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Boston Farcaster Channel",
+  title: "Farcaster Channel",
   description:
-    "Browse channel members, network with locals, and view recent casts. All things Boston Blockchain! Events, network, jobs, and more! 🦞",
+    "Browse channel members, view channel stats, and view recent casts!",
 };
 
 export default function RootLayout({
@@ -23,11 +22,10 @@ export default function RootLayout({
           <div className="z-30">
             <Header />
           </div>
-          {/* background */}
           <div className="fixed top-0 right-0 min-h-screen -z-10">
             <img
-              src="/boston.png"
-              alt="Boston 🦞 FC"
+              src="/sand.jpg"
+              alt="background image of sand dunes"
               className="w-full min-h-screen object-cover"
             />
           </div>
@@ -37,7 +35,7 @@ export default function RootLayout({
           {/* footer */}
           <footer>
             <div className="flex justify-center items-center w-full h-20 bg-gray-100 mt-10">
-              <div className="flex justify-between w-full max-w-7xl items-center h-20">
+              <div className="flex flex-col sm:flex-row justify-between w-full max-w-7xl items-center h-10 pb-2 sm:pb-0">
                 <p className="text-sm flex items-center">
                   Made with <span className="text-2xl mx-1">❤️</span> by{" "}
                   <a
@@ -49,16 +47,18 @@ export default function RootLayout({
                     Jack Dishman
                   </a>
                 </p>
-                {/* join farcaster channel */}
-                <a
-                  href="https://warpcast.com/~/channel/boston"
-                  className="flex items-center"
-                  target="_blank"
-                  referrerPolicy="no-referrer"
-                >
-                  <Farcaster />
-                  <span className="ml-2 text-sm">Boston Channel</span>
-                </a>
+                <p className="text-sm">
+                  msg{" "}
+                  <a
+                    href="https://warpcast.com/dish"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline ml-1"
+                  >
+                    @dish
+                  </a>{" "}
+                  to sponsor or collab
+                </p>
               </div>
             </div>
           </footer>

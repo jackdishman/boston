@@ -5,6 +5,7 @@ import { INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "./ImageCard";
 import Az from "./icons/Az";
 import Calendar from "./icons/Calendar";
+import ChannelNav from "../channel/[id]/ChannelNav";
 
 interface FollowersListProps {
   users: INeynarUserResponse[];
@@ -50,48 +51,54 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   return (
     <div className="flex flex-col items-center justify-center">
       {/* top header */}
-      <div className="flex justify-center w-full fixed top-20 right-0 z-10">
-        <div className="flex justify-between w-full max-w-7xl items-center pt-2 px-2">
-          <div className="flex">
-            {/* filters */}
-            <div className="mb-5 flex">
-              <button
-                onClick={() => setSortOption("dateJoined")}
-                className={`px-4 py-2 rounded-l ${
-                  sortOption === "dateJoined"
-                    ? "bg-gray-200 border-2 border-blue-500 "
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                <span className="mr-2 hidden md:block">Date joined</span>
-                <div className="md:hidden">
-                  <Calendar />
-                </div>
-              </button>
-              <button
-                onClick={() => setSortOption("alphabetical")}
-                className={`px-4 py-2 rounded-r flex items-center ${
-                  sortOption === "alphabetical"
-                    ? "bg-gray-200 border-2 border-blue-500"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                <span className="mr-2 hidden md:block">Alphabetical</span>
-                <div className="md:hidden">
-                  <Az />
-                </div>
-              </button>
+      <div className=" w-full fixed top-10 right-0 z-10">
+        {/* tabs */}
+        <div className="bg-gray-100">
+          <ChannelNav />
+        </div>
+        <div className="flex justify-center">
+          <div className="flex justify-between w-full max-w-7xl items-center pt-2 px-2">
+            <div className="flex">
+              {/* filters */}
+              <div className="mb-5 flex">
+                <button
+                  onClick={() => setSortOption("dateJoined")}
+                  className={`px-4 py-2 rounded-l ${
+                    sortOption === "dateJoined"
+                      ? "bg-gray-200 border-2 border-blue-500 "
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  <span className="mr-2 hidden md:block">Date joined</span>
+                  <div className="md:hidden">
+                    <Calendar />
+                  </div>
+                </button>
+                <button
+                  onClick={() => setSortOption("alphabetical")}
+                  className={`px-4 py-2 rounded-r flex items-center ${
+                    sortOption === "alphabetical"
+                      ? "bg-gray-200 border-2 border-blue-500"
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  <span className="mr-2 hidden md:block">Alphabetical</span>
+                  <div className="md:hidden">
+                    <Az />
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
-
-          <div className="mb-5">
-            <input
-              type="text"
-              placeholder="Search by username or display name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded w-full sm:w-64 lg:w-72 text-xs focus:outline-none focus:ring focus:ring-blue-500 ring-blue-200"
-            />
+            {/* search */}
+            <div className="mb-5">
+              <input
+                type="text"
+                placeholder="Search by username or display name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded w-full sm:w-64 lg:w-72 text-xs focus:outline-none focus:ring focus:ring-blue-500 ring-blue-200"
+              />
+            </div>
           </div>
         </div>
       </div>
