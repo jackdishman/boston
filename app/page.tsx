@@ -1,7 +1,4 @@
-import { getAllChannels } from "@/middleware/helpers";
-import { IChannelResponse } from "@/types/interfaces";
 import React from "react";
-import ChannelList from "./components/ChannelList"; // Import ChannelList
 
 export async function generateMetadata() {
   const fcMetadata: Record<string, string> = {
@@ -36,11 +33,9 @@ export async function generateMetadata() {
   };
 }
 
-export default async function Page() {
-  const channels = await getAllChannels();
-
+export default function Page() {
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center overflow-x-hidden  p-10">
+    <section className="flex min-h-screen flex-col items-center justify-center overflow-x-hidden p-10">
       <article className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg text-center ">
         <div className="p-8">
           <p className="text-2xl text-gray-700 mb-4">
@@ -61,10 +56,6 @@ export default async function Page() {
             </ul>
           </div>
         </div>
-      </article>
-
-      <article className="w-full">
-        <ChannelList channels={channels} />
       </article>
     </section>
   );

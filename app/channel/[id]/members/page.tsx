@@ -1,13 +1,20 @@
+// pages/channel/[id]/members.tsx
 import React from "react";
 import { IChannelUsersResponse, INeynarUserResponse } from "@/types/interfaces";
-import FollowersList from "../../../components/FollowersList";
-import { getChannelFids, getUsersByFids } from "@/middleware/helpers";
+import FollowersList from "../FollowersList";
+import {
+  getChannelFids,
+  getUsersByFids,
+  getChannelById,
+} from "@/middleware/helpers";
+import ChannelLayout from "../ChannelLayout";
 
 type Props = {
   params: { id: string };
 };
 
 export async function generateMetadata({ params }: Props) {
+  const channel = await getChannelById(params.id);
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:image": "https://boston-five.vercel.app/fc-og.png",
@@ -18,10 +25,10 @@ export async function generateMetadata({ params }: Props) {
 
   return {
     title: params.id + " Channel",
-    description: "members of the " + params.id + " channel",
+    description: "Members of the " + params.id + " channel",
     openGraph: {
       title: params.id + " Channel",
-      description: "members of the " + params.id + " channel",
+      description: "Members of the " + params.id + " channel",
       images: [
         {
           url: "https://boston-five.vercel.app/fc-og.png",
@@ -38,14 +45,16 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default async function Page() {
-  const fetchUsers = async (): Promise<INeynarUserResponse[]> => {
+export default async function Page({ params }: Props) {
+  const fetchUsers = async (
+    channelId: string
+  ): Promise<INeynarUserResponse[]> => {
     let cursor: string | null = null;
     const allFollowers: IChannelUsersResponse[] = [];
     const allUsers: INeynarUserResponse[] = [];
 
     do {
-      const { followers, nextCursor } = await getChannelFids(cursor);
+      const { followers, nextCursor } = await getChannelFids(channelId, cursor);
       allFollowers.push(...followers);
       cursor = nextCursor;
     } while (cursor);
@@ -66,19 +75,23 @@ export default async function Page() {
       });
       allUsers.push(...users);
     }
-
     return allUsers;
   };
 
-  const users = await fetchUsers();
+  const channel = await getChannelById(params.id);
+  if (!channel) return <div>Error fetching channel</div>;
 
+  const leadMember = await getUsersByFids([channel.leadFid.toString()]);
+  const hosts = await getUsersByFids(
+    channel.hostFids.map((fid) => fid.toString())
+  );
+
+  const users = await fetchUsers(params.id);
   if (!users || users.length === 0) return <div>Error fetching users</div>;
 
   return (
-    <section className="flex min-h-screen flex-col items-center justify-between overflow-x-hidden">
-      <article className="flex flex-col items-center justify-center">
-        <FollowersList users={users} />
-      </article>
-    </section>
+    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+      <FollowersList users={users} />
+    </ChannelLayout>
   );
 }

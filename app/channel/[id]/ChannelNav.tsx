@@ -1,3 +1,4 @@
+// components/ChannelNav.tsx
 "use client";
 
 import Calendar from "@/app/components/icons/Calendar";
@@ -8,7 +9,6 @@ import React from "react";
 import { usePathname } from "next/navigation";
 
 export default function ChannelNav() {
-  //   const pathname = usePathname()
   const pathname = usePathname().split("/").slice(0, 3).join("/");
   return (
     <div className="flex justify-around w-full py-5">

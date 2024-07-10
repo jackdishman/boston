@@ -1,29 +1,14 @@
+// pages/channel/[id]/casts.tsx
 import React from "react";
-import {
-  ApiResponse,
-  IChannelResponse,
-  INeynarCastResponse,
-} from "@/types/interfaces";
+import { IChannelResponse, INeynarCastResponse } from "@/types/interfaces";
+import { getChannelById, getUsersByFids } from "@/middleware/helpers";
 import { NeynarAPIClient, FeedType, FilterType } from "@neynar/nodejs-sdk";
 import CastsContainer from "./CastsContainer";
-import ChannelNav from "../ChannelNav";
+import ChannelLayout from "../ChannelLayout";
 
 type Props = {
   params: { id: string };
 };
-
-async function getChannelById(id: string): Promise<IChannelResponse | null> {
-  try {
-    const response = await fetch(
-      `https://api.warpcast.com/v1/channel?channelId=${id}`
-    );
-    const data: ApiResponse = await response.json();
-    return data.result.channel as IChannelResponse;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
 
 async function getChannelCasts(
   channelUrl: string
@@ -42,26 +27,53 @@ async function getChannelCasts(
   }
 }
 
+export async function generateMetadata({ params }: Props) {
+  const channel = await getChannelById(params.id);
+  const fcMetadata: Record<string, string> = {
+    "fc:frame": "vNext",
+    "fc:frame:image": "https://boston-five.vercel.app/fc-og.png",
+    "fc:frame:button:1": `${params.id} Channel Site`,
+    "fc:frame:button:1:action": `link`,
+    "fc:frame:button:1:target": `https://boston-five.vercel.app`,
+  };
+
+  return {
+    title: params.id + " Channel",
+    description: "Casts of the " + params.id + " channel",
+    openGraph: {
+      title: params.id + " Channel",
+      description: "Casts of the " + params.id + " channel",
+      images: [
+        {
+          url: "https://boston-five.vercel.app/fc-og.png",
+          width: 800,
+          height: 600,
+          alt: "og image",
+        },
+      ],
+    },
+    other: {
+      ...fcMetadata,
+    },
+    metadataBase: new URL("https://boston-five.vercel.app"),
+  };
+}
+
 export default async function Page({ params }: Props) {
   const channel = await getChannelById(params.id);
-  if (!channel) {
-    return <div>Error fetching channel</div>;
-  }
+  if (!channel) return <div>Error fetching channel</div>;
+
+  const leadMember = await getUsersByFids([channel.leadFid.toString()]);
+  const hosts = await getUsersByFids(
+    channel.hostFids.map((fid) => fid.toString())
+  );
 
   const casts = await getChannelCasts(channel.url);
-  if (!casts) {
-    return <div>Error fetching casts</div>;
-  }
+  if (!casts) return <div>Error fetching casts</div>;
 
   return (
-    <div>
-      <div className="fixed w-full top-0 right-0 mt-10 bg-gray-100">
-        <ChannelNav />
-      </div>
-      <div className="pt-10">
-        {" "}
-        <CastsContainer casts={casts} />
-      </div>
-    </div>
+    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+      <CastsContainer casts={casts} />
+    </ChannelLayout>
   );
 }

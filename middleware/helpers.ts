@@ -1,4 +1,5 @@
 import {
+  ApiResponse,
   IChannelFollowersResponse,
   IChannelResponse,
   IChannelUsersResponse,
@@ -6,6 +7,7 @@ import {
 } from "@/types/interfaces";
 
 export const getChannelFids = async (
+  channelId: string,
   nextCursor?: string | null
 ): Promise<{
   followers: IChannelUsersResponse[];
@@ -13,9 +15,9 @@ export const getChannelFids = async (
 }> => {
   try {
     const response = await fetch(
-      `https://api.warpcast.com/v1/channel-followers?channelId=${
-        process.env.CHANNEL_NAME
-      }${nextCursor ? `&cursor=${nextCursor}` : ""}`
+      `https://api.warpcast.com/v1/channel-followers?channelId=${channelId}${
+        nextCursor ? `&cursor=${nextCursor}` : ""
+      }`
     );
     const data: IChannelFollowersResponse = await response.json();
     const followers: IChannelUsersResponse[] = data.result.users.map(
@@ -64,3 +66,18 @@ export const getAllChannels = async (): Promise<IChannelResponse[]> => {
     return [];
   }
 };
+
+export async function getChannelById(
+  id: string
+): Promise<IChannelResponse | null> {
+  try {
+    const response = await fetch(
+      `https://api.warpcast.com/v1/channel?channelId=${id}`
+    );
+    const data: ApiResponse = await response.json();
+    return data.result.channel as IChannelResponse;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
