@@ -55,9 +55,14 @@ export const getUsersByFids = async (
   }
 };
 
-export const getAllChannels = async (): Promise<IChannelResponse[]> => {
+export const getAllChannels = async (
+  isServer = false
+): Promise<IChannelResponse[]> => {
   try {
-    const response = await fetch(`https://api.warpcast.com/v2/all-channels`);
+    const url = isServer
+      ? "https://api.warpcast.com/v2/all-channels"
+      : "/api/channels";
+    const response = await fetch(url);
     const data = await response.json();
     const { channels } = data.result;
     return channels as IChannelResponse[];
