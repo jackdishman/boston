@@ -2,22 +2,18 @@
 
 import React, { useState } from "react";
 import { usePrivy, useLogin, useLinkAccount } from "@privy-io/react-auth";
-import Link from "next/link";
 import Menu from "./icons/Menu";
 import X from "./icons/X";
-import Members from "./icons/Members";
-import Calendar from "./icons/Calendar";
-import Cast from "./icons/Cast";
 import Connect from "./icons/Connect";
 import LinkAccount from "./icons/LinkAccount";
+import Link from "next/link";
 
 export default function Header() {
   const { logout, ready, authenticated, getAccessToken, user } = usePrivy();
 
-  console.log(`user`, user);
   //   handle login
   const { login } = useLogin({
-    onComplete: async (isNewUser) => {
+    onComplete: async (user, isNewUser) => {
       if (isNewUser) {
         const accessToken = await getAccessToken();
         // add new user to db
@@ -49,26 +45,14 @@ export default function Header() {
   return (
     <div className="fixed z-20 w-full">
       <header className="flex justify-center items-center bg-gray-100 shadow-md">
-        <nav className="flex justify-between w-full max-w-7xl items-center h-20 px-4">
-          <Link
-            href="/"
-            className="text-4xl font-bold font-serif rounded-lg px-4 py-2"
-          >
-            Boston 🦞 FC
-          </Link>
+        <nav className="flex justify-between w-full max-w-7xl items-center h-10 px-4">
+          {/* search channels */}
+          <div>
+            <Link href="/" className="underline hover:font-semibold">
+              Search Channels
+            </Link>
+          </div>
           <div className="hidden md:flex space-x-6">
-            <Link href="/members" className="hover:underline flex items-center">
-              <Members />
-              <span className="ml-2">Members</span>
-            </Link>
-            <Link href="/events" className="hover:underline flex items-center">
-              <Calendar />
-              <span className="ml-2">Events</span>
-            </Link>
-            <Link href="/casts" className="hover:underline flex items-center">
-              <Cast />
-              <span className="ml-2">Casts</span>
-            </Link>
             {authenticated ? (
               <div className="flex space-x-4">
                 <button
@@ -105,31 +89,7 @@ export default function Header() {
         </nav>
       </header>
       {isOpen && (
-        <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-20 z-20">
-          <Link
-            href="/members"
-            className="hover:underline flex items-center"
-            onClick={() => setIsOpen(false)}
-          >
-            <Members />
-            <span className="ml-2 w-32">Members</span>
-          </Link>
-          <Link
-            href="/events"
-            className="hover:underline flex items-center"
-            onClick={() => setIsOpen(false)}
-          >
-            <Calendar />
-            <span className="ml-2 w-32">Events</span>
-          </Link>
-          <Link
-            href="/casts"
-            className="hover:underline flex items-center"
-            onClick={() => setIsOpen(false)}
-          >
-            <Cast />
-            <span className="ml-2 w-32">Casts</span>
-          </Link>
+        <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-10 z-20">
           {authenticated ? (
             <div className="flex flex-col space-y-4">
               <button
