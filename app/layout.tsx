@@ -35,7 +35,7 @@ export default function RootLayout({
           {/* footer */}
           <footer>
             <div className="flex justify-center items-center w-full h-20 bg-gray-100 mt-10">
-              <div className="flex flex-col sm:flex-row justify-between w-full max-w-7xl items-center h-10 pb-2 sm:pb-0">
+              <div className="flex flex-col sm:flex-row justify-center w-full max-w-7xl items-center h-10 pb-2 sm:pb-0">
                 <p className="text-sm flex items-center">
                   Made with <span className="text-2xl mx-1">❤️</span> by{" "}
                   <a
@@ -47,7 +47,7 @@ export default function RootLayout({
                     Jack Dishman
                   </a>
                 </p>
-                <p className="text-sm">
+                {/* <p className="text-sm">
                   msg{" "}
                   <a
                     href="https://warpcast.com/dish"
@@ -58,7 +58,7 @@ export default function RootLayout({
                     @dish
                   </a>{" "}
                   to sponsor or collab
-                </p>
+                </p> */}
               </div>
             </div>
           </footer>

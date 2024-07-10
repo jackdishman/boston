@@ -56,7 +56,8 @@ export default async function Page() {
             <ul className="text-start text-gray-600 list-disc my-2">
               <li>Events.xyz integration to view local events</li>
               <li>BountyBot integration for channel-specific tasks</li>
-              <li>Premium features for Hypersub subscribers</li>
+              <li>Advanced channel analytics, bringing back top casters</li>
+              {/* <li>Premium features for Hypersub subscribers</li> */}
             </ul>
           </div>
         </div>
