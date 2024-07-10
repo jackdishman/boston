@@ -59,11 +59,11 @@ const ChannelList: React.FC<IChannelListProps> = ({
             onClick={() => handleChannelClick(channel.id)}
             className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200"
           >
-            <img
+            {/* <img
               src={channel.imageUrl}
               alt={`${channel.name} cover`}
               className="w-full h-32 object-cover rounded-md mb-4"
-            />
+            /> */}
             <h2 className="text-xl font-semibold mb-2">{channel.name}</h2>
             <p className="text-gray-700 mb-2">{channel.description}</p>
             <p className="text-gray-600 mt-2">
