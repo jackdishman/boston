@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { INeynarUserResponse } from "@/types/interfaces";
-import ImageCard from "../../components/ImageCard";
+import ImageCard from "../../../components/ImageCard";
 import Filter from "@/app/components/icons/Filter";
 
 interface FollowersListProps {
@@ -157,7 +157,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
 
       {/* Mobile Filter Panel */}
       {isFilterOpen && (
-        <div className="fixed inset-0 z-30 bg-white p-4 lg:hidden">
+        <div className="fixed inset-0 z-30 mt-20 bg-white p-4 lg:hidden">
           <button
             onClick={() => setIsFilterOpen(false)}
             className="absolute top-4 right-4 text-gray-500 text-2xl"
@@ -261,6 +261,10 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                 <h3 className="text-xl font-bold break-words">
                   {user.display_name}
                 </h3>
+                <p className="text-sm text-gray-500">
+                  @{user.username} <span className="ml-2">({user.fid})</span>
+                </p>
+
                 <p>{user.profile.bio.text}</p>
               </div>
               <div className="p-4">
@@ -278,6 +282,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                       href={`https://warpcast.com/${user.username}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
                     >
                       Warpcast
                     </a>

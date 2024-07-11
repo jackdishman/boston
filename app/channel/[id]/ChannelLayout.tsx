@@ -56,9 +56,16 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
               Created on{" "}
               {new Date(channel.createdAt * 1000).toLocaleDateString()}
             </p>
+            <a
+              className="text-blue-600 mt-2 inline-block text-sm"
+              href={channel.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Warpcast
+            </a>
           </div>
         </div>
-        <ChannelNav />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div>
             <p className="text-lg font-semibold text-gray-700 mb-2">Lead:</p>
@@ -71,14 +78,7 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
             ))}
           </div>
         </div>
-        <a
-          className="text-blue-600 mt-6 inline-block font-semibold"
-          href={channel.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Channel on Warpcast
-        </a>
+        <ChannelNav />
       </article>
       <div className="w-full mt-8">{children}</div>
     </section>
