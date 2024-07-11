@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "../../components/ImageCard";
+import Filter from "@/app/components/icons/Filter";
 
 interface FollowersListProps {
   users: INeynarUserResponse[];
@@ -21,10 +22,10 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
   useEffect(() => {
     let sorted = [...users].sort((a, b) => {
       if (sortOption === "alphabeticalAsc") {
-        return a.display_name.localeCompare(b.display_name);
+        return (a.display_name || "").localeCompare(b.display_name || "");
       }
       if (sortOption === "alphabeticalDesc") {
-        return b.display_name.localeCompare(a.display_name);
+        return (b.display_name || "").localeCompare(a.display_name || "");
       }
       if (sortOption === "dateJoinedAsc") {
         return (
@@ -52,8 +53,10 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
     if (searchQuery) {
       sorted = sorted.filter(
         (user) =>
-          user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+          (user.username &&
+            user.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (user.display_name &&
+            user.display_name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -149,7 +152,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
         onClick={() => setIsFilterOpen(!isFilterOpen)}
         className="fixed bottom-4 left-4 bg-blue-500 text-white p-2 rounded-full z-40 lg:hidden"
       >
-        Filters
+        <Filter />
       </button>
 
       {/* Mobile Filter Panel */}
@@ -244,11 +247,8 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
       <div className="w-full lg:w-3/4 lg:ml-auto lg:pl-4 pt-20 lg:pt-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 p-4">
           {sortedUsers.map((user) => (
-            <a
+            <div
               key={user.fid}
-              href={`https://warpcast.com/${user.username}`}
-              target="_blank"
-              rel="noopener noreferrer"
               className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
             >
               <div className="h-64">
@@ -272,6 +272,17 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                   <span className="font-medium">Following:</span>{" "}
                   {user.following_count}
                 </p>
+                <ul>
+                  <li>
+                    <a
+                      href={`https://warpcast.com/${user.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Warpcast
+                    </a>
+                  </li>
+                </ul>
                 {user.verified_addresses.eth_addresses &&
                   user.verified_addresses.eth_addresses.map(
                     (address, index) => (
@@ -315,7 +326,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
                     )
                   )}
               </div>
-            </a>
+            </div>
           ))}
         </div>
       </div>

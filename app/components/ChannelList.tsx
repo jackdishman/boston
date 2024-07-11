@@ -1,4 +1,3 @@
-// components/ChannelList.tsx
 "use client";
 
 import React, { useMemo } from "react";
@@ -19,15 +18,25 @@ const ChannelList: React.FC<IChannelListProps> = ({
   const router = useRouter();
 
   const filteredChannels = useMemo(() => {
-    if (searchTerm === "") {
+    if (searchTerm.length < 2) {
       return channels
         .sort((a, b) => b.followerCount - a.followerCount)
         .slice(0, 10);
     }
 
     const term = searchTerm.toLowerCase();
-    const nameMatches = channels.filter((channel) =>
-      channel.name.toLowerCase().includes(term)
+    const idMatches = channels.filter(
+      (channel) => channel.id.toLowerCase() === term
+    );
+
+    const exactNameMatches = channels.filter(
+      (channel) => channel.name.toLowerCase() === term
+    );
+
+    const nameMatches = channels.filter(
+      (channel) =>
+        channel.name.toLowerCase().includes(term) &&
+        channel.name.toLowerCase() !== term
     );
 
     const descriptionMatches = channels.filter(
@@ -36,7 +45,19 @@ const ChannelList: React.FC<IChannelListProps> = ({
         channel.description.toLowerCase().includes(term)
     );
 
-    return [...nameMatches, ...descriptionMatches];
+    // Combine all matches and remove duplicates
+    const allMatches = [
+      ...idMatches,
+      ...exactNameMatches,
+      ...nameMatches,
+      ...descriptionMatches,
+    ];
+
+    const uniqueMatches = Array.from(
+      new Set(allMatches.map((channel) => channel.id))
+    ).map((id) => allMatches.find((channel) => channel.id === id)!);
+
+    return uniqueMatches;
   }, [channels, searchTerm]);
 
   const handleChannelClick = (id: string) => {
@@ -59,12 +80,9 @@ const ChannelList: React.FC<IChannelListProps> = ({
             onClick={() => handleChannelClick(channel.id)}
             className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200"
           >
-            {/* <img
-              src={channel.imageUrl}
-              alt={`${channel.name} cover`}
-              className="w-full h-32 object-cover rounded-md mb-4"
-            /> */}
-            <h2 className="text-xl font-semibold mb-2">{channel.name}</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              {channel.name} (/{channel.id})
+            </h2>
             <p className="text-gray-700 mb-2">{channel.description}</p>
             <p className="text-gray-600 mt-2">
               Follower Count: {channel.followerCount}
