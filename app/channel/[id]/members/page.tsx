@@ -1,7 +1,7 @@
 // pages/channel/[id]/members.tsx
 import React from "react";
 import { IChannelUsersResponse, INeynarUserResponse } from "@/types/interfaces";
-import FollowersList from "../FollowersList";
+import FollowersList from "./FollowersList";
 import {
   getChannelFids,
   getUsersByFids,
