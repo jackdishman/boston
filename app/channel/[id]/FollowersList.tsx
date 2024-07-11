@@ -157,7 +157,7 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
 
       {/* Mobile Filter Panel */}
       {isFilterOpen && (
-        <div className="fixed inset-0 z-30 bg-white p-4 lg:hidden">
+        <div className="fixed inset-0 z-30 mt-20 bg-white p-4 lg:hidden">
           <button
             onClick={() => setIsFilterOpen(false)}
             className="absolute top-4 right-4 text-gray-500 text-2xl"
