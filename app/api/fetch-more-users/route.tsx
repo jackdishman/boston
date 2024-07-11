@@ -1,7 +1,7 @@
-import { getChannelFids, getUsersByFids } from "@/middleware/helpers";
-import { NextResponse } from "next/server";
+import { getUsersByFids } from "@/middleware/helpers";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Response, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   // get data from body
   const request = await req.json();
   try {
