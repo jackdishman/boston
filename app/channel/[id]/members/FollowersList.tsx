@@ -1,26 +1,43 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { INeynarUserResponse } from "@/types/interfaces";
+import { IChannelUsersResponse, INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "../../../components/ImageCard";
 import Filter from "@/app/components/icons/Filter";
+import ProgressBar from "@/app/components/ProgressBar"; // Import ProgressBar component
 
 interface FollowersListProps {
-  users: INeynarUserResponse[];
+  allChannelFids: IChannelUsersResponse[];
+  firstBatch: INeynarUserResponse[];
+  toFetch: IChannelUsersResponse[][];
+  channelId: string;
+  numChannelMembers: number;
 }
 
 const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
+const FollowersList: React.FC<FollowersListProps> = ({
+  allChannelFids,
+  firstBatch,
+  toFetch,
+  channelId,
+  numChannelMembers,
+}) => {
+  const [allUsers, setAllUsers] = useState<INeynarUserResponse[]>(firstBatch);
+  const [toBeFetched, setToBeFetched] =
+    useState<IChannelUsersResponse[][]>(toFetch);
   const [sortOption, setSortOption] = useState<string>("dateJoinedDesc");
-  const [sortedUsers, setSortedUsers] = useState<INeynarUserResponse[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [displayedUsers, setDisplayedUsers] =
+    useState<INeynarUserResponse[]>(firstBatch);
 
   useEffect(() => {
-    let sorted = [...users].sort((a, b) => {
+    if (toBeFetched.length > 0) return;
+    let sorted = [...allUsers].sort((a, b) => {
       if (sortOption === "alphabeticalAsc") {
         return (a.display_name || "").localeCompare(b.display_name || "");
       }
@@ -60,8 +77,53 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
       );
     }
 
-    setSortedUsers(sorted);
-  }, [sortOption, users, searchQuery]);
+    setDisplayedUsers(sorted);
+  }, [sortOption, searchQuery, allUsers]);
+
+  // Logic to fetch more users
+  const fetchMoreUsers = async (batch: IChannelUsersResponse[]) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/fetch-more-users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fids: batch.map((item) => item.fid),
+        }),
+      });
+      const data = await response.json();
+      const usersWithFollowedAt = data.users.map(
+        (user: INeynarUserResponse) => {
+          const follower = batch.find((f) => f.fid === user.fid.toString());
+          if (follower) {
+            user.followedAt = follower.followedAt;
+          }
+          return user;
+        }
+      );
+      setAllUsers((prev) => {
+        const newUsers = [...prev, ...usersWithFollowedAt];
+        const uniqueUsers = newUsers.filter(
+          (user, index, self) =>
+            index === self.findIndex((u) => u.fid === user.fid)
+        );
+        return uniqueUsers;
+      });
+      setToBeFetched((prev) => prev.slice(1));
+    } catch (error) {
+      console.error("Error fetching more users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (toBeFetched.length > 0) {
+      fetchMoreUsers(toBeFetched[0]);
+    }
+  }, [channelId, toBeFetched]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
@@ -245,8 +307,9 @@ const FollowersList: React.FC<FollowersListProps> = ({ users }) => {
 
       {/* Main Content */}
       <div className="w-full lg:w-3/4 lg:ml-auto lg:pl-4 pt-20 lg:pt-0">
+        <ProgressBar loaded={allUsers.length} total={numChannelMembers} />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 p-4">
-          {sortedUsers.map((user) => (
+          {displayedUsers.map((user) => (
             <div
               key={user.fid}
               className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"

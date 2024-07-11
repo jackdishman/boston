@@ -19,9 +19,7 @@ const ChannelList: React.FC<IChannelListProps> = ({
 
   const filteredChannels = useMemo(() => {
     if (searchTerm.length < 2) {
-      return channels
-        .sort((a, b) => b.followerCount - a.followerCount)
-        .slice(0, 10);
+      return [];
     }
 
     const term = searchTerm.toLowerCase();

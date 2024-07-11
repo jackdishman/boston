@@ -1,10 +1,10 @@
-// pages/channel/[id]/members.tsx
 import React from "react";
 import FollowersList from "./FollowersList";
 import {
   getUsersByFids,
   getChannelById,
-  fetchUsers,
+  fetchChannelFollowerFids,
+  splitIntoBatches,
 } from "@/middleware/helpers";
 import ChannelLayout from "../ChannelLayout";
 
@@ -49,28 +49,34 @@ export default async function Page({ params }: Props) {
   if (!channel) return <div>Error fetching channel</div>;
 
   const leadMember = await getUsersByFids([channel.leadFid.toString()]);
-  const hosts = await getUsersByFids(
-    channel.hostFids.map((fid) => fid.toString())
-  );
+  const hosts =
+    channel.hostFids && channel.hostFids.length > 0
+      ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
+      : [];
 
-  if (channel.followerCount > 10000) {
-    return (
-      <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
-        <div className="flex justify-center ">
-          <h1 className="bg-red-600 text-white font-semibold p-5 rounded-lg">
-            Too many followers to display. Working on a solution to handle this
-          </h1>
-        </div>
-      </ChannelLayout>
-    );
-  }
+  const users = await fetchChannelFollowerFids(params.id);
 
-  const users = await fetchUsers(params.id);
   if (!users || users.length === 0) return <div>Error fetching users</div>;
+
+  const batches = splitIntoBatches(users, 50);
+
+  // Get first batch and then pop it off
+  const firstBatch = batches.shift();
+  if (!firstBatch) return <div>Error fetching first batch</div>;
+
+  const usersBatch = await getUsersByFids(
+    firstBatch.map((item) => item.fid.toString())
+  );
 
   return (
     <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
-      <FollowersList users={users} />
+      <FollowersList
+        allChannelFids={users}
+        firstBatch={usersBatch}
+        toFetch={batches}
+        channelId={params.id}
+        numChannelMembers={users.length}
+      />
     </ChannelLayout>
   );
 }
