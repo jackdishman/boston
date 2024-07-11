@@ -63,10 +63,6 @@ export interface ApiResponse {
   result: IWarpcastChannelResult;
 }
 
-interface Bio {
-  // Define properties for the bio object as per your requirements
-}
-
 interface Profile {
   bio: Bio;
 }
