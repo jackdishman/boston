@@ -86,3 +86,33 @@ export async function getChannelById(
     return null;
   }
 }
+
+export const fetchUsers = async (
+  channelId: string
+): Promise<INeynarUserResponse[]> => {
+  let cursor: string | null = null;
+  const allFollowers: IChannelUsersResponse[] = [];
+  const allUsers: INeynarUserResponse[] = [];
+
+  do {
+    const { followers, nextCursor } = await getChannelFids(channelId, cursor);
+    allFollowers.push(...followers);
+    cursor = nextCursor;
+  } while (cursor);
+
+  const fids = allFollowers.map((item) => item.fid);
+  const batchSize = 100;
+
+  for (let i = 0; i < fids.length; i += batchSize) {
+    const batchFids = fids.slice(i, i + batchSize);
+    const users = await getUsersByFids(batchFids);
+    users.forEach((user) => {
+      const follower = allFollowers.find((f) => f.fid === user.fid.toString());
+      if (follower) {
+        (user as any).followedAt = follower.followedAt;
+      }
+    });
+    allUsers.push(...users);
+  }
+  return allUsers;
+};
