@@ -5,15 +5,16 @@ import { getAccessToken, useLogin, usePrivy } from "@privy-io/react-auth";
 import { IChannelResponse } from "@/types/interfaces";
 import Header from "./Header";
 import ChannelList from "./ChannelList";
+import { getAllChannels } from "@/middleware/helpers";
 
 interface AppProps {
-  channels: IChannelResponse[];
   children: React.ReactNode;
 }
 
-const App: React.FC<AppProps> = ({ channels, children }) => {
+const App: React.FC<AppProps> = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [channels, setChannels] = useState<IChannelResponse[]>([]);
   const { authenticated } = usePrivy();
 
   const clearSearch = () => setSearchTerm("");
@@ -52,6 +53,14 @@ const App: React.FC<AppProps> = ({ channels, children }) => {
       setIsSearchActive(false);
     }
   }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchChannels = async () => {
+      const channels = await getAllChannels(true);
+      setChannels(channels);
+    };
+    fetchChannels();
+  }, []);
 
   if (!authenticated) {
     return <div></div>;
