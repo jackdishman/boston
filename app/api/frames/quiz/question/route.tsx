@@ -108,7 +108,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (submission.score !== null) {
       const questions = await getQuestions(Number(quizId));
-      const progress = `${questions?.length}/${questions?.length}`;
+      const progress = `${questions?.length} of ${questions?.length}`;
       return sendResults(submission.score, quizId, elapsedTime, progress);
     }
 
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const progress = `${
       (submission.answers ? submission.answers.length : 0) + 1
-    }/${questions.length}`;
+    } of ${questions.length}`;
 
     const question = await getQuestion(Number(quizId), Number(questionId));
     if (!question) {

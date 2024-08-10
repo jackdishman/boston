@@ -20,46 +20,65 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           width: "100%",
           height: "100%",
           backgroundColor: "#222",
-          padding: "20px",
+          padding: "0px",
           border: "10px solid #ffcc00",
           fontFamily: "Roboto",
           color: "#fff",
           boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
           textAlign: "center",
           position: "relative",
         }}
       >
+        {/* Top header: progress, time */}
         <div
           style={{
-            position: "absolute",
-            top: "-30px",
-            backgroundColor: "#ffcc00",
-            padding: "5px 20px",
-            color: "#000",
-            fontSize: "16px",
-            fontWeight: "bold",
-            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "space-between",
+            left: "0",
+            right: "0",
           }}
         >
-          Question
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffcc00",
+              padding: "5px 20px",
+              color: "#000",
+              fontSize: "24px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            Question {progress}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffcc00",
+              padding: "5px 20px",
+              color: "#000",
+              fontSize: "24px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            Time: {time}
+          </div>
         </div>
         <div
           style={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 10,
-            width: "100%",
+            justifyContent: "center",
+            // alignItems: "center",
+            height: "100%",
           }}
         >
-          <p>{progress}</p>
-          <p>{time}</p>
+          <h2 style={{ textAlign: "center", color: "#fff", fontSize: "64px" }}>
+            {text}
+          </h2>
         </div>
-        <h2 style={{ textAlign: "center", color: "#fff" }}>{text}</h2>
       </div>,
       {
         width: 1148, // 600 * 1.91

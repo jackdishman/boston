@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         </div>
         <h2
           style={{
-            fontSize: "36px",
+            fontSize: "96px",
             fontWeight: "bold",
             marginBottom: "20px",
             textShadow: "2px 2px #000",
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
         </h2>
         <h3
           style={{
-            fontSize: "24px",
+            fontSize: "48px",
             fontWeight: "normal",
             color: "#ffcc00",
             textShadow: "1px 1px #000",

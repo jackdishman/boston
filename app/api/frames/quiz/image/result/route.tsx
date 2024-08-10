@@ -10,6 +10,7 @@ let fontData = fs.readFileSync(fontPath);
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
+    const answer = searchParams.get("answer") ?? "";
     const isCorrect = searchParams.get("correct") ?? "false";
     const explanation = searchParams.get("explanation") ?? "";
     const time = searchParams.get("time") ?? "";
@@ -21,56 +22,119 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           width: "100%",
           height: "100%",
           backgroundColor: "#222",
-          padding: "20px",
+          padding: "0px",
           border: "10px solid #ffcc00",
           fontFamily: "Roboto",
           color: "#fff",
           boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
           textAlign: "center",
           position: "relative",
         }}
       >
+        {/* Top header: progress, time */}
         <div
           style={{
-            position: "absolute",
-            top: "-30px",
-            backgroundColor: "#ffcc00",
-            padding: "5px 20px",
-            color: "#000",
-            fontSize: "16px",
-            fontWeight: "bold",
-            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "space-between",
+            left: "0",
+            right: "0",
           }}
         >
-          Result
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffcc00",
+              padding: "5px 20px",
+              color: "#000",
+              fontSize: "24px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            Question {progress}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              backgroundColor: "#ffcc00",
+              padding: "5px 20px",
+              color: "#000",
+              fontSize: "24px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            Time: {time}
+          </div>
         </div>
         <div
           style={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 10,
-            width: "100%",
+            justifyContent: "center",
           }}
         >
-          <p>{progress}</p>
-          <p>{time}</p>
+          <h2
+            style={{
+              textAlign: "center",
+              color: isCorrect === "true" ? "#0f0" : "#f00",
+              fontSize: 96,
+              fontWeight: "bold",
+              textTransform: "uppercase",
+            }}
+          >
+            {isCorrect === "true" ? "Correct" : "Incorrect"}
+          </h2>
         </div>
-        <h2
-          style={{
-            textAlign: "center",
-            color: isCorrect === "true" ? "#0f0" : "#f00",
-            fontSize: 50,
-            textTransform: "uppercase",
-          }}
-        >
-          {isCorrect === "true" ? "Correct" : "Incorrect"}
-        </h2>
-        <h2 style={{ textAlign: "center", color: "#fff", fontSize: 20 }}>
+        {isCorrect !== "true" ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <h2
+              style={{
+                textAlign: "center",
+                fontSize: "64px",
+                marginLeft: "10px",
+              }}
+            >
+              Correct answer: {answer}
+            </h2>
+            {/* explanation */}
+            <h2
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                fontSize: "32px",
+              }}
+            >
+              {explanation}
+            </h2>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100px",
+            }}
+          >
+            <h2
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                fontSize: "64px",
+              }}
+            >
+              Nice Job!
+            </h2>
+          </div>
+        )}
+        <h2 style={{ textAlign: "center", color: "#fff", fontSize: "32px" }}>
           {explanation}
         </h2>
       </div>,

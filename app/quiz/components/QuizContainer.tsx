@@ -16,7 +16,7 @@ export default function QuizToggle(props: IProps) {
 
   return (
     <div>
-      <div className="mt-64">
+      <div className="">
         <div className="flex items-center">
           <div className="relative bg-gray-300 w-full rounded-full h-8">
             <div

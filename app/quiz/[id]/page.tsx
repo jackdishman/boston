@@ -91,7 +91,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <img
           src={
             process.env[`NEXT_PUBLIC_HOST`] +
-            `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
+            `/api/frames/quiz/image?title=${quiz.title}&description=${quiz.description}`
           }
         />
         {/* quiz stats */}

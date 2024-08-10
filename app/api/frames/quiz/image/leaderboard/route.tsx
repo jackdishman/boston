@@ -79,16 +79,45 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       });
     }
 
-    const topSubmissionsFidList =
-      submissions.length > 0 ? submissions.slice(0, 5).map((s) => s.fid) : [];
+    // Sort submissions by score (descending) and time taken (ascending)
+    const sortedSubmissions = submissions.sort((a, b) => {
+      const scoreA = a.score ?? 0;
+      const scoreB = b.score ?? 0;
+
+      if (scoreB === scoreA) {
+        const timeA =
+          new Date(a.time_completed ?? 0).getTime() -
+          new Date(a.created_at).getTime();
+        const timeB =
+          new Date(b.time_completed ?? 0).getTime() -
+          new Date(b.created_at).getTime();
+        return timeA - timeB;
+      }
+      return scoreB - scoreA;
+    });
+
+    const topSubmissionsFidList = sortedSubmissions
+      .slice(0, 5)
+      .map((s) => s.fid);
     const users = await getUsersByFids(topSubmissionsFidList as string[]);
 
-    const topPlayerScores = topSubmissionsFidList.map((fid, index) => ({
-      fid,
-      score: submissions[index].score,
-      fname:
-        users.find((user) => user.fid === Number(fid))?.username || "Unknown",
-    }));
+    const topPlayerScores = sortedSubmissions
+      .slice(0, 5)
+      .map((submission, index) => ({
+        rank: index + 1,
+        fid: submission.fid,
+        score: submission.score ?? 0,
+        fname:
+          users.find((user) => user.fid === Number(submission.fid))?.username ||
+          "Unknown",
+        timeTaken: submission.time_completed
+          ? `${(
+              (new Date(submission.time_completed).getTime() -
+                new Date(submission.created_at).getTime()) /
+              1000
+            ).toFixed(2)}s`
+          : "N/A",
+      }));
 
     const svg = await satori(
       <div
@@ -96,7 +125,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           width: "100%",
           height: "100%",
           backgroundColor: "#222",
-          padding: "20px",
+          padding: "0px",
           border: "10px solid #ffcc00",
           fontFamily: "Roboto",
           color: "#fff",
@@ -104,35 +133,123 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
           textAlign: "center",
           position: "relative",
         }}
       >
         <div
           style={{
-            position: "absolute",
-            top: "-30px",
-            backgroundColor: "#ffcc00",
-            padding: "5px 20px",
-            color: "#000",
-            fontSize: "16px",
-            fontWeight: "bold",
-            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "center",
+            left: "0",
+            right: "0",
           }}
         >
-          Leaderboard
+          <div
+            style={{
+              backgroundColor: "#ffcc00",
+              padding: "10px 40px",
+              color: "#000",
+              fontSize: "32px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              display: "flex",
+            }}
+          >
+            Leaderboard
+          </div>
         </div>
-        <h2 style={{ textAlign: "center", color: "#fff" }}>
-          Top 5 Submissions
+        <h2
+          style={{
+            textAlign: "center",
+            color: "#fff",
+            fontSize: "64px",
+            display: "flex",
+          }}
+        >
+          Top Players
         </h2>
         <div
-          style={{ display: "flex", flexDirection: "column", color: `#fff` }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            padding: "0 20px",
+            boxSizing: "border-box",
+            justifyContent: "center",
+          }}
         >
-          {topPlayerScores.map((s, index) => (
-            <p key={index}>
-              {s.fname} - {s.score}
-            </p>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              fontSize: "32px",
+              marginBottom: "10px",
+              paddingBottom: "10px",
+            }}
+          >
+            <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+              Rank
+            </div>
+            <div style={{ flex: 3, display: "flex", justifyContent: "center" }}>
+              Farcaster Name
+            </div>
+            <div style={{ flex: 2, display: "flex", justifyContent: "center" }}>
+              Score (%)
+            </div>
+            <div style={{ flex: 2, display: "flex", justifyContent: "center" }}>
+              Time to Complete
+            </div>
+          </div>
+          {topPlayerScores.map((s) => (
+            <div
+              key={s.rank}
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                fontSize: "32px",
+                marginBottom: "10px",
+              }}
+            >
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {s.rank}
+              </div>
+              <div
+                style={{
+                  flex: 3,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {s.fname}
+              </div>
+              <div
+                style={{
+                  flex: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {s.score}%
+              </div>
+              <div
+                style={{
+                  flex: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {s.timeTaken}
+              </div>
+            </div>
           ))}
         </div>
       </div>,

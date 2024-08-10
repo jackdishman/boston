@@ -58,19 +58,15 @@ const Header: React.FC<HeaderProps> = ({
     <div className="fixed z-50 w-full bg-gray-100 shadow-md">
       <header className="flex justify-center items-center">
         <nav className="flex justify-between w-full max-w-7xl items-center h-16 px-4">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              🔎
-            </Link>
-          </div>
           <div className="flex-1 mx-4 relative">
             <input
               type="text"
-              placeholder="Search channels"
+              placeholder="🔎 Search channels"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-96 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+
             {searchTerm && (
               <button
                 onClick={clearSearch}
@@ -91,6 +87,12 @@ const Header: React.FC<HeaderProps> = ({
           <div className="hidden md:flex space-x-6">
             {authenticated ? (
               <div className="flex space-x-4">
+                <Link
+                  href="/quiz"
+                  className="hover:underline flex items-center text-start"
+                >
+                  Trivia Quiz
+                </Link>
                 <button
                   onClick={linkWallet}
                   className="hover:underline flex items-center text-start"

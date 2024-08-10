@@ -11,7 +11,6 @@ import { supabase } from "./supabase";
 export async function getQuizzes(): Promise<IQuiz[] | undefined> {
   try {
     const { data, error } = await supabase.from("quizzes").select("*");
-    console.log(data);
     if (error) throw error;
     return data;
   } catch (error) {

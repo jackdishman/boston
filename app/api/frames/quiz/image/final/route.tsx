@@ -55,7 +55,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             textShadow: "2px 2px #000",
           }}
         >
-          You Scored {score}
+          You Scored {score}%
         </h2>
         <h3
           style={{
@@ -67,14 +67,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         >
           Time: {time}
         </h3>
-        <h4
-          style={{
-            fontSize: "20px",
-            color: "#fff",
-          }}
-        >
-          Progress: {progress}
-        </h4>
       </div>,
       {
         width: 1148, // 600 * 1.91
