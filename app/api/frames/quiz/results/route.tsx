@@ -7,41 +7,24 @@ import {
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/quiz";
 
-async function sendResults(
+async function sendFinalResults(
   percentage: number,
   quizId: string,
   elapsedTime: string
 ): Promise<NextResponse> {
-  const imageUrl = `${
-    process.env["NEXT_PUBLIC_HOST"]
-  }/api/frames/quiz/image/question?text=${
-    "You scored " + percentage + " percent correct"
-  }&time=${elapsedTime}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${quizId}`;
 
   const responseHtml = `
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Vote Recorded</title>
-        <meta property="og:title" content="Vote Recorded">
+        <title>Final Results</title>
+        <meta property="og:title" content="Final Results">
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame" content="vNext">
         <meta name="fc:frame:image" content="${imageUrl}">
-
         <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/leaderboard?quiz_id=${quizId}">
-        <meta name="fc:frame:button:1" content="Leaderboard">
-
-        <meta property="fc:frame:button:2" content="Give feedback" />
-        <meta property="fc:frame:button:2:action" content="link" />
-        <meta property="fc:frame:button:2:target" content="https://warpcast.com/dish" />  
-
-        <meta property="fc:frame:button:2" content="Source Code" />
-        <meta property="fc:frame:button:2:action" content="link" />
-        <meta property="fc:frame:button:2:target" content="https://github.com/jackdishman/farcaster-frame" />  
-
-        <meta property="fc:frame:button:3" content="Create Quiz & Stats" />
-        <meta property="fc:frame:button:3:action" content="link" />
-        <meta property="fc:frame:button:3:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
+        <meta name="fc:frame:button:1" content="View Leaderboard">
       </head>
       <body>
         <p>You scored ${percentage}%</p>
@@ -74,7 +57,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         submission.created_at,
         submission.time_completed
       );
-      return sendResults(submission.score, quizId, elapsedTime);
+      return sendFinalResults(submission.score, quizId, elapsedTime);
     }
 
     const questions = await getQuestions(Number(quizId));
@@ -93,10 +76,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     try {
       submission = await updateSubmissionScore(submission.id, percentage);
-      if (!submission)
+      if (!submission) {
         return new NextResponse("Error updating submission score", {
           status: 500,
         });
+      }
     } catch (error) {
       console.error("Error updating submission score", error);
       return new NextResponse("Error updating submission score", {
@@ -108,7 +92,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       submission.created_at,
       submission.time_completed
     );
-    return sendResults(percentage, quizId, elapsedTime);
+    return sendFinalResults(percentage, quizId, elapsedTime);
   } catch (error) {
     console.error(error);
     return new NextResponse("Error generating image", { status: 500 });

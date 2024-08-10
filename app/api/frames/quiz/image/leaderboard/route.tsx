@@ -12,10 +12,8 @@ let fontData = fs.readFileSync(fontPath);
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const url = new URL(req.url);
   const quizId = url.searchParams.get("quiz_id") || "";
-  const fid = url.searchParams.get("fid") || "";
 
   try {
-    // Get quiz submissions
     const submissions = await getSubmissions(Number(quizId));
     if (!submissions || submissions.length === 0) {
       const svg = await satori(
@@ -23,25 +21,41 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           style={{
             width: "100%",
             height: "100%",
-            backgroundColor: "#111",
-            padding: 10,
-            lineHeight: 1.2,
-            fontSize: 24,
+            backgroundColor: "#222",
+            padding: "20px",
+            border: "10px solid #ffcc00",
+            fontFamily: "Roboto",
+            color: "#fff",
+            boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            position: "relative",
           }}
         >
-          <p
+          <div
             style={{
-              color: `#fff`,
+              position: "absolute",
+              top: "-30px",
+              backgroundColor: "#ffcc00",
+              padding: "5px 20px",
+              color: "#000",
+              fontSize: "16px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
             }}
           >
+            Leaderboard
+          </div>
+          <h2 style={{ textAlign: "center", color: "#fff" }}>
             No submissions yet
-          </p>
+          </h2>
         </div>,
         {
-          width: 600,
-          height: 400,
+          width: 1148, // 600 * 1.91
+          height: 600, // 1.91:1 aspect ratio
           fonts: [
             {
               data: fontData,
@@ -65,7 +79,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Get top 5 submissions
     const topSubmissionsFidList =
       submissions.length > 0 ? submissions.slice(0, 5).map((s) => s.fid) : [];
     const users = await getUsersByFids(topSubmissionsFidList as string[]);
@@ -77,34 +90,44 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         users.find((user) => user.fid === Number(fid))?.username || "Unknown",
     }));
 
-    console.log(topPlayerScores);
-
     const svg = await satori(
       <div
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: "#111",
-          padding: 40,
-          lineHeight: 1.2,
-          fontSize: 24,
+          backgroundColor: "#222",
+          padding: "20px",
+          border: "10px solid #ffcc00",
+          fontFamily: "Roboto",
+          color: "#fff",
+          boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          position: "relative",
         }}
       >
-        <p
-          style={{
-            color: `#fff`,
-          }}
-        >
-          Top 5 Submissions
-        </p>
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            color: `#fff`,
+            position: "absolute",
+            top: "-30px",
+            backgroundColor: "#ffcc00",
+            padding: "5px 20px",
+            color: "#000",
+            fontSize: "16px",
+            fontWeight: "bold",
+            textTransform: "uppercase",
           }}
+        >
+          Leaderboard
+        </div>
+        <h2 style={{ textAlign: "center", color: "#fff" }}>
+          Top 5 Submissions
+        </h2>
+        <div
+          style={{ display: "flex", flexDirection: "column", color: `#fff` }}
         >
           {topPlayerScores.map((s, index) => (
             <p key={index}>
@@ -114,8 +137,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         </div>
       </div>,
       {
-        width: 600,
-        height: 400,
+        width: 1148, // 600 * 1.91
+        height: 600, // 1.91:1 aspect ratio
         fonts: [
           {
             data: fontData,

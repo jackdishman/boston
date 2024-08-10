@@ -19,28 +19,58 @@ export async function GET(req: NextRequest) {
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: "#111",
-          padding: 10,
-          lineHeight: 1.2,
-          fontSize: 24,
+          backgroundColor: "#222",
+          padding: "20px",
+          border: "10px solid #ffcc00",
+          fontFamily: "Roboto",
+          color: "#fff",
+          boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          position: "relative",
         }}
       >
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            padding: 20,
+            position: "absolute",
+            top: "-30px",
+            backgroundColor: "#ffcc00",
+            padding: "5px 20px",
+            color: "#000",
+            fontSize: "16px",
+            fontWeight: "bold",
+            textTransform: "uppercase",
           }}
         >
-          <h2 style={{ textAlign: "center", color: "#fff" }}>{title}</h2>
-          <h3 style={{ color: "#fff" }}>{description}</h3>
+          Trivia
         </div>
+        <h2
+          style={{
+            fontSize: "36px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+            textShadow: "2px 2px #000",
+          }}
+        >
+          {title}
+        </h2>
+        <h3
+          style={{
+            fontSize: "24px",
+            fontWeight: "normal",
+            color: "#ffcc00",
+            textShadow: "1px 1px #000",
+          }}
+        >
+          {description}
+        </h3>
       </div>,
       {
-        width: 600,
-        height: 400,
+        width: 1148, // 600 * 1.91
+        height: 600, // 1.91:1 aspect ratio
         fonts: [
           {
             data: fontData,
@@ -58,7 +88,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": "image/png",
-        "Cache-Control": "max-age=10",
+        "Cache-Control": "max-age=10", // Set max-age to 10 seconds
       },
     });
   } catch (error) {

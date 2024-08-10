@@ -20,74 +20,63 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: "#111",
-          padding: 10,
-          lineHeight: 1.2,
-          fontSize: 24,
+          backgroundColor: "#222",
+          padding: "20px",
+          border: "10px solid #ffcc00",
+          fontFamily: "Roboto",
+          color: "#fff",
+          boxShadow: "0 0 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          position: "relative",
         }}
       >
-        {/* top header */}
+        <div
+          style={{
+            position: "absolute",
+            top: "-30px",
+            backgroundColor: "#ffcc00",
+            padding: "5px 20px",
+            color: "#000",
+            fontSize: "16px",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+          }}
+        >
+          Result
+        </div>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             padding: 10,
+            width: "100%",
           }}
         >
-          <p
-            style={{
-              color: `#fff`,
-            }}
-          >
-            {progress}
-          </p>
-          <p
-            style={{
-              color: `#fff`,
-            }}
-          >
-            {time}
-          </p>
+          <p>{progress}</p>
+          <p>{time}</p>
         </div>
-        {/* question */}
-        <div
+        <h2
           style={{
-            justifyContent: "flex-start",
-            alignItems: "center",
-            display: "flex",
+            textAlign: "center",
+            color: isCorrect === "true" ? "#0f0" : "#f00",
+            fontSize: 50,
+            textTransform: "uppercase",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              padding: 0,
-              justifyContent: "center",
-            }}
-          >
-            <h2
-              style={{
-                textAlign: "center",
-                color: isCorrect === "true" ? "#0f0" : "#f00",
-                fontSize: 50,
-                paddingLeft: "40%",
-                textTransform: "uppercase",
-              }}
-            >
-              {isCorrect === "true" ? "Correct" : "Incorrect"}
-            </h2>
-            <h2 style={{ textAlign: "center", color: "#fff", fontSize: 20 }}>
-              {explanation}
-            </h2>
-          </div>
-        </div>
+          {isCorrect === "true" ? "Correct" : "Incorrect"}
+        </h2>
+        <h2 style={{ textAlign: "center", color: "#fff", fontSize: 20 }}>
+          {explanation}
+        </h2>
       </div>,
       {
-        width: 600,
-        height: 400,
+        width: 1148, // 600 * 1.91
+        height: 600, // 1.91:1 aspect ratio
         fonts: [
           {
             data: fontData,
@@ -99,7 +88,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       }
     );
 
-    // Convert SVG to PNG using Sharp
     const pngBuffer = await sharp(Buffer.from(svg)).toFormat("png").toBuffer();
 
     return new NextResponse(pngBuffer, {

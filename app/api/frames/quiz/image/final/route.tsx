@@ -10,9 +10,9 @@ let fontData = fs.readFileSync(fontPath);
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
-    const text = searchParams.get("text") || "Default Text";
-    const time = searchParams.get("time") || "";
-    const progress = searchParams.get("progress") || "";
+    const score = searchParams.get("score") ?? "0%";
+    const time = searchParams.get("time") ?? "";
+    const progress = searchParams.get("progress") ?? "";
 
     const svg = await satori(
       <div
@@ -45,21 +45,36 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             textTransform: "uppercase",
           }}
         >
-          Question
+          Final Results
         </div>
-        <div
+        <h2
           style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            padding: 10,
-            width: "100%",
+            fontSize: "36px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+            textShadow: "2px 2px #000",
           }}
         >
-          <p>{progress}</p>
-          <p>{time}</p>
-        </div>
-        <h2 style={{ textAlign: "center", color: "#fff" }}>{text}</h2>
+          You Scored {score}
+        </h2>
+        <h3
+          style={{
+            fontSize: "24px",
+            fontWeight: "normal",
+            color: "#ffcc00",
+            textShadow: "1px 1px #000",
+          }}
+        >
+          Time: {time}
+        </h3>
+        <h4
+          style={{
+            fontSize: "20px",
+            color: "#fff",
+          }}
+        >
+          Progress: {progress}
+        </h4>
       </div>,
       {
         width: 1148, // 600 * 1.91
@@ -88,8 +103,4 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     console.error(error);
     return new NextResponse("Error generating image", { status: 500 });
   }
-}
-
-export async function POST() {
-  return new NextResponse("Method not allowed", { status: 405 });
 }

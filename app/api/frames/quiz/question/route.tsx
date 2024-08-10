@@ -14,23 +14,20 @@ async function sendResults(
   elapsedTime: string,
   progress: string
 ): Promise<NextResponse> {
-  const imageUrl = `${
-    process.env["NEXT_PUBLIC_HOST"]
-  }/api/frames/quiz/image/question?text=${
-    "You scored " + percentage + " percent correct"
-  }&time=${elapsedTime}&progress=${progress}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${progress}`;
+  const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/results?quiz_id=${quizId}`;
 
   const response = `
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Vote Recorded</title>
-        <meta property="og:title" content="Vote Recorded">
+        <title>Results</title>
+        <meta property="og:title" content="Results">
         <meta property="og:image" content="${imageUrl}">
         <meta property="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
-        <meta property="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/results?quiz_id=${quizId}">
-        <meta property="fc:frame:button:1" content="Done">
+        <meta property="fc:frame:post_url" content="${resultsLink}">
+        <meta property="fc:frame:button:1" content="Results">
       </head>
       <body>
         <p>You scored ${percentage}%</p>
@@ -61,8 +58,8 @@ async function skipQuestionResponse(
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Vote Recorded</title>
-        <meta property="og:title" content="Vote Recorded">
+        <title>Next Question</title>
+        <meta property="og:title" content="Next Question">
         <meta property="og:image" content="${imageUrl}">
         <meta property="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
@@ -95,7 +92,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const { fid } = await validateMessage(req);
 
-    let submission: ISubmission | undefined = await createSubmission(
+    const submission: ISubmission | undefined = await createSubmission(
       Number(quizId),
       fid.toString()
     );
@@ -109,6 +106,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       submission.time_completed
     );
 
+    if (submission.score !== null) {
+      const questions = await getQuestions(Number(quizId));
+      const progress = `${questions?.length}/${questions?.length}`;
+      return sendResults(submission.score, quizId, elapsedTime, progress);
+    }
+
     const questions = await getQuestions(Number(quizId));
     if (!questions || questions.length === 0) {
       return new NextResponse("No questions found", { status: 404 });
@@ -118,17 +121,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       (submission.answers ? submission.answers.length : 0) + 1
     }/${questions.length}`;
 
-    if (submission.score !== null) {
-      return sendResults(submission.score, quizId, elapsedTime, progress);
-    }
-
     const question = await getQuestion(Number(quizId), Number(questionId));
-
     if (!question) {
-      if (submission.score !== null) {
-        return sendResults(submission.score, quizId, elapsedTime, progress);
-      }
-      return new NextResponse("Error fetching questions", { status: 500 });
+      return new NextResponse("Error fetching question", { status: 500 });
     }
 
     const previousAnswer = submission.answers?.find(
@@ -137,10 +132,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (previousAnswer) {
       if (!question.next_question_id) {
-        if (submission.score !== null) {
-          return sendResults(submission.score, quizId, elapsedTime, progress);
-        }
-        return new NextResponse("Error fetching questions", { status: 500 });
+        return sendResults(
+          submission.score ?? 0,
+          quizId,
+          elapsedTime,
+          progress
+        );
       }
       return skipQuestionResponse(
         previousAnswer,
@@ -210,7 +207,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       headers: { "Content-Type": "text/html" },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error processing request:", error);
     return new NextResponse("Error processing request", { status: 500 });
   }
 }

@@ -3,10 +3,10 @@ import React from "react";
 export async function generateMetadata() {
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:image": "https://boston-five.vercel.app/fc-og.png",
+    "fc:frame:image": `${process.env.NEXT_PUBLIC_HOST}/fc-og.png`,
     "fc:frame:button:1": `Channel Site`,
     "fc:frame:button:1:action": `link`,
-    "fc:frame:button:1:target": `https://boston-five.vercel.app`,
+    "fc:frame:button:1:target": `${process.env.NEXT_PUBLIC_HOST}`,
   };
 
   return {
@@ -19,7 +19,7 @@ export async function generateMetadata() {
         "Get detailed information about channels, including members, events, and casts.",
       images: [
         {
-          url: "https://boston-five.vercel.app/fc-og.png",
+          url: `${process.env.NEXT_PUBLIC_HOST}/fc-og.png`,
           width: 800,
           height: 600,
           alt: "Get detailed information about channels, including members, events, and casts.",
@@ -29,7 +29,7 @@ export async function generateMetadata() {
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL("https://boston-five.vercel.app"),
+    metadataBase: new URL(`${process.env.NEXT_PUBLIC_HOST}`),
   };
 }
 

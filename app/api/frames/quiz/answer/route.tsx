@@ -32,7 +32,9 @@ function sendResponse(
         <meta property="fc:frame:post_url" content="${
           currentQuestion.next_question_id ? nextQuestionLink : resultsLink
         }">
-        <meta property="fc:frame:button:1" content="Next question">
+        <meta property="fc:frame:button:1" content="${
+          currentQuestion.next_question_id ? "Next Question" : "Results"
+        }">
       </head>
       <body>
         <p></p>
@@ -106,10 +108,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     let isCorrect = false;
 
-    if (currentQuestion.answer === `option_${buttonId}`) {
-      isCorrect = true;
+    // handle multiple choice
+    if (
+      currentQuestion.question_type === "multiple_choice" &&
+      currentQuestion.options
+    ) {
+      // check if the index of the button clicked is the same as the correct answer
+      if (currentQuestion.options[buttonId - 1] === currentQuestion.answer) {
+        isCorrect = true;
+      }
     }
-
+    // handle short answer
     if (
       currentQuestion.question_type === "short_answer" &&
       currentQuestion.answer &&
