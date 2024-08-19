@@ -13,6 +13,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const text = searchParams.get("text") || "Default Text";
     const time = searchParams.get("time") || "";
     const progress = searchParams.get("progress") || "";
+    const optionA = searchParams.get("optionA");
+    const optionB = searchParams.get("optionB");
+    const optionC = searchParams.get("optionC");
+    const optionD = searchParams.get("optionD");
 
     const svg = await satori(
       <div
@@ -31,7 +35,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           position: "relative",
         }}
       >
-        {/* Top header: progress, time */}
         <div
           style={{
             display: "flex",
@@ -71,13 +74,44 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           style={{
             display: "flex",
             justifyContent: "center",
-            // alignItems: "center",
             height: "100%",
+            flexDirection: "column",
           }}
         >
           <h2 style={{ textAlign: "center", color: "#fff", fontSize: "64px" }}>
             {text}
           </h2>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginTop: "5px",
+              marginLeft: "20px",
+              fontSize: "32px",
+            }}
+          >
+            {optionA && (
+              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                A: {optionA}
+              </p>
+            )}
+            {optionB && (
+              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                B: {optionB}
+              </p>
+            )}
+            {optionC && (
+              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                C: {optionC}
+              </p>
+            )}
+            {optionD && (
+              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                D: {optionD}
+              </p>
+            )}
+          </div>
         </div>
       </div>,
       {

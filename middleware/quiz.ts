@@ -191,7 +191,7 @@ export async function updateSubmissionScore(
   try {
     const { data, error } = await supabase
       .from("submissions")
-      .update({ score, time_completed: new Date().toISOString() })
+      .update({ score, time_completed: new Date() })
       .eq("id", submissionId)
       .select();
     if (error) throw error;

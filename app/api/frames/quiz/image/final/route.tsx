@@ -59,7 +59,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         </h2>
         <h3
           style={{
-            fontSize: "24px",
+            fontSize: "32px",
             fontWeight: "normal",
             color: "#ffcc00",
             textShadow: "1px 1px #000",

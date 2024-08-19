@@ -113,17 +113,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                 {answer}
               </h2>
             </div>
-            {/* <div
-              style={{
-                display: "flex",
-                textAlign: "center",
-                fontSize: "64px",
-                marginLeft: "10px",
-              }}
-            >
-              <h2 style={{ fontSize: "32px" }}>Correct Answer is </h2>
-              <p style={{ color: "#ffcc00" }}>{answer}</p>
-            </div> */}
           </div>
         ) : (
           <div

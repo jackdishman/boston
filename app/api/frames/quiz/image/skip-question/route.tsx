@@ -144,12 +144,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
                   fontSize: "32px",
                 }}
               >
-                <h2 style={{}}>Correct Answer is</h2>
+                <h2 style={{ marginTop: "10px", marginBottom: "10px" }}>
+                  Correct Answer is
+                </h2>
                 <h2
                   style={{
                     color: "#ffcc00",
