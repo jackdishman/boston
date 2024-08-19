@@ -112,18 +112,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // handle multiple choice
     if (
       currentQuestion.question_type === "multiple_choice" &&
-      currentQuestion.options
+      currentQuestion.options &&
+      buttonId
     ) {
       // check if the index of the button clicked is the same as the correct answer
-      if (currentQuestion.options[buttonId - 1] === currentQuestion.answer) {
+      const selectedAnswer = currentQuestion.options[buttonId - 1];
+      if (selectedAnswer === currentQuestion.answer) {
         isCorrect = true;
       }
-      submittedAnswer = currentQuestion.options[buttonId - 1];
+      submittedAnswer = selectedAnswer;
     }
     // handle short answer
     if (
       currentQuestion.question_type === "short_answer" &&
       currentQuestion.answer &&
+      inputText &&
       currentQuestion.answer.toUpperCase().trim() ===
         inputText.toUpperCase().trim()
     ) {

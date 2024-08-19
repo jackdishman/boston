@@ -1,63 +1,83 @@
-import { Message, getSSLHubRpcClient } from "@farcaster/hub-nodejs";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function validateMessage(req: NextRequest): Promise<{
-  validatedMessage: Message | undefined;
   fid: number;
-  buttonId: number;
-  inputText: string;
+  buttonId?: number;
+  inputText?: string;
 }> {
   const HUB_URL = process.env["HUB_URL"];
-  const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
-  let validatedMessage: Message | undefined = undefined;
+  let body: any;
+  let data: any;
 
   try {
-    const body = await req.json(); // Parse the request body as JSON
-    const frameMessage = Message.decode(
-      Buffer.from(body?.trustedData?.messageBytes || "", "hex")
-    );
-    const result = await client?.validateMessage(frameMessage);
+    body = await req.json(); // Parse the request body as JSON
+    const neynarUrl = "https://api.neynar.com/v2/farcaster/frame/validate";
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        cast_reaction_context: true,
+        follow_context: false,
+        signer_context: false,
+        channel_follow_context: false,
+        message_bytes_in_hex: body.trustedData.messageBytes,
+      }),
+    };
+    const response = await fetch(neynarUrl, {
+      method: "POST",
+      // @ts-ignore
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        cast_reaction_context: true,
+        follow_context: false,
+        signer_context: false,
+        channel_follow_context: false,
+        message_bytes_in_hex: body.trustedData.messageBytes,
+      }),
+    });
+    data = await response.json();
 
-    if (!result?.isOk()) {
-      throw new Error("Failed to validate message. Check HUB_URL");
+    if (!data.valid) {
+      throw new Error("Unvalidated data!");
     }
 
-    if (result && result.isOk() && result.value.valid) {
-      validatedMessage = result.value.message;
-    }
-
-    // Also validate the frame URL matches the expected URL
-    const urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
-    const urlString = Buffer.from(urlBuffer).toString("utf-8");
-
-    if (
-      validatedMessage &&
-      !urlString.startsWith(process.env["NEXT_PUBLIC_HOST"] || "")
-    ) {
-      throw new Error(`Invalid frame URL: ${urlString}`);
+    if (!data.action.url.startsWith(process.env["NEXT_PUBLIC_HOST"] || "")) {
+      throw new Error(`Invalid frame URL: ${data.action.url}`);
     }
   } catch (e) {
-    console.error(`Failed to validate message: ${e}`);
-    return { validatedMessage: undefined, fid: 0, buttonId: 0, inputText: "" };
+    if (e instanceof Error) {
+      console.error(`Failed to validate message: ${e.message}`);
+    } else {
+      console.error(`An unexpected error occurred: ${e}`);
+    }
+    return { fid: 0 };
   }
 
-  // If HUB_URL is not provided, don't validate and fall back to untrusted data
+  // Extract fid, buttonId, and inputText
   let fid = 0,
-    buttonId = 0,
-    inputText = "";
+    buttonId,
+    inputText;
 
-  if (client) {
-    buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
-    fid = validatedMessage?.data?.fid || 0;
-    inputText = Buffer.from(
-      validatedMessage?.data?.frameActionBody?.inputText || []
-    ).toString("utf-8");
+  if (data.valid) {
+    buttonId = data.action.tapped_button
+      ? data.action.tapped_button.index
+      : undefined;
+    fid = data.action.interactor.fid || 0;
+    inputText = data.action.input?.text || "";
   } else {
-    const body = await req.json(); // Parse the request body as JSON
-    fid = body?.untrustedData?.fid || 0;
-    buttonId = body?.untrustedData?.buttonIndex || 0;
-    inputText = body?.untrustedData?.inputText || "";
+    // todo: handle invalid data
+    buttonId = data.action.tapped_button.index;
+    fid = data.action.interactor.fid || 0;
+    inputText = data.action.input.text;
   }
 
-  return { validatedMessage, fid, buttonId, inputText };
+  return { fid, buttonId, inputText };
 }

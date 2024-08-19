@@ -224,10 +224,6 @@ export function getElapsedTimeString(
   const start = new Date(createdAtTimestamp);
   let end = completedAtTimestamp ? new Date(completedAtTimestamp) : new Date();
 
-  console.log("Start Time:", start.toLocaleTimeString());
-  console.log("End Time:", end.toLocaleTimeString());
-  console.log(`diff: ${end.getTime() - start.getTime()}`);
-
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     console.error("Invalid date provided:", {
       createdAtTimestamp,
@@ -242,11 +238,7 @@ export function getElapsedTimeString(
     end = new Date(); // Use the current time as the end time
   }
 
-  console.log("Start Time (ms):", start.getTime());
-  console.log("End Time (ms):", end.getTime());
-
   const elapsed = end.getTime() - start.getTime();
-  console.log("Elapsed Time (ms):", elapsed);
 
   const seconds = Math.floor(elapsed / 1000);
   const minutes = Math.floor(seconds / 60);
