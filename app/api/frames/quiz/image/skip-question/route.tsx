@@ -54,7 +54,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
               textTransform: "uppercase",
             }}
           >
-            You've completed {progress} questions.
+            You&amp;ve completed {progress} questions.
           </div>
           <div
             style={{
