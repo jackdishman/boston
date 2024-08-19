@@ -222,14 +222,38 @@ export function getElapsedTimeString(
   completedAtTimestamp?: string | null
 ): string {
   const start = new Date(createdAtTimestamp);
-  const end = completedAtTimestamp
-    ? new Date(completedAtTimestamp)
-    : new Date();
+  let end = completedAtTimestamp ? new Date(completedAtTimestamp) : new Date();
+
+  console.log("Start Time:", start.toLocaleTimeString());
+  console.log("End Time:", end.toLocaleTimeString());
+  console.log(`diff: ${end.getTime() - start.getTime()}`);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    console.error("Invalid date provided:", {
+      createdAtTimestamp,
+      completedAtTimestamp,
+    });
+    return "Invalid time";
+  }
+
+  // Check if end time is before start time, correct if necessary
+  if (end < start) {
+    console.warn("End time is before start time. Using current time instead.");
+    end = new Date(); // Use the current time as the end time
+  }
+
+  console.log("Start Time (ms):", start.getTime());
+  console.log("End Time (ms):", end.getTime());
+
   const elapsed = end.getTime() - start.getTime();
+  console.log("Elapsed Time (ms):", elapsed);
+
   const seconds = Math.floor(elapsed / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
+
   let timeString = "";
+
   if (hours > 0) {
     timeString += hours + "h ";
   }
@@ -237,5 +261,6 @@ export function getElapsedTimeString(
     timeString += (minutes % 60) + "m ";
   }
   timeString += (seconds % 60) + "s";
-  return timeString;
+
+  return timeString.trim();
 }

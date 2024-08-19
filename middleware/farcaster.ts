@@ -59,8 +59,5 @@ export async function validateMessage(req: NextRequest): Promise<{
     inputText = body?.untrustedData?.inputText || "";
   }
 
-  console.log(`fid`, fid);
-  console.log(`input text`, inputText);
-
   return { validatedMessage, fid, buttonId, inputText };
 }

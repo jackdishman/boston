@@ -48,10 +48,8 @@ async function skipQuestionResponse(
   progress: string,
   elapsedTime: string
 ): Promise<NextResponse> {
-  const text = `Question: ${question.text}, you answered ${
-    previousAnswer.is_correct ? "correctly" : "incorrectly"
-  }`;
-  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/question?text=${text}&time=${elapsedTime}&progress=${progress}`;
+  const text = question.text;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/skip-question?text=${text}&time=${elapsedTime}&isCorrect=${previousAnswer.is_correct}&previousAnswer=${previousAnswer.answer}&progress=${progress}&correctAnswer=${question.answer}`;
   const nextQuestionLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
 
   const response = `

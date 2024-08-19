@@ -3,7 +3,7 @@ import sharp from "sharp";
 import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
-import { getSubmissions } from "@/middleware/quiz";
+import { getElapsedTimeString, getSubmissions } from "@/middleware/quiz";
 import { getUsersByFids } from "@/middleware/helpers";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
@@ -110,13 +110,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         fname:
           users.find((user) => user.fid === Number(submission.fid))?.username ||
           "Unknown",
-        timeTaken: submission.time_completed
-          ? `${(
-              (new Date(submission.time_completed).getTime() -
-                new Date(submission.created_at).getTime()) /
-              1000
-            ).toFixed(2)}s`
-          : "N/A",
+        timeTaken: getElapsedTimeString(
+          submission.created_at,
+          submission.time_completed
+        ),
       }));
 
     const svg = await satori(

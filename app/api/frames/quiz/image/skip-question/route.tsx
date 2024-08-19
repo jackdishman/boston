@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
+import { NextRequest, NextResponse } from "next/server";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
@@ -10,11 +10,12 @@ let fontData = fs.readFileSync(fontPath);
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
-    const answer = searchParams.get("answer") ?? "";
-    const isCorrect = searchParams.get("correct") ?? "false";
-    const explanation = searchParams.get("explanation") ?? "";
-    const time = searchParams.get("time") ?? "";
-    const progress = searchParams.get("progress") ?? "";
+    const text = searchParams.get("text") || "Default Text";
+    const previousAnswer = searchParams.get("previousAnswer") || "";
+    const isCorrect = searchParams.get("isCorrect") || "";
+    const time = searchParams.get("time") || "";
+    const progress = searchParams.get("progress") || "";
+    const correctAnswer = searchParams.get("correctAnswer") || "";
 
     const svg = await satori(
       <div
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
               textTransform: "uppercase",
             }}
           >
-            Question {progress}
+            You've completed {progress} questions.
           </div>
           <div
             style={{
@@ -72,82 +73,96 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
+            // alignItems: "center",
+            height: "100%",
           }}
         >
-          <h2
-            style={{
-              textAlign: "center",
-              color: isCorrect === "true" ? "#0f0" : "#f00",
-              fontSize: 96,
-              fontWeight: "bold",
-              textTransform: "uppercase",
-            }}
-          >
-            {isCorrect === "true" ? "Correct" : "Incorrect"}
+          <h2 style={{ textAlign: "center", color: "#fff", fontSize: "50px" }}>
+            {text}
           </h2>
-        </div>
-        {isCorrect !== "true" ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                fontSize: "32px",
-              }}
-            >
-              <h2 style={{}}>Correct Answer is</h2>
-              <h2
-                style={{
-                  color: "#ffcc00",
-                  fontSize: "52px",
-                  marginLeft: "10px",
-                }}
-              >
-                {answer}
-              </h2>
-            </div>
-            {/* <div
-              style={{
-                display: "flex",
-                textAlign: "center",
-                fontSize: "64px",
-                marginLeft: "10px",
-              }}
-            >
-              <h2 style={{ fontSize: "32px" }}>Correct Answer is </h2>
-              <p style={{ color: "#ffcc00" }}>{answer}</p>
-            </div> */}
-          </div>
-        ) : (
+
           <div
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "100px",
+              fontSize: "32px",
             }}
           >
-            <h2
+            You answered{" "}
+            <span
               style={{
-                textAlign: "center",
-                color: "#fff",
-                fontSize: "64px",
+                color: "#ffcc00",
+                fontSize: "32px",
+                marginLeft: "10px",
+                marginRight: "10px",
               }}
             >
-              Nice Job!
-            </h2>
+              {previousAnswer}
+            </span>{" "}
+            which was
+            {isCorrect === "true" ? (
+              <h2
+                style={{
+                  color: "#00ff00",
+                  fontSize: "48px",
+                  marginLeft: "10px",
+                }}
+              >
+                Correct
+              </h2>
+            ) : (
+              <h2
+                style={{
+                  color: "#ff0000",
+                  fontSize: "48px",
+                  marginLeft: "10px",
+                }}
+              >
+                Incorrect
+              </h2>
+            )}
           </div>
-        )}
-        <h2 style={{ textAlign: "center", color: "#fff", fontSize: "32px" }}>
-          {explanation}
-        </h2>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {isCorrect === "true" ? (
+              <h2
+                style={{
+                  color: "#00ff00",
+                  fontSize: "48px",
+                }}
+              >
+                Great job!!!
+              </h2>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: "32px",
+                }}
+              >
+                <h2 style={{}}>Correct Answer is</h2>
+                <h2
+                  style={{
+                    color: "#ffcc00",
+                    fontSize: "52px",
+                    marginLeft: "5px",
+                  }}
+                >
+                  {correctAnswer}
+                </h2>
+              </div>
+            )}
+          </div>
+        </div>
       </div>,
       {
         width: 1148, // 600 * 1.91
@@ -178,6 +193,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-export async function POST(): Promise<NextResponse> {
+export async function POST() {
   return new NextResponse("Method not allowed", { status: 405 });
 }

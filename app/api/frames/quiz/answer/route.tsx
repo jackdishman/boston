@@ -107,6 +107,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     let isCorrect = false;
+    let submittedAnswer = ``;
 
     // handle multiple choice
     if (
@@ -117,6 +118,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       if (currentQuestion.options[buttonId - 1] === currentQuestion.answer) {
         isCorrect = true;
       }
+      submittedAnswer = currentQuestion.options[buttonId - 1];
     }
     // handle short answer
     if (
@@ -126,6 +128,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         inputText.toUpperCase().trim()
     ) {
       isCorrect = true;
+      submittedAnswer = inputText;
     }
 
     try {
@@ -133,7 +136,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         fid.toString(),
         submission,
         questionId,
-        inputText,
+        submittedAnswer,
         isCorrect
       );
     } catch (error) {
