@@ -15,7 +15,7 @@ async function sendResults(
   progress: string
 ): Promise<NextResponse> {
   const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${progress}`;
-  const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/results?quiz_id=${quizId}`;
+  const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/leaderboard?quiz_id=${quizId}`;
 
   const response = `
     <!DOCTYPE html>
@@ -27,7 +27,7 @@ async function sendResults(
         <meta property="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
         <meta property="fc:frame:post_url" content="${resultsLink}">
-        <meta property="fc:frame:button:1" content="Results">
+        <meta property="fc:frame:button:1" content="Leaderboard">
       </head>
       <body>
         <p>You scored ${percentage}%</p>
