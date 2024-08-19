@@ -4,10 +4,12 @@ export async function validateMessage(req: NextRequest): Promise<{
   fid: number;
   buttonId?: number;
   inputText?: string;
+  address?: string;
 }> {
   const HUB_URL = process.env["HUB_URL"];
   let body: any;
   let data: any;
+  let address: string;
 
   try {
     body = await req.json(); // Parse the request body as JSON
@@ -44,6 +46,9 @@ export async function validateMessage(req: NextRequest): Promise<{
       }),
     });
     data = await response.json();
+    address =
+      data.action.interactor.verified_addresses.eth_addresses[0] ??
+      data.action.interactor.custody_address;
 
     if (!data.valid) {
       throw new Error("Unvalidated data!");
@@ -79,5 +84,5 @@ export async function validateMessage(req: NextRequest): Promise<{
     inputText = data.action.input.text;
   }
 
-  return { fid, buttonId, inputText };
+  return { fid, buttonId, inputText, address };
 }

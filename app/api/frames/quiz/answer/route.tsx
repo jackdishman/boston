@@ -8,6 +8,7 @@ import {
 import { ISubmission, IQuestion } from "@/types/quiz";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/quiz";
+import { rewardPoints } from "@/middleware/points";
 
 function sendResponse(
   isCorrect: boolean,
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
     }
 
-    const { fid, buttonId, inputText } = await validateMessage(req);
+    const { fid, buttonId, inputText, address } = await validateMessage(req);
 
     let submission: ISubmission | undefined = await createSubmission(
       Number(quizId),
@@ -119,6 +120,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       const selectedAnswer = currentQuestion.options[buttonId - 1];
       if (selectedAnswer === currentQuestion.answer) {
         isCorrect = true;
+        if (address) {
+          await rewardPoints(
+            `quiz-${quizId}-question-${questionId}`,
+            address,
+            10
+          );
+        }
       }
       submittedAnswer = selectedAnswer;
     }

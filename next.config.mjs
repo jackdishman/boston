@@ -10,6 +10,8 @@ const nextConfig = {
     PRIVY_APP_SECRET: process.env.PRIVY_APP_SECRET,
     NEXT_PUBLIC_HOST: process.env.NEXT_PUBLIC_HOST,
     HUB_URL: process.env.HUB_URL,
+    STACK_API_KEY: process.env.STACK_API_KEY,
+    NEXT_PUBLIC_REWARD_POINTS: process.env.NEXT_PUBLIC_REWARD_POINTS,
   },
   images: {
     remotePatterns: [

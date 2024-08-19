@@ -7,14 +7,17 @@ import {
 } from "@/middleware/quiz";
 import { validateMessage } from "@/middleware/farcaster";
 import { IAnswerEntry, IQuestion, ISubmission } from "@/types/quiz";
+import { getPoints } from "@/middleware/points";
 
 async function sendResults(
   percentage: number,
   quizId: string,
   elapsedTime: string,
-  progress: string
+  progress: string,
+  totalPoints?: number
 ): Promise<NextResponse> {
-  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${progress}`;
+  console.log("Total points:", totalPoints);
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${progress}&totalPoints=${totalPoints}`;
   const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/leaderboard?quiz_id=${quizId}`;
 
   const response = `
@@ -88,7 +91,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
     }
 
-    const { fid } = await validateMessage(req);
+    const { fid, address } = await validateMessage(req);
 
     const submission: ISubmission | undefined = await createSubmission(
       Number(quizId),
@@ -104,10 +107,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       submission.time_completed
     );
 
+    let totalPoints = 0;
+    if (address) {
+      totalPoints = await getPoints(address);
+    }
+
     if (submission.score !== null) {
       const questions = await getQuestions(Number(quizId));
       const progress = `${questions?.length} of ${questions?.length}`;
-      return sendResults(submission.score, quizId, elapsedTime, progress);
+      return sendResults(
+        submission.score,
+        quizId,
+        elapsedTime,
+        progress,
+        totalPoints
+      );
     }
 
     const questions = await getQuestions(Number(quizId));
@@ -134,9 +148,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           submission.score ?? 0,
           quizId,
           elapsedTime,
-          progress
+          progress,
+          totalPoints
         );
       }
+
       return skipQuestionResponse(
         previousAnswer,
         question,
