@@ -146,38 +146,44 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
+    let imageUrl = `${
+      process.env["NEXT_PUBLIC_HOST"]
+    }/api/frames/quiz/image/question?text=${encodeURIComponent(
+      question.text
+    )}&time=${elapsedTime}&progress=${progress}`;
+
+    if (question.question_type === "multiple_choice" && question.options) {
+      imageUrl += `&optionA=${encodeURIComponent(
+        question.options[0]
+      )}&optionB=${encodeURIComponent(
+        question.options[1]
+      )}&optionC=${encodeURIComponent(
+        question.options[2]
+      )}&optionD=${encodeURIComponent(question.options[3])}`;
+    }
     let response = "";
 
     if (question.question_type === "multiple_choice") {
       response = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Question</title>
-            <meta property="og:title" content="Question">
-            <meta property="og:image" content="${imageUrl}">
-            <meta property="fc:frame" content="vNext">
-            <meta property="fc:frame:image" content="${imageUrl}">
-            <meta property="fc:frame:post_url" content="${
-              process.env["NEXT_PUBLIC_HOST"]
-            }/api/frames/quiz/answer?quiz_id=${quizId}&question_id=${
-        question.id
-      }">
-            ${question.options
-              ?.map(
-                (option, index) =>
-                  `<meta property="fc:frame:button:${
-                    index + 1
-                  }" content="${option}">`
-              )
-              .join("")}
-          </head>
-          <body>
-            <p>${question.text}</p>
-          </body>
-        </html>
-      `;
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Question</title>
+      <meta property="og:title" content="Question">
+      <meta property="og:image" content="${imageUrl}">
+      <meta property="fc:frame" content="vNext">
+      <meta property="fc:frame:image" content="${imageUrl}">
+      <meta property="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/answer?quiz_id=${quizId}&question_id=${question.id}">
+      <meta property="fc:frame:button:1" content="A">
+      <meta property="fc:frame:button:2" content="B">
+      <meta property="fc:frame:button:3" content="C">
+      <meta property="fc:frame:button:4" content="D">
+    </head>
+    <body>
+      <p>${question.text}</p>
+    </body>
+  </html>
+`;
     } else if (question.question_type === "short_answer") {
       response = `
         <!DOCTYPE html>
