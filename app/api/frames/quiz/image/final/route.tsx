@@ -13,6 +13,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const score = searchParams.get("score") ?? "0%";
     const time = searchParams.get("time") ?? "";
     const progress = searchParams.get("progress") ?? "";
+    const totalPoints = searchParams.get("totalPoints") ?? "0";
 
     const svg = await satori(
       <div
@@ -66,6 +67,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           }}
         >
           Time: {time}
+        </h3>
+        <h3
+          style={{
+            fontSize: "32px",
+            fontWeight: "normal",
+            textShadow: "1px 1px #000",
+          }}
+        >
+          Points: <span style={{ color: "#00ff00" }}>{totalPoints}</span>
         </h3>
       </div>,
       {

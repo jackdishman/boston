@@ -6,13 +6,15 @@ import {
 } from "@/middleware/quiz";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/quiz";
+import { getPoints, rewardPoints } from "@/middleware/points";
 
 async function sendFinalResults(
   percentage: number,
   quizId: string,
-  elapsedTime: string
+  elapsedTime: string,
+  totalPoints?: number
 ): Promise<NextResponse> {
-  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${quizId}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/final?score=${percentage}&time=${elapsedTime}&progress=${quizId}&totalPoints=${totalPoints}`;
 
   const responseHtml = `
     <!DOCTYPE html>
@@ -48,7 +50,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return new NextResponse("Missing quiz_id", { status: 400 });
     }
 
-    const { fid } = await validateMessage(req);
+    const { fid, address } = await validateMessage(req);
 
     let submission = await createSubmission(Number(quizId), fid.toString());
 
@@ -57,7 +59,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         submission.created_at,
         submission.time_completed
       );
-      return sendFinalResults(submission.score, quizId, elapsedTime);
+      let totalPoints = 0;
+      if (address) {
+        totalPoints = await getPoints(address);
+      }
+      return sendFinalResults(
+        submission.score,
+        quizId,
+        elapsedTime,
+        totalPoints
+      );
     }
 
     const questions = await getQuestions(Number(quizId));
@@ -86,6 +97,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return new NextResponse("Error updating submission score", {
         status: 500,
       });
+    }
+
+    // give points
+    if (
+      address &&
+      percentage >= 75 &&
+      process.env["NEXT_PUBLIC_REWARD_POINTS"] === "true"
+    ) {
+      try {
+        await rewardPoints(`quiz-${quizId}-complete`, address, 100);
+      } catch (error) {
+        console.error("Error rewarding points", error);
+      }
     }
 
     const elapsedTime = getElapsedTimeString(
