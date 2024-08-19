@@ -8,6 +8,8 @@ const nextConfig = {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     PRIVY_APP_ID: process.env.PRIVY_APP_ID,
     PRIVY_APP_SECRET: process.env.PRIVY_APP_SECRET,
+    NEXT_PUBLIC_HOST: process.env.NEXT_PUBLIC_HOST,
+    HUB_URL: process.env.HUB_URL,
   },
   images: {
     remotePatterns: [

@@ -31,10 +31,10 @@ export async function generateMetadata({ params }: Props) {
   const channel = await getChannelById(params.id);
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:image": "https://boston-five.vercel.app/fc-og.png",
+    "fc:frame:image": `${process.env.NEXT_PUBLIC_HOST}/fc-og.png`,
     "fc:frame:button:1": `${params.id} Channel Site`,
     "fc:frame:button:1:action": `link`,
-    "fc:frame:button:1:target": `https://boston-five.vercel.app`,
+    "fc:frame:button:1:target": `${process.env.NEXT_PUBLIC_HOST}`,
   };
 
   return {
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props) {
       description: "Casts of the " + params.id + " channel",
       images: [
         {
-          url: "https://boston-five.vercel.app/fc-og.png",
+          url: `${process.env.NEXT_PUBLIC_HOST}`,
           width: 800,
           height: 600,
           alt: "og image",
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props) {
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL("https://boston-five.vercel.app"),
+    metadataBase: new URL(`${process.env.NEXT_PUBLIC_HOST}`),
   };
 }
 

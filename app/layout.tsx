@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/privy";
 import App from "./components/App";
-import { getAllChannels } from "@/middleware/helpers";
 import { IChannelResponse } from "@/types/interfaces";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,13 +16,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const channels: IChannelResponse[] = await getAllChannels(true);
-
   return (
     <html lang="en">
       <body className={`${inter.className} bg-slate-100`}>
         <Providers>
-          <App channels={channels}>
+          <App>
             <main className="flex flex-col items-center w-full min-h-screen z-0 pt-20">
               <div className="w-full max-w-7xl">{children}</div>
             </main>

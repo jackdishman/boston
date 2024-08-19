@@ -11,7 +11,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
-          logo: "https://boston-five.vercel.app/fc-og.png",
+          logo: `${process.env.NEXT_PUBLIC_HOST}/fc-og.png`,
         },
       }}
     >
