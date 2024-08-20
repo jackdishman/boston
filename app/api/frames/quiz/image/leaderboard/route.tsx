@@ -5,6 +5,8 @@ import { join } from "path";
 import * as fs from "fs";
 import { getElapsedTimeString, getSubmissions } from "@/middleware/quiz";
 import { getUsersByFids } from "@/middleware/helpers";
+import { get } from "http";
+import { getPoints } from "@/middleware/points";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
@@ -101,6 +103,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       .map((s) => s.fid);
     const users = await getUsersByFids(topSubmissionsFidList as string[]);
 
+    const pointsMap = async (): Promise<Map<number, number>> => {
+      const map = new Map<number, number>();
+
+      await Promise.all(
+        users.map(async (user) => {
+          const points = await getPoints(
+            user.verified_addresses.eth_addresses[0]
+          );
+          map.set(user.fid, points);
+        })
+      );
+      return map;
+    };
+
+    const userPoints = await pointsMap();
+
     const topPlayerScores = sortedSubmissions
       .slice(0, 5)
       .map((submission, index) => ({
@@ -110,10 +128,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         fname:
           users.find((user) => user.fid === Number(submission.fid))?.username ||
           "Unknown",
-        timeTaken: getElapsedTimeString(
-          submission.created_at,
-          submission.time_completed
-        ),
+        timeTaken: submission.time_completed
+          ? getElapsedTimeString(
+              submission.created_at,
+              submission.time_completed
+            )
+          : "Incomplete",
+        totalPoints: userPoints.get(Number(submission.fid)) || 0,
       }));
 
     const svg = await satori(
@@ -196,7 +217,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
               Score (%)
             </div>
             <div style={{ flex: 2, display: "flex", justifyContent: "center" }}>
-              Time to Complete
+              Time
+            </div>
+            <div style={{ flex: 2, display: "flex", justifyContent: "center" }}>
+              Total Points
             </div>
           </div>
           {topPlayerScores.map((s) => (
@@ -245,6 +269,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                 }}
               >
                 {s.timeTaken}
+              </div>
+              <div
+                style={{
+                  flex: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {s.totalPoints}
               </div>
             </div>
           ))}

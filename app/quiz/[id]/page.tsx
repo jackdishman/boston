@@ -1,3 +1,4 @@
+import { Metadata, ResolvingMetadata } from "next";
 import { getQuiz, getSubmissions } from "@/middleware/quiz";
 import { getUsersByFids } from "@/middleware/helpers";
 import ShareQuiz from "./ShareQuiz";
@@ -8,6 +9,49 @@ type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.id;
+  const quiz = await getQuiz(Number(id));
+  if (!quiz) {
+    return {
+      title: "Quiz not found",
+      openGraph: {
+        title: "Quiz not found",
+        description: "Quiz not found",
+      },
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+    };
+  }
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image?title=${quiz.title}&description=${quiz.description}`;
+  const fcMetadata: Record<string, string> = {
+    "fc:frame": "vNext",
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
+    "fc:frame:image": imageUrl,
+    "fc:frame:button:1": `Start Quiz`,
+    "fc:frame:button:2": `Leaderboard`,
+    "fc:frame:button:2:action": `link`,
+    "fc:frame:button:2:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/${id}`,
+    "fc:frame:button:3": `Create a Quiz`,
+    "fc:frame:button:3:action": `link`,
+    "fc:frame:button:3:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/create`,
+  };
+
+  return {
+    title: quiz.title,
+    openGraph: {
+      title: quiz.title ?? `Quiz ${id}`,
+      description: quiz.description ?? `Quiz ${id}`,
+      images: [{ url: imageUrl }],
+    },
+    other: {
+      ...fcMetadata,
+    },
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+  };
+}
 
 async function getQuizSubmissionsWithUsers(quizId: number) {
   try {

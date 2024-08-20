@@ -18,11 +18,10 @@ async function sendResults(fid: string, quizId: string): Promise<NextResponse> {
         <meta property="fc:frame:button:1:action" content="link" />
         <meta property="fc:frame:button:1:target" content="https://warpcast.com/dish" />
 
-        <meta property="fc:frame:button:2" content="Source Code" />
-        <meta property="fc:frame:button:2:action" content="link" />
-        <meta property="fc:frame:button:2:target" content="https://github.com/jackdishman/farcaster-frame" />
+        <meta property="fc:frame:button:2" content="More Trivia" />
+        <meta property="fc:frame:button:2:action" content="post_redirect" />
 
-        <meta property="fc:frame:button:3" content="Create Quiz & Stats" />
+        <meta property="fc:frame:button:3" content="Create your own" />
         <meta property="fc:frame:button:3:action" content="link" />
         <meta property="fc:frame:button:3:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
       </head>
