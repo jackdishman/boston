@@ -19,7 +19,7 @@ function sendResponse(
 ): NextResponse {
   const nextQuestionLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
   const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/results?quiz_id=${quizId}`;
-  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/result?correct=${isCorrect}&explanation=${currentQuestion.explanation}&time=${elapsedTime}&progress=${progress}&answer=${currentQuestion.answer}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/result?correct=${isCorrect}&time=${elapsedTime}&progress=${progress}&questionId=${currentQuestion.id}`;
 
   const response = `
     <!DOCTYPE html>

@@ -3,6 +3,7 @@ import sharp from "sharp";
 import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
+import { getQuestionById } from "@/middleware/quiz";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
@@ -24,11 +25,19 @@ function getRandomImage(isCorrect: boolean): string {
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
-    const answer = searchParams.get("answer") ?? "";
     const isCorrect = searchParams.get("correct") ?? "false";
-    const explanation = searchParams.get("explanation") ?? "";
     const time = searchParams.get("time") ?? "";
     const progress = searchParams.get("progress") ?? "";
+    const questionId = searchParams.get("questionId") ?? "";
+
+    const question = await getQuestionById(Number(questionId));
+    if (!question) {
+      return new NextResponse("Question not found", { status: 404 });
+    }
+
+    const answer = question.answer;
+    const explanation = question.explanation;
+    console.log(`Answer: ${answer}, Explanation: ${explanation}`);
 
     const svg = await satori(
       <div
@@ -117,7 +126,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             >
               <img
                 src={getRandomImage(false)}
-                width={250}
+                width={350}
                 height={350}
                 style={{
                   objectFit: "cover",
@@ -130,10 +139,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                   display: "flex",
                   flexDirection: "column",
                   textAlign: "left",
-                  width: "250px",
+                  paddingRight: "20px",
                 }}
               >
-                <p style={{ wordBreak: "break-word" }}>
+                <p style={{ wordBreak: "break-word", fontSize: "36px" }}>
                   Correct Answer is{" "}
                   <span
                     style={{
@@ -141,8 +150,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                       paddingLeft: "10px",
                     }}
                   >
-                    {answer}.
+                    {answer}
                   </span>
+                </p>
+                <p
+                  style={{
+                    wordBreak: "break-word",
+                    fontSize: "32px",
+                    color: "#eee",
+                    width: "650px",
+                  }}
+                >
                   {explanation}
                 </p>
               </div>
@@ -152,13 +170,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           <div
             style={{
               display: "flex",
-              alignItems: "center",
               justifyContent: "center",
             }}
           >
             <img
               src={getRandomImage(true)}
-              width={250}
+              width={350}
               height={350}
               style={{
                 objectFit: "cover",
@@ -167,10 +184,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             />
             <h2
               style={{
-                textAlign: "center",
-                color: "#fff",
+                color: "#eee",
                 fontSize: "32px",
+                width: "650px",
                 wordBreak: "break-word",
+                textAlign: "left",
+                paddingLeft: "20px",
               }}
             >
               {explanation}
