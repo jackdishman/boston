@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { IChannelResponse } from "@/types/interfaces";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  IChannelResponse,
+  IChannelUsersResponse,
+  INeynarUserResponse,
+} from "@/types/interfaces";
 import { useRouter } from "next/navigation";
+import { getUsersByFids } from "@/middleware/helpers";
+import Link from "next/link";
 
 interface IChannelListProps {
   channels: IChannelResponse[];
@@ -16,6 +22,21 @@ const ChannelList: React.FC<IChannelListProps> = ({
   closeSearch,
 }) => {
   const router = useRouter();
+  const [users, setUsers] = useState<INeynarUserResponse[]>([]);
+
+  async function fetchUsers(input: string) {
+    const uList: string[] = [input];
+    const users = await getUsersByFids(uList);
+    console.log(users);
+    setUsers(users);
+  }
+
+  useEffect(() => {
+    // if search only containes numbers, search by id
+    if (/^\d+$/.test(searchTerm)) {
+      fetchUsers(searchTerm);
+    }
+  }, [searchTerm]);
 
   const filteredChannels = useMemo(() => {
     if (searchTerm.length < 2) {
@@ -71,6 +92,32 @@ const ChannelList: React.FC<IChannelListProps> = ({
       >
         ✖
       </button>
+      {/* loop through users and display them */}
+      <div>
+        <h2 className="text-lg mt-16">FIDs:</h2>
+
+        {users.map((user) => (
+          <div
+            key={user.fid}
+            className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200 w-96"
+          >
+            <a
+              href={`https://warpcast.com/${user.username}`}
+              target="_blank"
+              className="text-xl font-semibold mb-2 flex items-center "
+            >
+              <img src={user.pfp_url} className="w-12 h-12 rounded-full" />
+              <div className="ml-4">
+                <h2 className="text-xl font-semibold mb-2">
+                  {user.username} ({user.fid})
+                </h2>
+              </div>
+            </a>
+            <p></p>
+          </div>
+        ))}
+      </div>
+      <h2 className="text-lg mt-16">Channels:</h2>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-8">
         {filteredChannels.map((channel) => (
           <div
