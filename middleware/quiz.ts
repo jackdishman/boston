@@ -147,6 +147,22 @@ export async function getQuestion(
   }
 }
 
+export async function getQuestionById(
+  questionId: number
+): Promise<IQuestion | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*")
+      .eq("id", questionId)
+      .single();
+    if (error) throw error;
+    return data as IQuestion;
+  } catch (error) {
+    console.error("Error fetching question", error);
+  }
+}
+
 export async function updateSubmission(
   fid: string,
   submissionState: ISubmission,
