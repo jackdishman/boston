@@ -130,6 +130,13 @@ const Header: React.FC<HeaderProps> = ({
         <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-16 z-50">
           {authenticated ? (
             <div className="flex flex-col space-y-4">
+              <Link
+                href="/quiz"
+                onClick={() => setIsOpen(false)}
+                className="hover:underline flex items-center text-start"
+              >
+                Trivia Quiz
+              </Link>
               <button
                 onClick={linkWallet}
                 className="hover:underline flex items-center text-start"
