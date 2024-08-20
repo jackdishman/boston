@@ -7,6 +7,20 @@ import * as fs from "fs";
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
 
+function getRandomImage(isCorrect: boolean): string {
+  // generate a random number between 1-10
+  const random = Math.floor(Math.random() * 10) + 1;
+  const imgUrl =
+    process.env.NEXT_PUBLIC_HOST +
+    "/quiz-assets/" +
+    (isCorrect ? "correct" : "incorrect") +
+    "-" +
+    random +
+    ".png";
+  console.log(`Image URL: ${imgUrl}`);
+  return imgUrl;
+}
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
@@ -97,46 +111,72 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             <div
               style={{
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                fontSize: "32px",
+                fontSize: "24px",
               }}
             >
-              <h2 style={{}}>Correct Answer is</h2>
-              <h2
+              <img
+                src={getRandomImage(false)}
+                width={250}
+                height={350}
                 style={{
-                  color: "#ffcc00",
-                  fontSize: "52px",
+                  objectFit: "cover",
                   marginLeft: "10px",
+                  marginRight: "20px",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  textAlign: "left",
+                  width: "250px",
                 }}
               >
-                {answer}
-              </h2>
+                <p style={{ wordBreak: "break-word" }}>
+                  Correct Answer is{" "}
+                  <span
+                    style={{
+                      color: "#ffcc00",
+                      paddingLeft: "10px",
+                    }}
+                  >
+                    {answer}.
+                  </span>
+                  {explanation}
+                </p>
+              </div>
             </div>
           </div>
         ) : (
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
               alignItems: "center",
-              height: "100px",
+              justifyContent: "center",
             }}
           >
+            <img
+              src={getRandomImage(true)}
+              width={250}
+              height={350}
+              style={{
+                objectFit: "cover",
+                marginLeft: "10px",
+              }}
+            />
             <h2
               style={{
                 textAlign: "center",
                 color: "#fff",
-                fontSize: "64px",
+                fontSize: "32px",
+                wordBreak: "break-word",
               }}
             >
-              Nice Job!
+              {explanation}
             </h2>
           </div>
         )}
-        <h2 style={{ textAlign: "center", color: "#fff", fontSize: "32px" }}>
-          {explanation}
-        </h2>
       </div>,
       {
         width: 1148, // 600 * 1.91

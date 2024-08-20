@@ -11,6 +11,9 @@ export async function rewardPoints(
   account: string,
   points: number
 ): Promise<void> {
+  if (process.env.NEXT_PUBLIC_REWARD_POINTS !== "true") {
+    return;
+  }
   await stack.track(action, {
     account,
     points,
@@ -18,6 +21,10 @@ export async function rewardPoints(
 }
 
 export async function getPoints(account: string): Promise<number> {
+  if (process.env.NEXT_PUBLIC_REWARD_POINTS !== "true") {
+    return -1;
+  }
+
   const points = await stack.getPoints(account);
   console.log("Points:", points);
   return points;

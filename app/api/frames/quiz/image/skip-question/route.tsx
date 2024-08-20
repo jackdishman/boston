@@ -54,7 +54,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
               textTransform: "uppercase",
             }}
           >
-            You&amp;ve completed {progress} questions.
+            Completed {progress} questions.
           </div>
           <div
             style={{
@@ -102,27 +102,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             >
               {previousAnswer}
             </span>{" "}
-            which was
+            which was{" "}
             {isCorrect === "true" ? (
-              <h2
+              <span
                 style={{
                   color: "#00ff00",
-                  fontSize: "48px",
-                  marginLeft: "10px",
+                  paddingLeft: "5px",
                 }}
               >
                 Correct
-              </h2>
+              </span>
             ) : (
-              <h2
+              <span
                 style={{
                   color: "#ff0000",
-                  fontSize: "48px",
-                  marginLeft: "10px",
+                  paddingLeft: "5px",
                 }}
               >
                 Incorrect
-              </h2>
+              </span>
             )}
           </div>
           <div
@@ -147,20 +145,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: "32px",
+                  fontSize: "24px",
                 }}
               >
                 <h2 style={{ marginTop: "10px", marginBottom: "10px" }}>
-                  Correct Answer is
-                </h2>
-                <h2
-                  style={{
-                    color: "#ffcc00",
-                    fontSize: "52px",
-                    marginLeft: "5px",
-                  }}
-                >
-                  {correctAnswer}
+                  Correct Answer is{" "}
+                  <span
+                    style={{
+                      color: "#ffcc00",
+                      paddingLeft: "5px",
+                    }}
+                  >
+                    {correctAnswer}
+                  </span>
                 </h2>
               </div>
             )}

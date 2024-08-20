@@ -78,7 +78,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             flexDirection: "column",
           }}
         >
-          <h2 style={{ textAlign: "center", color: "#fff", fontSize: "64px" }}>
+          <h2 style={{ textAlign: "center", color: "#fff", fontSize: "48px" }}>
             {text}
           </h2>
 
