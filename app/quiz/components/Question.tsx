@@ -2,6 +2,7 @@
 
 import React from "react";
 import { IQuestionBuilder } from "@/types/quiz";
+import { testImage } from "@/middleware/checks";
 
 interface QuestionProps {
   index: number;
@@ -32,6 +33,18 @@ const Question: React.FC<QuestionProps> = ({
   handleCorrectAnswerChange,
   removeQuestion,
 }) => {
+  const [imgError, setImgError] = React.useState(false);
+
+  function handleImageChange(url: string) {
+    if (url === "") {
+      setImgError(false);
+    } else {
+      testImage(url)
+        .then(() => setImgError(false))
+        .catch(() => setImgError(true));
+    }
+  }
+
   return (
     <div className="mb-6 border p-4 rounded">
       <div className="mb-4">
@@ -61,12 +74,16 @@ const Question: React.FC<QuestionProps> = ({
           id={`image_url-${index}`}
           type="text"
           value={question.image_url || ""}
-          onChange={(e) =>
-            handleQuestionChange(index, "image_url", e.target.value)
-          }
+          onChange={(e) => {
+            handleQuestionChange(index, "image_url", e.target.value);
+            handleImageChange(e.target.value);
+          }}
           className="mt-1 p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
           placeholder="Image URL"
         />
+        {imgError && (
+          <p className="text-red-500 text-sm mt-1">Invalid image URL!</p>
+        )}
       </div>
       <div className="mb-4">
         <label

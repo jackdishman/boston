@@ -4,6 +4,7 @@ import { join } from "path";
 import * as fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { getQuestionById } from "@/middleware/quiz";
+import { testImageSSR } from "@/middleware/checks";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
@@ -23,6 +24,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     if (!question) {
       return new NextResponse("Question not found", { status: 404 });
     }
+
+    const validQuestionImage =
+      question.image_url && (await testImageSSR(question.image_url));
 
     const svg = await satori(
       <div
@@ -94,7 +98,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           }}
         >
           {/* image */}
-          {question.image_url && (
+          {validQuestionImage && question.image_url && (
             <img
               src={question.image_url}
               width={350}
