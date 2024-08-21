@@ -2,19 +2,10 @@
 
 import { ISubmission } from "@/types/quiz";
 import { INeynarUserResponse } from "@/types/interfaces";
+import { getElapsedTimeString } from "@/middleware/quiz";
 
 interface IProps {
   submissions: (ISubmission & INeynarUserResponse)[];
-}
-
-function getElapsedTime(timeCompleted: string, createdAt: string): string {
-  const timeCompletedDate = new Date(timeCompleted);
-  const createdAtDate = new Date(createdAt);
-  const elapsedTime = timeCompletedDate.getTime() - createdAtDate.getTime();
-  const hours = Math.floor(elapsedTime / 3600000);
-  const minutes = Math.floor((elapsedTime % 3600000) / 60000);
-  const seconds = Math.floor((elapsedTime % 60000) / 1000);
-  return `${hours}h ${minutes}m ${seconds}s`;
 }
 
 export default function SubmissionList({ submissions }: IProps) {
@@ -35,7 +26,7 @@ export default function SubmissionList({ submissions }: IProps) {
           >
             <div>
               <a
-                href={`https://warpcast.con/${data.username}`}
+                href={`https://warpcast.com/${data.username}`}
                 target="_blank"
                 className="flex items-center"
               >
@@ -47,10 +38,9 @@ export default function SubmissionList({ submissions }: IProps) {
             </div>
             <div>{data.score}</div>
             <div>
-              {getElapsedTime(
-                data.time_completed ?? new Date().toString(),
-                data.created_at
-              )}
+              {data.time_completed
+                ? getElapsedTimeString(data.created_at, data.time_completed)
+                : "Incomplete"}
             </div>
             <div>{new Date(data.created_at).toLocaleDateString()}</div>
           </div>
