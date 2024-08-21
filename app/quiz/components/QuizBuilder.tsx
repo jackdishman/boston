@@ -7,6 +7,7 @@ import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { IQuizBuilder, IQuestionBuilder } from "@/types/quiz";
 import QuizForm from "./QuizForm";
 import QuestionList from "./QuestionList";
+import { testImage } from "@/middleware/checks";
 
 export default function QuizBuilder() {
   const { user } = usePrivy();
@@ -27,17 +28,32 @@ export default function QuizBuilder() {
   }, [fid]);
 
   useEffect(() => {
-    setDisabled(
-      !quiz.title ||
-        !quiz.description ||
-        questions.length < 1 ||
-        questions.some(
-          (q) =>
-            q.question_type === "multiple_choice" &&
-            (!q.options || q.options.length < 2)
-        )
-    );
-  }, [quiz.title, quiz.description, questions.length, questions]);
+    const validateQuestions = async () => {
+      for (const question of questions) {
+        if (question.image_url) {
+          try {
+            await testImage(question.image_url);
+          } catch {
+            setDisabled(true);
+            return;
+          }
+        }
+      }
+      setDisabled(
+        !quiz.title ||
+          !quiz.description ||
+          questions.length < 1 ||
+          questions.some(
+            (q) =>
+              q.question_type === "multiple_choice" &&
+              (!q.options || q.options.length < 2)
+          ) ||
+          questions.some((q) => !q.answer)
+      );
+    };
+
+    validateQuestions();
+  }, [quiz.title, quiz.description, questions]);
 
   const addQuestion = () => {
     setQuestions((prevQuestions) => [
