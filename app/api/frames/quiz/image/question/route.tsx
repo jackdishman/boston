@@ -3,6 +3,7 @@ import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
+import { getQuestionById } from "@/middleware/quiz";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
 let fontData = fs.readFileSync(fontPath);
@@ -10,13 +11,18 @@ let fontData = fs.readFileSync(fontPath);
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
-    const text = searchParams.get("text") || "Default Text";
     const time = searchParams.get("time") || "";
     const progress = searchParams.get("progress") || "";
-    const optionA = searchParams.get("optionA");
-    const optionB = searchParams.get("optionB");
-    const optionC = searchParams.get("optionC");
-    const optionD = searchParams.get("optionD");
+    const questionId = searchParams.get("questionId");
+
+    if (!questionId) {
+      return new NextResponse("Missing questionId", { status: 400 });
+    }
+
+    const question = await getQuestionById(Number(questionId));
+    if (!question) {
+      return new NextResponse("Question not found", { status: 404 });
+    }
 
     const svg = await satori(
       <div
@@ -70,46 +76,74 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             Time: {time}
           </div>
         </div>
+        {/* question text */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            height: "100%",
-            flexDirection: "column",
           }}
         >
           <h2 style={{ textAlign: "center", color: "#fff", fontSize: "48px" }}>
-            {text}
+            {question.text}
           </h2>
-
+        </div>
+        {/* multiple choice and image */}
+        <div
+          style={{
+            display: "flex",
+          }}
+        >
+          {/* image */}
+          {question.image_url && (
+            <img
+              src={question.image_url}
+              width={350}
+              height={350}
+              style={{
+                objectFit: "cover",
+                marginLeft: "10px",
+                marginRight: "20px",
+              }}
+            />
+          )}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              marginTop: "5px",
-              marginLeft: "20px",
-              fontSize: "32px",
             }}
           >
-            {optionA && (
-              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
-                A: {optionA}
-              </p>
-            )}
-            {optionB && (
-              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
-                B: {optionB}
-              </p>
-            )}
-            {optionC && (
-              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
-                C: {optionC}
-              </p>
-            )}
-            {optionD && (
-              <p style={{ marginTop: "10px", marginBottom: "0px" }}>
-                D: {optionD}
-              </p>
+            {/* multiple choice */}
+            {question.options && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: "5px",
+                  marginLeft: "20px",
+                  fontSize: "32px",
+                }}
+              >
+                {question.options[0] && (
+                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                    A: {question.options[0]}
+                  </p>
+                )}
+                {question.options[1] && (
+                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                    B: {question.options[1]}
+                  </p>
+                )}
+                {question.options[2] && (
+                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                    C: {question.options[2]}
+                  </p>
+                )}
+                {question.options[3] && (
+                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                    D: {question.options[3]}
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>

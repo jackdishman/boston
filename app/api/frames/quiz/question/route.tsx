@@ -162,11 +162,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    let imageUrl = `${
-      process.env["NEXT_PUBLIC_HOST"]
-    }/api/frames/quiz/image/question?text=${encodeURIComponent(
-      question.text
-    )}&time=${elapsedTime}&progress=${progress}`;
+    let imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/question?time=${elapsedTime}&progress=${progress}&questionId=${question.id}`;
 
     if (question.question_type === "multiple_choice" && question.options) {
       imageUrl += `&optionA=${encodeURIComponent(
