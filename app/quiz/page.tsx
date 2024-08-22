@@ -1,12 +1,22 @@
 import React from "react";
 import QuizList from "./components/QuizList";
-import { getQuizzes } from "@/middleware/quiz";
+import { getQuizStats, getQuizzes } from "@/middleware/quiz";
 import Link from "next/link";
+import { IQuizStats } from "@/types/quiz";
 
 export default async function page() {
   const quizzes = await getQuizzes();
+  const quizStats = new Map<number, IQuizStats>();
 
   if (!quizzes) return <div>No quizzes Found</div>;
+
+  await Promise.all(
+    quizzes.map(async (quiz) => {
+      const stats = await getQuizStats(quiz.id);
+      quizStats.set(quiz.id, stats);
+    })
+  );
+
   return (
     <div>
       <div className="mx-4 my-8 flex justify-center">
@@ -17,7 +27,7 @@ export default async function page() {
           Create a Trivia Quiz
         </Link>
       </div>
-      <QuizList quizzes={quizzes} />
+      <QuizList quizzes={quizzes} quizStats={quizStats} />
     </div>
   );
 }

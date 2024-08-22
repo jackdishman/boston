@@ -5,6 +5,7 @@ import {
   IQuestionBuilder,
   IQuizBuilder,
   ISubmission,
+  IQuizStats,
 } from "@/types/quiz";
 import { supabase } from "./supabase";
 
@@ -271,4 +272,60 @@ export function getElapsedTimeString(
   timeString += (seconds % 60) + "s";
 
   return timeString.trim();
+}
+
+export async function getQuizStats(quizId: number): Promise<IQuizStats> {
+  try {
+    const { data: submissions, error: submissionsError } = await supabase
+      .from("submissions")
+      .select("*")
+      .eq("quiz_id", quizId);
+    if (submissionsError) throw submissionsError;
+
+    const totalSubmissions = submissions.length;
+    const totalScore = submissions.reduce(
+      (acc: number, submission: ISubmission) => acc + (submission.score ?? 0),
+      0
+    );
+    const averageScore = totalScore / totalSubmissions;
+
+    const submissionTimes = submissions.map((submission: ISubmission) =>
+      submission.time_completed
+        ? new Date(submission.time_completed).getTime() -
+          new Date(submission.created_at).getTime()
+        : 0
+    );
+
+    const totalElapsedTime = submissionTimes.reduce(
+      (acc: number, time: number) => acc + time,
+      0
+    );
+    const averageElapsedTime = totalElapsedTime / totalSubmissions;
+
+    const incompleteSubmissions = submissions.filter(
+      (submission: ISubmission) => !submission.time_completed
+    );
+
+    const quizStats: IQuizStats = {
+      quizId,
+      totalSubmissions,
+      totalScore,
+      averageScore,
+      totalElapsedTime,
+      incompleteSubmissions: incompleteSubmissions.length,
+      completedSubmissions: totalSubmissions - incompleteSubmissions.length,
+    };
+    return quizStats;
+  } catch (error) {
+    console.error("Error fetching quiz stats", error);
+    return {
+      quizId,
+      totalSubmissions: 0,
+      totalScore: 0,
+      averageScore: 0,
+      totalElapsedTime: 0,
+      incompleteSubmissions: 0,
+      completedSubmissions: 0,
+    };
+  }
 }
