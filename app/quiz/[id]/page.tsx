@@ -152,10 +152,6 @@ export default async function Page({ params }: { params: { id: string } }) {
         <div className="my-4 w-full">
           <ShareQuiz quiz={quiz} />
         </div>
-        <img
-          src={`${process.env.NEXT_PUBLIC_HOST}/api/frames/quiz/image?title=${quiz.title}&description=${quiz.description}`}
-          alt="Quiz"
-        />
         <QuizContainer
           submissionsWithUsers={submissionsWithUsers}
           quizQuestions={quizQuestions}

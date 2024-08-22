@@ -3,6 +3,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import React from "react";
 import SubmissionList from "./SubmissionList";
 import { IQuestion, ISubmissionWithUser } from "@/types/quiz";
+import QuizTaker from "./QuizTaker";
 
 interface IProps {
   submissionsWithUsers: ISubmissionWithUser[];
@@ -13,7 +14,6 @@ export default function QuizContainer(props: IProps) {
   const { submissionsWithUsers, quizQuestions } = props;
   const { user } = usePrivy();
   const fid = user?.farcaster?.fid?.toString() || null;
-  console.log(fid);
 
   return (
     <div className="my-4 w-full">
@@ -38,6 +38,7 @@ export default function QuizContainer(props: IProps) {
         <div>
           <h2 className="text-2xl font-semibold mt-5">Quiz</h2>
           <p>Complete the quiz to view results and stats</p>
+          <QuizTaker quizQuestions={quizQuestions} />
         </div>
       )}
     </div>
