@@ -1,3 +1,5 @@
+import { INeynarUserResponse } from "./interfaces";
+
 // IQuiz interface
 export interface IQuiz {
   id: number;
@@ -66,4 +68,9 @@ export interface IQuizStats {
   incompleteSubmissions: number;
   completedSubmissions: number;
   totalScore: number;
+}
+
+export interface ISubmissionWithUser extends ISubmission {
+  user: INeynarUserResponse;
+  submission: ISubmission;
 }
