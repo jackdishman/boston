@@ -111,12 +111,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         console.error("Error rewarding points", error);
       }
     }
+    const totalPoints = address ? await getPoints(address) : 0;
 
     const elapsedTime = getElapsedTimeString(
       submission.created_at,
       submission.time_completed
     );
-    return sendFinalResults(percentage, quizId, elapsedTime);
+    return sendFinalResults(percentage, quizId, elapsedTime, totalPoints);
   } catch (error) {
     console.error(error);
     return new NextResponse("Error generating image", { status: 500 });
