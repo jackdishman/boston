@@ -26,6 +26,8 @@ export async function getPoints(account: string): Promise<number> {
     return -1;
   }
 
+  if (!account) return 0;
+
   const points = await stack.getPoints(account);
   console.log("Points:", points);
   return points;
