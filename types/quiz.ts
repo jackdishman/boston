@@ -1,9 +1,12 @@
+import { INeynarUserResponse } from "./interfaces";
+
 // IQuiz interface
 export interface IQuiz {
   id: number;
   uuid: string;
   title: string;
   description: string | null;
+  image: string | null;
   proctor_fid: string | null;
   created_at: string;
   first_question_id: number | null;
@@ -55,4 +58,19 @@ export interface IQuestionBuilder {
   explanation: string;
   image_url?: string;
   question_type: "multiple_choice" | "short_answer";
+}
+
+export interface IQuizStats {
+  quizId: number;
+  totalSubmissions: number;
+  averageScore: number;
+  totalElapsedTime: number;
+  incompleteSubmissions: number;
+  completedSubmissions: number;
+  totalScore: number;
+}
+
+export interface ISubmissionWithUser extends ISubmission {
+  user: INeynarUserResponse;
+  submission: ISubmission;
 }
