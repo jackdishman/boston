@@ -33,7 +33,7 @@ export async function generateMetadata(
     "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Start Quiz`,
-    "fc:frame:button:2": `Leaderboard`,
+    "fc:frame:button:2": `Take in App`,
     "fc:frame:button:2:action": `link`,
     "fc:frame:button:2:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/${id}`,
     "fc:frame:button:3": `Create a Quiz`,

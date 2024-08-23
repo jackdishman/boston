@@ -37,7 +37,6 @@ export default function QuizContainer(props: IProps) {
       ) : (
         <div>
           <h2 className="text-2xl font-semibold mt-5">Quiz</h2>
-          <p>Complete the quiz to view results and stats</p>
           <QuizTaker quizQuestions={quizQuestions} />
         </div>
       )}

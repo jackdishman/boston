@@ -4,6 +4,7 @@ import { IQuestion, ISubmissionWithUser } from "@/types/quiz";
 import { getElapsedTimeString } from "@/middleware/quiz";
 import Image from "next/image";
 import { useState } from "react";
+import Link from "next/link";
 
 interface IProps {
   submissionsWithUsers: ISubmissionWithUser[];
@@ -16,7 +17,7 @@ export default function SubmissionList({
 }: IProps) {
   return (
     <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
-      <div className="min-w-full grid grid-cols-5 bg-gray-50 dark:bg-gray-700 text-xs text-gray-700 uppercase dark:text-gray-400 font-medium">
+      <div className="min-w-full grid grid-cols-6 bg-gray-50 dark:bg-gray-700 text-xs text-gray-700 uppercase dark:text-gray-400 font-medium">
         <div className="py-3 px-6 col-span-2">Farcaster Profile</div>
         <div className="py-3 px-6">Score</div>
         <div className="py-3 px-6">Time</div>
@@ -27,7 +28,7 @@ export default function SubmissionList({
         {submissionsWithUsers.map((data, index) => (
           <div
             key={index}
-            className="grid grid-cols-5 py-4 px-6 bg-white dark:bg-gray-800 text-sm text-gray-500 dark:text-gray-400"
+            className="grid grid-cols-6 py-4 px-6 bg-white dark:bg-gray-800 text-sm text-gray-500 dark:text-gray-400"
           >
             <div className="col-span-2">
               <a
@@ -47,7 +48,7 @@ export default function SubmissionList({
                 </span>
               </a>
             </div>
-            <div>{data.submission.score}</div>
+            <div>{data.submission.score ?? 0}%</div>
             <div>
               {data.submission.time_completed
                 ? getElapsedTimeString(
@@ -59,6 +60,7 @@ export default function SubmissionList({
             <div>
               {new Date(data.submission.created_at).toLocaleDateString()}
             </div>
+            <Link href={`/quiz/results/${data.submission.id}`}>Results</Link>
           </div>
         ))}
       </div>

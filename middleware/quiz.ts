@@ -329,3 +329,30 @@ export async function getQuizStats(quizId: number): Promise<IQuizStats> {
     };
   }
 }
+
+export async function getSubmissionById(id: number) {
+  try {
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (error) throw error;
+    return data as ISubmission;
+  } catch (error) {
+    console.error("Error fetching submission", error);
+  }
+}
+
+export async function getQuestionsByIds(ids: number[]) {
+  try {
+    const { data, error } = await supabase
+      .from("questions")
+      .select("*")
+      .in("id", ids);
+    if (error) throw error;
+    return data as IQuestion[];
+  } catch (error) {
+    console.error("Error fetching questions", error);
+  }
+}

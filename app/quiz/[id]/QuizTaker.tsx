@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { getAccessToken, usePrivy } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import { IQuestion, ISubmission } from "@/types/quiz";
 import { getElapsedTimeString } from "@/middleware/quiz";
+import Link from "next/link";
 
 interface IProps {
   quizQuestions: IQuestion[] | undefined;
@@ -19,6 +20,7 @@ export default function QuizTaker(props: IProps) {
   const [loading, setLoading] = useState(true); // Add loading state
   const shortAnswer = useRef<HTMLInputElement>(null);
   const hasFetchedSubmission = useRef(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   async function getSubmission(
     fid: string,
@@ -107,6 +109,8 @@ export default function QuizTaker(props: IProps) {
       if (!nextQuestion) {
         console.log("No more questions to answer");
         await updateSubmissionScore(); // Update the submission score
+        setIsComplete(true);
+        return;
       }
       setActiveQuestion(nextQuestion);
     }
@@ -172,33 +176,67 @@ export default function QuizTaker(props: IProps) {
 
   if (loading) return <div>Loading...</div>;
 
-  if (!activeQuestion) return <div>No active question found</div>;
+  if (!activeQuestion)
+    return (
+      <div>
+        <h4>No active question found</h4>
+        <Link
+          href={`/quiz/results/${submissionState?.id}`}
+          className="text-lg underline text-blue-500 font-semibold text-center"
+        >
+          View results
+        </Link>
+      </div>
+    );
+
+  if (isComplete)
+    return (
+      <div>
+        <h2 className="text-xl text-amber-600	">Quiz Complete!</h2>
+        <Link
+          className="text-lg underline text-blue-500 font-semibold text-center"
+          href={`/quiz/results/${submissionState?.id}`}
+        >
+          View results
+        </Link>
+      </div>
+    );
 
   return (
     <div className="w-full rounded-lg border-gray-200 border-2 p-10 mt-10">
       {/* top header */}
-      <div className="flex justify-between mb-5">
-        <h6 className="text-sm font-semibold">
+      <div className="flex justify-between mb-5 text-sm items-center">
+        <h6 className="font-semibold">
           Question{" "}
           {quizQuestions?.indexOf(activeQuestion) !== undefined
             ? quizQuestions?.indexOf(activeQuestion) + 1
             : 0}{" "}
           of {quizQuestions?.length}
         </h6>
-        {elapsedTime && <p>Elapsed Time: {elapsedTime}</p>}
+        {elapsedTime && <p>Time: {elapsedTime}</p>}
       </div>
       <h2 className="text-xl">{activeQuestion.text}</h2>
+      {activeQuestion.image_url && (
+        <div className="flex justify-center my-2">
+          <img
+            src={activeQuestion.image_url}
+            alt="Question Image"
+            width={600}
+            height={400}
+          />
+        </div>
+      )}
       {activeQuestion.question_type === "short_answer" && (
-        <div>
+        <div className="w-full flex items-center justify-center mt-5">
           <input
             ref={shortAnswer}
             type="text"
             placeholder="Answer"
-            className="bg-gray-200 hover:border-gray-300 border-2 shadow hover:shadow-lg px-6 py-4 text-xl rounded-tl-lg rounded-lb-lg mt-5 outline-none"
+            className="bg-gray-200 hover:border-gray-300 border-2 shadow hover:shadow-lg px-3 py-2 md:px-6 md:py-4 text-xl rounded-tl-lg rounded-bl-lg outline-none"
           />
           <button
             onClick={handleShortAnswerSubmit}
-            className="h-full bg-blue-200 p-4 text-xl rounded-r-lg border-2 border-blue-200 hover:bg-blue-300 hover:border-blue-400 shadow hover:shadow-lg"
+            className="h-full bg-blue-200 p-2 md:p-4 text-xl rounded-r-lg border-2 border-blue-200 hover:bg-blue-300 hover:border-blue-400 shadow hover:shadow-lg"
           >
             Submit
           </button>
