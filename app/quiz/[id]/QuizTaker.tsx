@@ -67,6 +67,11 @@ export default function QuizTaker(props: IProps) {
       ? Math.round((correctAnswers / totalQuestions) * 100)
       : 0;
 
+    const address =
+      user && user.wallet?.address
+        ? user.wallet.address
+        : user?.farcaster?.ownerAddress;
+
     await fetch("/api/quiz/submit", {
       method: "POST",
       headers: {
@@ -75,13 +80,20 @@ export default function QuizTaker(props: IProps) {
       },
       body: JSON.stringify({
         submissionId: submissionState?.id,
+        address,
         score,
+        quizId: params.id,
       }),
     });
   }
 
   async function handleAnswerSubmit(answer: string, isCorrect: boolean) {
     const accessToken = await getAccessToken();
+
+    const address =
+      user && user.wallet?.address
+        ? user.wallet.address
+        : user?.farcaster?.ownerAddress;
 
     await fetch("/api/quiz/question", {
       method: "POST",
@@ -94,7 +106,9 @@ export default function QuizTaker(props: IProps) {
         submissionState,
         questionId: activeQuestion?.id ?? 0,
         answer,
+        address,
         isCorrect,
+        quizId: params.id,
       }),
     });
 

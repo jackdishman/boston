@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkPrivyAuth } from "@/middleware/auth";
 import { createSubmission, updateSubmission } from "@/middleware/quiz";
+import { rewardPoints } from "@/middleware/points";
 
 export async function POST(req: Request) {
   // get Authorization token from header
@@ -13,7 +14,15 @@ export async function POST(req: Request) {
 
   const body = await req.json();
 
-  const { fid, submissionState, questionId, answer, isCorrect } = body;
+  const {
+    fid,
+    submissionState,
+    questionId,
+    answer,
+    isCorrect,
+    address,
+    quizId,
+  } = body;
 
   if (!submissionState) {
     return NextResponse.json(
@@ -30,6 +39,9 @@ export async function POST(req: Request) {
       answer,
       isCorrect
     );
+    if (isCorrect) {
+      await rewardPoints(`quiz-${quizId}-question-${questionId}`, address, 10);
+    }
     return NextResponse.json(submission, { status: 200 });
   } catch (error) {
     console.error("Error updating submission:", error);

@@ -8,12 +8,13 @@ const stack = new StackClient({
 
 export async function rewardPoints(
   action: string,
-  account: string,
+  account: string | null,
   points: number
 ): Promise<void> {
   if (process.env.NEXT_PUBLIC_REWARD_POINTS !== "true") {
     return;
   }
+  if (!account) return;
   await stack.track(action, {
     account,
     points,
