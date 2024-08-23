@@ -17,7 +17,7 @@ export default function QuizTaker(props: IProps) {
   const [activeQuestion, setActiveQuestion] = useState<IQuestion>();
   const [submissionState, setSubmissionState] = useState<ISubmission>();
   const [elapsedTime, setElapsedTime] = useState<string>("");
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const shortAnswer = useRef<HTMLInputElement>(null);
   const hasFetchedSubmission = useRef(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -56,16 +56,15 @@ export default function QuizTaker(props: IProps) {
     }
   }
 
-  async function updateSubmissionScore() {
+  async function updateSubmissionScore(isCorrectLastAnswer: boolean) {
     const accessToken = await getAccessToken();
 
-    const correctAnswers = submissionState?.answers.filter(
-      (a) => a.is_correct
-    ).length;
+    const correctAnswers =
+      (submissionState?.answers.filter((a) => a.is_correct).length || 0) +
+      (isCorrectLastAnswer ? 1 : 0);
+
     const totalQuestions = quizQuestions?.length ?? 1;
-    const score = correctAnswers
-      ? Math.round((correctAnswers / totalQuestions) * 100)
-      : 0;
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
 
     const address =
       user && user.wallet?.address
@@ -122,7 +121,7 @@ export default function QuizTaker(props: IProps) {
       );
       if (!nextQuestion) {
         console.log("No more questions to answer");
-        await updateSubmissionScore(); // Update the submission score
+        await updateSubmissionScore(isCorrect); // Update the submission score
         setIsComplete(true);
         return;
       }
