@@ -25,28 +25,7 @@ export default function PageContainer(props: IProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <Link
-        href={`/quiz/${quizId}`}
-        className="text-blue-500 p-4 flex items-center mb-6"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5 8.25 12l7.5-7.5"
-          />
-        </svg>
-        Back
-      </Link>
-      <h1 className="text-2xl font-bold mb-6">Quiz Details for ID: {id}</h1>
+    <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Array.from(joinedData).map(([key, value]) => (
           <div key={key} className="border rounded-lg p-4 shadow-sm bg-gray-50">

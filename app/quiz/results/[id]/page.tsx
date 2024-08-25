@@ -3,8 +3,67 @@ import {
   getQuiz,
   getSubmissionById,
 } from "@/middleware/quiz";
-import { IAnswerEntry, IQuestion, ISubmission } from "@/types/quiz";
+import { IAnswerEntry, IQuestion, IQuiz, ISubmission } from "@/types/quiz";
 import PageContainer from "./PageContainer";
+import Link from "next/link";
+import { Metadata, ResolvingMetadata } from "next";
+
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = params.id;
+  // get submission
+  const submission = await getSubmissionById(Number(id));
+  if (!submission) {
+    return {
+      title: "Submission not found",
+      openGraph: {
+        title: "Submission not found",
+        description: "Submission not found",
+      },
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+    };
+  }
+  // get quiz
+  const quiz = await getQuiz(submission.quiz_id);
+  if (!quiz) {
+    return {
+      title: "Quiz not found",
+      openGraph: {
+        title: "Quiz not found",
+        description: "Quiz not found",
+      },
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+    };
+  }
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/share-results?submissionId=${id}`;
+  console.log("Image URL", imageUrl);
+  const fcMetadata: Record<string, string> = {
+    "fc:frame": "vNext",
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${quiz.id}&question_id=${quiz.first_question_id}`,
+    "fc:frame:image": imageUrl,
+    "fc:frame:button:1": `Take Quiz`,
+    "fc:frame:button:2": `View Report`,
+    "fc:frame:button:2:action": `link`,
+    "fc:frame:button:2:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/results/${id}`,
+  };
+
+  return {
+    title: quiz.title,
+    openGraph: {
+      title: quiz.title ?? `Quiz ${id}`,
+      description: quiz.description ?? `Quiz ${id}`,
+      images: [{ url: imageUrl }],
+    },
+    other: {
+      ...fcMetadata,
+    },
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+  };
+}
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -16,11 +75,16 @@ export default async function Page({ params }: { params: { id: string } }) {
   > = new Map();
   let quizId: number | null = null;
   let proctorFid: string | null = null;
+  let finalScore = 0;
+  let fid = "";
+  let quiz: IQuiz | null = null;
 
   // fetch submission data
   try {
     const submissionRes = await getSubmissionById(Number(id));
     if (!submissionRes) return <div>no submissions</div>;
+    finalScore = submissionRes.score ?? 0;
+    fid = submissionRes.fid ?? "";
     submissions.push(submissionRes);
     quizId = submissionRes.quiz_id;
   } catch (error) {
@@ -33,6 +97,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   try {
     const quizRes = await getQuiz(quizId);
     if (!quizRes) return <div>no quiz</div>;
+    quiz = quizRes;
     proctorFid = quizRes.proctor_fid;
   } catch (error) {
     console.error("Error fetching quiz", error);
@@ -67,13 +132,52 @@ export default async function Page({ params }: { params: { id: string } }) {
     }
   });
 
+  if (!quiz) return <div>cannot find quiz</div>;
+
   return (
-    <PageContainer
-      id={id}
-      quizId={quizId}
-      proctorFid={proctorFid ?? ""}
-      submissions={submissions}
-      joinedData={joinedData}
-    />
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <Link
+        href={`/quiz/${quizId}`}
+        className="text-blue-500 p-4 flex items-center mb-6"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15.75 19.5 8.25 12l7.5-7.5"
+          />
+        </svg>
+        Back
+      </Link>
+
+      <h1 className="text-2xl mb-5">
+        Submission for quiz{" "}
+        <Link
+          className="underline hover:text-blue-500"
+          href={`/quiz/${quiz.id}`}
+        >
+          {quiz.id}: {quiz.title}
+        </Link>
+      </h1>
+      <div className="flex justify-between  mb-5 text-lg">
+        <p className="">Final Score: {finalScore}%</p>
+        <p className="">Submission of FID: {fid}</p>
+      </div>
+
+      <PageContainer
+        id={id}
+        quizId={quizId}
+        proctorFid={proctorFid ?? ""}
+        submissions={submissions}
+        joinedData={joinedData}
+      />
+    </div>
   );
 }
