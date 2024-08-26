@@ -14,17 +14,15 @@ async function sendResults(fid: string, quizId: string): Promise<NextResponse> {
         <meta name="fc:frame" content="vNext">
         <meta name="fc:frame:image" content="${imageUrl}">
 
-        <meta property="fc:frame:button:1" content="Give feedback" />
+        <meta property="fc:frame:button:1" content="Full Result Breakdown" />
         <meta property="fc:frame:button:1:action" content="link" />
-        <meta property="fc:frame:button:1:target" content="https://warpcast.com/dish" />
+        <meta property="fc:frame:button:1:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz/${quizId}" />
 
-        <meta property="fc:frame:button:2" content="More Trivia" />
-        <meta property="fc:frame:button:2:action" content="post_redirect" />
+        <meta property="fc:frame:button:2" content="Choose a Quiz" />
+        <meta property="fc:frame:button:2:action" content="link" />
+        <meta property="fc:frame:button:2:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
 
-        <meta property="fc:frame:button:3" content="Create your own" />
-        <meta property="fc:frame:button:3:action" content="link" />
-        <meta property="fc:frame:button:3:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
-      </head>
+        </head>
       <body>
       </body>
     </html>
