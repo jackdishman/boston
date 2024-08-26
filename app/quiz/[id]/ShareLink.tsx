@@ -1,19 +1,17 @@
 "use client";
-import { IQuiz } from "@/types/quiz";
+
 import React from "react";
 import { toast } from "react-toastify";
 
 interface IProps {
-  quiz: IQuiz;
+  url: string;
 }
 
-export default function ShareQuiz(props: IProps) {
-  const { quiz } = props;
+export default function ShareLink(props: IProps) {
+  const { url } = props;
 
   const handleClick = () => {
-    navigator.clipboard.writeText(
-      `${process.env["NEXT_PUBLIC_HOST"]}/quiz/${quiz.id}`
-    );
+    navigator.clipboard.writeText(process.env["NEXT_PUBLIC_HOST"] + url);
     toast("Copied to clipboard");
   };
   return (
@@ -21,9 +19,8 @@ export default function ShareQuiz(props: IProps) {
       className="w-full h-20 border rounded-lg bg-[#7c65c1]/10 hover:bg-[#7c65c1]/30 hover:border-[#7c65c1]/10 border-gray-200 flex items-center justify-around cursor-pointer transition duration-300 hover:shadow-md"
       onClick={handleClick}
     >
-      <h2 className="text-xl font-semibold mx-4">Share this quiz</h2>(
-      {process.env["NEXT_PUBLIC_HOST"]}/quiz/{quiz.id})
-      {/* copy to clipboard icon */}
+      <h2 className="text-xl font-semibold mx-4">Share</h2>(
+      {process.env["NEXT_PUBLIC_HOST"] + url}){/* copy to clipboard icon */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

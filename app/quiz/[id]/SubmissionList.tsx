@@ -76,33 +76,41 @@ const SubmissionBreakdown = ({
   submissionsWithUsers,
   quizQuestions,
 }: IProps) => {
-  const [sortOrder, setSortOrder] = useState<"hardest" | "easiest">("hardest"); // Default to hardest questions first
+  const [sortOrder, setSortOrder] = useState<"hardest" | "easiest">("hardest");
 
-  const questions = submissionsWithUsers[0].submission.answers.map(
-    (answer) => answer.question_id
-  );
+  const questions = quizQuestions?.map((question) => question.id) || [];
 
   let breakdown = questions.map((questionId) => {
-    const correct = submissionsWithUsers.filter((data) =>
-      data.submission.answers.find(
+    const answeredSubmissions = submissionsWithUsers.filter((data) =>
+      data.submission.answers.some(
+        (answer) => answer.question_id === questionId
+      )
+    );
+
+    const correct = answeredSubmissions.filter((data) =>
+      data.submission.answers.some(
         (answer) => answer.question_id === questionId && answer.is_correct
       )
     );
-    const incorrect = submissionsWithUsers.filter((data) =>
-      data.submission.answers.find(
+
+    const incorrect = answeredSubmissions.filter((data) =>
+      data.submission.answers.some(
         (answer) => answer.question_id === questionId && !answer.is_correct
       )
     );
-    return { questionId, correct, incorrect };
+
+    return { questionId, correct, incorrect, answeredSubmissions };
   });
 
-  // Sorting the breakdown based on the sortOrder state
+  // Sort the breakdown based on the sortOrder state
   breakdown = breakdown.sort((a, b) => {
-    const aCorrectPercentage = a.correct.length / submissionsWithUsers.length;
-    const bCorrectPercentage = b.correct.length / submissionsWithUsers.length;
+    const aCorrectPercentage =
+      a.correct.length / a.answeredSubmissions.length || 0;
+    const bCorrectPercentage =
+      b.correct.length / b.answeredSubmissions.length || 0;
     return sortOrder === "hardest"
-      ? aCorrectPercentage - bCorrectPercentage // Hardest first
-      : bCorrectPercentage - aCorrectPercentage; // Easiest first
+      ? aCorrectPercentage - bCorrectPercentage
+      : bCorrectPercentage - aCorrectPercentage;
   });
 
   return (
@@ -148,14 +156,16 @@ const SubmissionBreakdown = ({
                 <p className="text-green-500">
                   Correct: {data.correct.length} (
                   {Math.round(
-                    (data.correct.length / submissionsWithUsers.length) * 100
+                    (data.correct.length / data.answeredSubmissions.length) *
+                      100
                   )}
                   %)
                 </p>
                 <p className="text-red-500">
                   Incorrect: {data.incorrect.length} (
                   {Math.round(
-                    (data.incorrect.length / submissionsWithUsers.length) * 100
+                    (data.incorrect.length / data.answeredSubmissions.length) *
+                      100
                   )}
                   %)
                 </p>

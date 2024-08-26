@@ -1,7 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { getQuestions, getQuiz, getSubmissions } from "@/middleware/quiz";
 import { getUsersByFids } from "@/middleware/helpers";
-import ShareQuiz from "./ShareQuiz";
+import ShareLink from "./ShareLink";
 import { ISubmissionWithUser } from "@/types/quiz";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,6 +11,7 @@ type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+
 export async function generateMetadata(
   { params, searchParams }: Props,
   parent: ResolvingMetadata
@@ -150,7 +151,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             : ""}
         </div>
         <div className="my-4 w-full">
-          <ShareQuiz quiz={quiz} />
+          <ShareLink url={`/quiz/${quiz.id}`} />
         </div>
         <QuizContainer
           submissionsWithUsers={submissionsWithUsers}

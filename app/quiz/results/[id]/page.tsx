@@ -7,6 +7,7 @@ import { IAnswerEntry, IQuestion, IQuiz, ISubmission } from "@/types/quiz";
 import PageContainer from "./PageContainer";
 import Link from "next/link";
 import { Metadata, ResolvingMetadata } from "next";
+import ShareLink from "../../[id]/ShareLink";
 
 type Props = {
   params: { id: string };
@@ -170,6 +171,8 @@ export default async function Page({ params }: { params: { id: string } }) {
         <p className="">Final Score: {finalScore}%</p>
         <p className="">Submission of FID: {fid}</p>
       </div>
+
+      <ShareLink url={`/quiz/results/${id}`} />
 
       <PageContainer
         id={id}
