@@ -5,7 +5,6 @@ import { getAccessToken, useLogin, usePrivy } from "@privy-io/react-auth";
 import { IChannelResponse } from "@/types/interfaces";
 import Header from "./Header";
 import ChannelList from "./ChannelList";
-import { getAllChannels } from "@/middleware/helpers";
 
 interface AppProps {
   children: React.ReactNode;
@@ -40,6 +39,19 @@ const App: React.FC<AppProps> = ({ children }) => {
     },
   });
 
+  const fetchChannels = async (search: string): Promise<IChannelResponse[]> => {
+    const channels = await fetch("/api/search-channels", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${await getAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ search }),
+    });
+    const data = await channels.json();
+    return data.channels as IChannelResponse[];
+  };
+
   useEffect(() => {
     if (!authenticated) {
       login(); // Automatically trigger login if user is not
@@ -49,18 +61,11 @@ const App: React.FC<AppProps> = ({ children }) => {
   useEffect(() => {
     if (searchTerm) {
       setIsSearchActive(true);
+      fetchChannels(searchTerm).then((data) => setChannels(data));
     } else {
       setIsSearchActive(false);
     }
   }, [searchTerm]);
-
-  useEffect(() => {
-    const fetchChannels = async () => {
-      const channels = await getAllChannels(true);
-      setChannels(channels);
-    };
-    fetchChannels();
-  }, []);
 
   if (!authenticated) {
     return <div></div>;
