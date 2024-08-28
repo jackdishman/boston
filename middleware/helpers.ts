@@ -27,23 +27,6 @@ const fetchWithRetry = async (
   throw new Error("Max retries reached");
 };
 
-export const getAllChannels = async (
-  isServer = false
-): Promise<IChannelResponse[]> => {
-  try {
-    const url = isServer
-      ? "https://api.warpcast.com/v2/all-channels"
-      : "/api/channels";
-    const response = await fetchWithRetry(url, { method: "GET" });
-    const data = await response.json();
-    const { channels } = data.result;
-    return channels as IChannelResponse[];
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-};
-
 export const getChannelById = async (
   id: string
 ): Promise<IChannelResponse | null> => {

@@ -5,6 +5,7 @@ import { IChannelUsersResponse, INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "../../../components/ImageCard";
 import Filter from "@/app/components/icons/Filter";
 import ProgressBar from "@/app/components/ProgressBar"; // Import ProgressBar component
+import { getAccessToken } from "@privy-io/react-auth";
 
 interface FollowersListProps {
   allChannelFids: IChannelUsersResponse[];
@@ -83,11 +84,13 @@ const FollowersList: React.FC<FollowersListProps> = ({
   // Logic to fetch more users
   const fetchMoreUsers = async (batch: IChannelUsersResponse[]) => {
     setLoading(true);
+    const accessToken = await getAccessToken();
     try {
       const response = await fetch(`/api/fetch-more-users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           fids: batch.map((item) => item.fid),
