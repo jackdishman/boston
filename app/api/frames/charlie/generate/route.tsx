@@ -1,5 +1,4 @@
 import { validateMessage } from "@/middleware/farcaster";
-import { getUsersByFids } from "@/middleware/helpers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
             <meta property="fc:frame" content="vNext">
             <meta property="fc:frame:image" content="${imageUrl}">
             <meta property="fc:frame:post_url" content="${process.env.NEXT_PUBLIC_HOST}/api/frames/charlie/generate">
-            <meta property="fc:frame:button:1" content="Charlie">
+            <meta property="fc:frame:button:1" content="Mint">
         </head>
         <body>
             <p>Charlie</p>
@@ -27,6 +26,9 @@ export async function POST(req: NextRequest) {
 
   return new NextResponse(response, {
     status: 200,
-    headers: { "Content-Type": "text/html" },
+    headers: {
+      "Content-Type": "text/html",
+      "Cache-Control": "max-age=10", // Set max-age to 10 seconds
+    },
   });
 }

@@ -3,7 +3,7 @@ import React from "react";
 export async function generateMetadata() {
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:image": `${process.env.NEXT_PUBLIC_HOST}/api/frames/charlie/image`,
+    "fc:frame:image": `${process.env.NEXT_PUBLIC_HOST}/charlie-final.jpg`,
     "fc:frame:button:1": `Generate Your Charlie Card`,
     "fc:frame:post_url": `${process.env.NEXT_PUBLIC_HOST}/api/frames/charlie/generate`,
   };
