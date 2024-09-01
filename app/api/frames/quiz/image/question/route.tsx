@@ -128,22 +128,50 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                 }}
               >
                 {question.options[0] && (
-                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                  <p
+                    style={{
+                      textAlign: "left",
+                      marginTop: "10px",
+                      marginBottom: "0px",
+                      width: "700px",
+                    }}
+                  >
                     A: {question.options[0]}
                   </p>
                 )}
                 {question.options[1] && (
-                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                  <p
+                    style={{
+                      textAlign: "left",
+                      marginTop: "10px",
+                      marginBottom: "0px",
+                      width: "700px",
+                    }}
+                  >
                     B: {question.options[1]}
                   </p>
                 )}
                 {question.options[2] && (
-                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                  <p
+                    style={{
+                      textAlign: "left",
+                      marginTop: "10px",
+                      marginBottom: "0px",
+                      width: "700px",
+                    }}
+                  >
                     C: {question.options[2]}
                   </p>
                 )}
                 {question.options[3] && (
-                  <p style={{ marginTop: "10px", marginBottom: "0px" }}>
+                  <p
+                    style={{
+                      textAlign: "left",
+                      marginTop: "10px",
+                      marginBottom: "0px",
+                      width: "700px",
+                    }}
+                  >
                     D: {question.options[3]}
                   </p>
                 )}

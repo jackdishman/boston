@@ -142,16 +142,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                   paddingRight: "20px",
                 }}
               >
-                <p style={{ wordBreak: "break-word", fontSize: "36px" }}>
-                  Correct Answer is{" "}
-                  <span
-                    style={{
-                      color: "#ffcc00",
-                      paddingLeft: "10px",
-                    }}
-                  >
-                    {answer}
-                  </span>
+                <p
+                  style={{
+                    wordBreak: "break-word",
+                    fontSize: "36px",
+                    width: "650px",
+                    color: "#ffcc00",
+                  }}
+                >
+                  {answer}
                 </p>
                 <p
                   style={{
