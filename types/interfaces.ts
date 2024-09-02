@@ -137,3 +137,10 @@ export interface INeynarCastResponse {
   channel: Channel;
   mentioned_profiles: []; // Adjust the type according to the structure of the mentioned_profiles array
 }
+
+export interface IBalanceResponse {
+  "base ethereum": string;
+  ethereum: string;
+  erc20: string;
+  "base erc20": string;
+}
