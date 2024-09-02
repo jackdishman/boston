@@ -5,30 +5,17 @@ export async function validateMessage(req: NextRequest): Promise<{
   buttonId?: number;
   inputText?: string;
   address?: string;
+  castSignerAddress?: string;
 }> {
   const HUB_URL = process.env["HUB_URL"];
   let body: any;
   let data: any;
   let address: string;
+  let castSignerAddress: string;
 
   try {
     body = await req.json(); // Parse the request body as JSON
     const neynarUrl = "https://api.neynar.com/v2/farcaster/frame/validate";
-    const options = {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        api_key: process.env.NEYNAR_API_KEY,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        cast_reaction_context: true,
-        follow_context: false,
-        signer_context: false,
-        channel_follow_context: false,
-        message_bytes_in_hex: body.trustedData.messageBytes,
-      }),
-    };
     const response = await fetch(neynarUrl, {
       method: "POST",
       // @ts-ignore
@@ -40,7 +27,7 @@ export async function validateMessage(req: NextRequest): Promise<{
       body: JSON.stringify({
         cast_reaction_context: true,
         follow_context: false,
-        signer_context: false,
+        signer_context: true,
         channel_follow_context: false,
         message_bytes_in_hex: body.trustedData.messageBytes,
       }),
@@ -49,6 +36,9 @@ export async function validateMessage(req: NextRequest): Promise<{
     address =
       data.action.interactor.verified_addresses.eth_addresses[0] ??
       data.action.interactor.custody_address;
+    castSignerAddress =
+      data.action.cast.author.verified_addresses.eth_addresses[0] ??
+      data.action.cast.author.custody_address;
 
     if (!data.valid) {
       throw new Error("Unvalidated data!");
@@ -84,5 +74,5 @@ export async function validateMessage(req: NextRequest): Promise<{
     inputText = data.action.input.text;
   }
 
-  return { fid, buttonId, inputText, address };
+  return { fid, buttonId, inputText, address, castSignerAddress };
 }

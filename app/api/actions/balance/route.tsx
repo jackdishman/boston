@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import { validateMessage } from "@/middleware/farcaster";
+import { getNativeBalance } from "@/middleware/alchemy";
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  try {
+    const { fid, address, castSignerAddress } = await validateMessage(req);
+
+    if (!fid) {
+      return new NextResponse("Missing fid", { status: 400 });
+    }
+    // fetch balances
+    if (!castSignerAddress) {
+      return new NextResponse("Missing address", { status: 400 });
+    }
+
+    const baseBalance = await getNativeBalance(castSignerAddress, "base");
+    const ethBalance = await getNativeBalance(castSignerAddress, "ethereum");
+
+    const body = {
+      type: "message",
+      message: `mainnet: ${ethBalance.balance.toFixed(
+        2
+      )} ETH // base: ${baseBalance.balance.toFixed(2)} ETH`,
+      link: process.env.NEXT_PUBLIC_HOST + "/api/actions/balance",
+    };
+
+    return new NextResponse(JSON.stringify(body), {
+      status: 200,
+      headers: { "Content-Type": "text/json" },
+    });
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return new NextResponse("Error processing request", { status: 500 });
+  }
+}
+
+export async function GET(): Promise<NextResponse> {
+  const body = {
+    type: "message",
+    message: "Balance checked!",
+    link: process.env.NEXT_PUBLIC_HOST + "/api/actions/balance",
+  };
+
+  return new NextResponse(JSON.stringify(body), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}

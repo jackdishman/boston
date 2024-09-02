@@ -1,10 +1,5 @@
 // pages/channel/[id]/index.tsx
 import { getChannelById, getUsersByFids } from "@/middleware/helpers";
-import {
-  ApiResponse,
-  IChannelResponse,
-  INeynarUserResponse,
-} from "@/types/interfaces";
 import React from "react";
 import ChannelLayout from "./ChannelLayout";
 
