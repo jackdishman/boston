@@ -1,6 +1,7 @@
 import React from "react";
 import ChannelNav from "./ChannelNav";
 import { IChannelResponse, INeynarUserResponse } from "@/types/interfaces";
+import Link from "next/link";
 
 interface ChannelLayoutProps {
   channel: IChannelResponse;
@@ -16,10 +17,8 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
   children,
 }) => {
   const MemberPreview = (member: INeynarUserResponse) => (
-    <a
-      href={`https://warpcast.com/${member.username}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/profile/${member.fid}`}
       className="flex items-center p-2 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 transition"
     >
       <img
@@ -34,7 +33,7 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
         <p className="text-sm text-gray-600">@{member.username}</p>
         <p className="text-sm text-gray-500">FID: {member.fid}</p>
       </div>
-    </a>
+    </Link>
   );
 
   return (

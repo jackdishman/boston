@@ -61,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex-1 mx-4 relative">
             <input
               type="text"
-              placeholder="🔎 Search channels"
+              placeholder="🔎 Search channels or user"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-96 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

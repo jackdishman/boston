@@ -1,14 +1,5 @@
-// Define the TokenBalance type
-type TokenBalance = {
-  chainId: string;
-  chainName: "ethereum" | "base";
-  contractAddress: string | null;
-  name: string;
-  symbol: string;
-  balance: number;
-};
+import { TokenBalance } from "@/types/interfaces";
 
-// Define the IBalanceResponse type as an array of TokenBalance objects
 export type IBalanceResponse = TokenBalance[];
 
 const networks = {
@@ -91,7 +82,7 @@ export async function getERC20Balances(
   const data = await res.json();
   const tokenBalances = data.result.tokenBalances;
 
-  return Promise.all(
+  const filteredBalances = await Promise.all(
     tokenBalances.map(
       async (token: { contractAddress: string; tokenBalance: string }) => {
         const tokenMetadata = await getTokenMetadata(
@@ -99,8 +90,17 @@ export async function getERC20Balances(
           networkName
         );
 
+        if (!tokenMetadata || Number(token.tokenBalance) === 0) {
+          // If no metadata or balance is 0, omit the token
+          return null;
+        }
+
         const balance =
           Number(token.tokenBalance) / 10 ** tokenMetadata.decimals;
+
+        if (balance === 0) {
+          return null;
+        }
 
         return {
           chainId: chainId,
@@ -113,6 +113,8 @@ export async function getERC20Balances(
       }
     )
   );
+
+  return filteredBalances.filter((token) => token !== null) as IBalanceResponse;
 }
 
 // Fetch token metadata for a given contract address
@@ -129,14 +131,27 @@ async function getTokenMetadata(
     params: [contractAddress],
   });
 
-  const res = await fetch(url, {
-    headers: headers,
-    method: "POST",
-    body,
-  });
+  try {
+    const res = await fetch(url, {
+      headers: headers,
+      method: "POST",
+      body: body,
+    });
 
-  const tokenData = await res.json();
-  return tokenData.result;
+    const tokenData = await res.json();
+    if (!tokenData.result) {
+      console.warn(`No metadata found for contract: ${contractAddress}`);
+      return null;
+    }
+
+    return tokenData.result;
+  } catch (error) {
+    console.error(
+      `Failed to fetch token metadata for ${contractAddress}:`,
+      error
+    );
+    return null;
+  }
 }
 
 // Combined method to get both native balance and ERC-20 token balances for a given network
@@ -147,5 +162,8 @@ export async function getAllBalances(
   const nativeBalance = await getNativeBalance(address, networkName);
   const erc20Balances = await getERC20Balances(address, networkName);
 
-  return [nativeBalance, ...erc20Balances];
+  // Only include native balance if it’s greater than 0
+  return nativeBalance.balance > 0
+    ? [nativeBalance, ...erc20Balances]
+    : erc20Balances;
 }

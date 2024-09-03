@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ImageCardProps {
   imageUrl: string;
@@ -9,7 +10,7 @@ interface ImageCardProps {
 const ImageCard: React.FC<ImageCardProps> = ({ imageUrl, linkUrl }) => {
   return (
     <div className="relative w-full h-full">
-      <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+      <Link href={linkUrl}>
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -22,7 +23,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ imageUrl, linkUrl }) => {
         ) : (
           <div className="absolute top-0 left-0 w-full h-full bg-gray-200" />
         )}
-      </a>
+      </Link>
     </div>
   );
 };

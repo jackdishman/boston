@@ -84,7 +84,34 @@ export const getUsersByFids = async (
     };
     const response = await fetchWithRetry(url, options);
     const data = await response.json();
+    if (!data || !data.users) {
+      return [];
+    }
     return data.users as INeynarUserResponse[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+export const getUsersByName = async (
+  search: string
+): Promise<INeynarUserResponse[]> => {
+  try {
+    const url = `https://api.neynar.com/v2/farcaster/user/search?q=${search}&limt=5`;
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY ?? ``,
+      },
+    };
+    const response = await fetchWithRetry(url, options);
+    const { result } = await response.json();
+    if (!result || !result.users) {
+      return [];
+    }
+    return result.users as INeynarUserResponse[];
   } catch (error) {
     console.error(error);
     return [];

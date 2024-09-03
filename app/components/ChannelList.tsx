@@ -1,13 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  IChannelResponse,
-  IChannelUsersResponse,
-  INeynarUserResponse,
-} from "@/types/interfaces";
+import { IChannelResponse, INeynarUserResponse } from "@/types/interfaces";
 import { useRouter } from "next/navigation";
-import { getUsersByFids } from "@/middleware/helpers";
+import { getAccessToken } from "@privy-io/react-auth";
 import Link from "next/link";
 
 interface IChannelListProps {
@@ -25,17 +21,22 @@ const ChannelList: React.FC<IChannelListProps> = ({
   const [users, setUsers] = useState<INeynarUserResponse[]>([]);
 
   async function fetchUsers(input: string) {
+    const accessToken = await getAccessToken();
     const uList: string[] = [input];
-    const users = await getUsersByFids(uList);
-    console.log(users);
+    const users = await fetch("/api/search-users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ search: uList }),
+    }).then((res) => res.json());
     setUsers(users);
   }
 
   useEffect(() => {
     // if search only containes numbers, search by id
-    if (/^\d+$/.test(searchTerm)) {
-      fetchUsers(searchTerm);
-    }
+    fetchUsers(searchTerm);
   }, [searchTerm]);
 
   const filteredChannels = useMemo(() => {
@@ -95,27 +96,29 @@ const ChannelList: React.FC<IChannelListProps> = ({
       {/* loop through users and display them */}
       {users.length > 0 && (
         <div>
-          <h2 className="text-lg mt-16">FIDs:</h2>
-          {users.map((user) => (
-            <div
-              key={user.fid}
-              className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200 w-96"
-            >
-              <a
-                href={`https://warpcast.com/${user.username}`}
-                target="_blank"
-                className="text-xl font-semibold mb-2 flex items-center "
+          <h2 className="text-lg mt-16 mb-8">Farcaster Accounts:</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+            {users.map((user) => (
+              <div
+                key={user.fid}
+                className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200 w-full sm:w-96"
               >
-                <img src={user.pfp_url} className="w-12 h-12 rounded-full" />
-                <div className="ml-4">
-                  <h2 className="text-xl font-semibold mb-2">
-                    {user.username} ({user.fid})
-                  </h2>
-                </div>
-              </a>
-              <p></p>
-            </div>
-          ))}
+                <Link
+                  href={`/profile/${user.fid}`}
+                  className="text-xl font-semibold mb-2 flex items-center"
+                  onClick={closeSearch}
+                >
+                  <img src={user.pfp_url} className="w-12 h-12 rounded-full" />
+                  <div className="ml-4">
+                    <h2 className="text-xl font-semibold mb-2">
+                      {user.username} ({user.fid})
+                    </h2>
+                  </div>
+                </Link>
+                <p></p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       <h2 className="text-lg mt-16">Channels:</h2>
