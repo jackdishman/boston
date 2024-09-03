@@ -1,8 +1,8 @@
 import { getUsersByFids } from "@/middleware/helpers";
 import React from "react";
 import { getAllBalances, IBalanceResponse } from "@/middleware/alchemy";
-import { TokenBalance } from "@/types/interfaces";
 import Link from "next/link";
+import TokenBalances from "./TokenBalances";
 
 type Props = {
   params: { fidid: string };
@@ -94,30 +94,7 @@ export default async function Page({ params }: { params: { fid: string } }) {
           <p>Following: {p.following_count}</p>
         </div>
       </div>
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Verified ETH Addresses:</h2>
-        {addressBalances.map(({ address, balances }) => (
-          <div key={address} className="mb-6 border p-4 rounded-lg shadow">
-            <h3 className="text-xl font-semibold mb-2">{address}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {balances.map((balance) => (
-                <div key={balance.contractAddress}>
-                  <h4 className="text-lg font-medium mb-2">
-                    {balance.name} ({balance.symbol})
-                  </h4>
-                  <p className="text-gray-700 mb-2">
-                    Balance: {balance.balance.toFixed(2)}
-                  </p>
-                  <p className="text-gray-700">
-                    Chain: {balance.chainName}, Contract:{" "}
-                    {balance.contractAddress || "Native Token"}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <TokenBalances addressBalances={addressBalances} />
     </div>
   );
 }
