@@ -11,7 +11,7 @@ export async function validateMessage(req: NextRequest): Promise<{
   let body: any;
   let data: any;
   let address: string;
-  let castSignerAddress: string;
+  let castSignerAddress: string | undefined;
 
   try {
     body = await req.json(); // Parse the request body as JSON
@@ -28,7 +28,7 @@ export async function validateMessage(req: NextRequest): Promise<{
         cast_reaction_context: true,
         follow_context: false,
         signer_context: true,
-        channel_follow_context: false,
+        channel_follow_context: true,
         message_bytes_in_hex: body.trustedData.messageBytes,
       }),
     });
@@ -36,10 +36,11 @@ export async function validateMessage(req: NextRequest): Promise<{
     address =
       data.action.interactor.verified_addresses.eth_addresses[0] ??
       data.action.interactor.custody_address;
-    castSignerAddress =
-      data.action.cast.author.verified_addresses.eth_addresses[0] ??
-      data.action.cast.author.custody_address;
-
+    if (data.action.cast.author) {
+      castSignerAddress =
+        data.action.cast.author.verified_addresses.eth_addresses[0] ??
+        data.action.cast.author.custody_address;
+    }
     if (!data.valid) {
       throw new Error("Unvalidated data!");
     }
