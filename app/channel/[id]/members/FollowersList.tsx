@@ -320,7 +320,7 @@ const FollowersList: React.FC<FollowersListProps> = ({
               <div className="h-64">
                 <ImageCard
                   imageUrl={user.pfp_url}
-                  linkUrl={`https://warpcast.com/${user.username}`}
+                  linkUrl={`/profile/${user.fid}`}
                 />
               </div>
               <div className="px-4 pt-4">

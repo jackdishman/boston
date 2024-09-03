@@ -138,9 +138,13 @@ export interface INeynarCastResponse {
   mentioned_profiles: []; // Adjust the type according to the structure of the mentioned_profiles array
 }
 
-export interface IBalanceResponse {
-  "base ethereum": string;
-  ethereum: string;
-  erc20: string;
-  "base erc20": string;
-}
+export interface IBalanceResponse extends Array<TokenBalance> {}
+
+export type TokenBalance = {
+  chainId: string;
+  chainName: "ethereum" | "base";
+  contractAddress: string | null;
+  name: string;
+  symbol: string;
+  balance: number;
+};
