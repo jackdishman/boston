@@ -37,9 +37,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function GET(): Promise<NextResponse> {
   const body = {
-    type: "message",
-    message: "Balance checked!",
-    link: process.env.NEXT_PUBLIC_HOST + "/api/actions/balance",
+    name: "ETH balance checker",
+    icon: "id-badge",
+    description: "Check ETH balance of a caster on mainnet and base",
+    aboutUrl: "https://dish.codes/",
+    action: {
+      type: "post",
+      postUrl: "https://dish.codes/api/actions/balance",
+    },
   };
 
   return new NextResponse(JSON.stringify(body), {
