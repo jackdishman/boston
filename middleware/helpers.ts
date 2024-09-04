@@ -1,5 +1,6 @@
 import {
   ApiResponse,
+  IIcebreakerProfilesResponse,
   IChannelFollowersResponse,
   IChannelResponse,
   IChannelUsersResponse,
@@ -143,4 +144,21 @@ export function splitIntoBatches(
     batches.push(batch);
   }
   return batches;
+}
+
+export async function getIcebreakerProfile(
+  fid: string
+): Promise<IIcebreakerProfilesResponse | null> {
+  try {
+    const res = await fetch(`https://app.icebreaker.xyz/api/v1/fid/${fid}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    return data;
+  } catch {
+    return null;
+  }
 }

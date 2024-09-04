@@ -79,7 +79,7 @@ export default function TokenBalances(props: IProps) {
         </button>
       </div>
 
-      <div className="flex items-center mb-4">
+      <div className="flex flex-col sm:flex-row items-center mb-4">
         <label className="text-2xl font-semibold mr-4">
           Verified ETH Addresses:
         </label>
@@ -87,7 +87,7 @@ export default function TokenBalances(props: IProps) {
         <select
           value={selectedAddress}
           onChange={(e) => setSelectedAddress(e.target.value)}
-          className="px-4 py-2 border rounded"
+          className="px-4 py-2 border rounded w-64"
         >
           <option value="all">All Addresses</option>
           {addressBalances.map(({ address }) => (
