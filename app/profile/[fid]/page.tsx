@@ -1,50 +1,12 @@
 import { getIcebreakerProfile, getUsersByFids } from "@/middleware/helpers";
 import React from "react";
 import { getAllBalances, IBalanceResponse } from "@/middleware/alchemy";
-import Link from "next/link";
 import TokenBalances from "./TokenBalances";
-
-type Props = {
-  params: { fidid: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-const TextToParagraph: React.FC<{ text: string }> = ({ text }) => {
-  const renderText = (text: string) => {
-    return text.split(" ").map((word, index) => {
-      if (word.startsWith("/")) {
-        const channel = word.substring(1);
-        return (
-          <React.Fragment key={index}>
-            <Link
-              href={`/channel/${channel}`}
-              className="underline text-purple-600"
-            >
-              {word}
-            </Link>{" "}
-          </React.Fragment>
-        );
-      } else if (word.startsWith("http://") || word.startsWith("https://")) {
-        return (
-          <React.Fragment key={index}>
-            <a
-              href={word}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline"
-            >
-              {word}
-            </a>{" "}
-          </React.Fragment>
-        );
-      } else {
-        return <span key={index}>{word} </span>;
-      }
-    });
-  };
-
-  return <p>{renderText(text)}</p>;
-};
+import UserInfo from "./UserInfo";
+import Credentials from "./Credentials";
+import Highlights from "./Highlights";
+import WorkExperience from "./WorkExperience";
+import Image from "next/image";
 
 interface IAddressBalance {
   address: string;
@@ -73,123 +35,45 @@ export default async function Page({ params }: { params: { fid: string } }) {
   );
 
   return (
-    <div className="p-4">
-      {/* Top part with user info */}
-      <div className="sm:flex">
-        <div className="flex justify-center">
-          <img
+    <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
+      <div className="sm:flex sm:space-x-8 items-center">
+        {/* Profile Picture */}
+        <div className="flex justify-center sm:w-1/3">
+          <Image
+            width={256}
+            height={256}
             src={p.pfp_url}
             alt="avatar"
-            className="w-64 h-64 rounded-full"
+            className="w-40 h-40 sm:w-64 sm:h-64 rounded object-cover shadow-md ring-4 ring-accent"
           />
         </div>
-        <div className="my-5 sm:ml-5">
-          <h1 className="text-3xl font-semibold text-center sm:text-left">
-            {p.display_name}
-          </h1>
-          <p className="text-xl text-center sm:text-left">
-            @{p.username} ({p.fid})
-          </p>
-          {/* Use TextToParagraph component to render the bio */}
-          <div className="text-lg my-4 text-center sm:text-left">
-            <TextToParagraph text={p.profile.bio.text} />
-          </div>
-          {/* middle section: stats and personal info */}
-          <div className="mt-2 flex justify-around sm:flex-col">
-            <div>
-              <p>Followers: {p.follower_count}</p>
-              <p>Following: {p.following_count}</p>
-            </div>
-            <div className="text-gray-800">
-              <p>Job title: {icebreakerProfile?.jobTitle || "N/A"}</p>
-              <p>Location: {icebreakerProfile?.location}</p>
-            </div>
-          </div>
-        </div>
-        {/* Channels */}
-        <div className="flex sm:flex-col sm:items-end flex-wrap">
-          {icebreakerProfile?.channels.map((channel, index) => (
-            <a
-              key={index}
-              href={channel.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-lg font-semibold capitalize text-gray-700 hover:underline p-4"
-            >
-              {channel.type} {channel.isVerified && "✅"}
-            </a>
-          ))}
-        </div>
+
+        {/* User Info */}
+        <UserInfo
+          displayName={p.display_name}
+          username={p.username}
+          fid={p.fid.toString()}
+          bio={p.profile.bio.text}
+          followerCount={p.follower_count}
+          followingCount={p.following_count}
+          jobTitle={icebreakerProfile?.jobTitle || "N/A"}
+          location={icebreakerProfile?.location || "N/A"}
+          channels={icebreakerProfile?.channels || []}
+        />
       </div>
 
-      {/* Credentials */}
-      <div className="my-6">
-        <h3 className="text-lg font-semibold">Credentials</h3>
-        {icebreakerProfile?.credentials.map((credential, index) => (
-          <div key={index}>
-            <p className="text-gray-700">
-              {credential.name}{" "}
-              <a
-                href={
-                  (credential.chain === "base"
-                    ? `https://base.easscan.org/attestation/view/`
-                    : `https://easscan.org/attestation/view/`) +
-                  credential.reference
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                {credential.source}
-              </a>
-            </p>
-          </div>
-        ))}
-      </div>
+      {/* Section Spacing */}
+      <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3">
+        {/* Credentials */}
+        <Credentials credentials={icebreakerProfile?.credentials || []} />
 
-      {/* Highlights */}
-      <div className="my-6">
-        <h3 className="text-lg font-semibold">Highlights</h3>
-        {icebreakerProfile?.highlights.map((highlight, index) => (
-          <div key={index}>
-            <p className="text-gray-700">
-              <a
-                href={highlight.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                {highlight.title}
-              </a>
-            </p>
-          </div>
-        ))}
-      </div>
+        {/* Highlights */}
+        <Highlights highlights={icebreakerProfile?.highlights || []} />
 
-      {/* Work Experience */}
-      <div className="my-6">
-        <h3 className="text-lg font-semibold">Work Experience</h3>
-        {icebreakerProfile?.workExperience.map((experience, index) => (
-          <div key={index} className="mb-4">
-            <p className="font-semibold text-gray-700">{experience.jobTitle}</p>
-            <p className="text-gray-500">{experience.employmentType}</p>
-            <p className="text-gray-500">{experience.location}</p>
-            <a
-              href={experience.orgWebsite}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline"
-            >
-              {experience.orgWebsite}
-            </a>
-            <p className="text-gray-500">
-              {new Date(experience.startDate).toLocaleDateString()} -{" "}
-              {experience.endDate
-                ? new Date(experience.endDate).toLocaleDateString()
-                : "Present"}
-            </p>
-          </div>
-        ))}
+        {/* Work Experience */}
+        <WorkExperience
+          workExperience={icebreakerProfile?.workExperience || []}
+        />
       </div>
 
       {/* Token Balances */}
