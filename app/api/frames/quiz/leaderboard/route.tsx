@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateMessage } from "@/middleware/farcaster";
+import { getQuizzes } from "@/middleware/quiz";
 
 async function sendResults(fid: string, quizId: string): Promise<NextResponse> {
+  // get random quiz
+  const quizzes = await getQuizzes();
+  if (!quizzes) {
+    return new NextResponse("No quizzes found", { status: 404 });
+  }
+  const quiz = quizzes[Math.floor(Math.random() * quizzes.length)];
+  const id = quiz.id;
+
   const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/leaderboard?fid=${fid}&quiz_id=${quizId}`;
 
   const responseHtml = `
@@ -21,7 +30,8 @@ async function sendResults(fid: string, quizId: string): Promise<NextResponse> {
         <meta property="fc:frame:button:2" content="Choose a Quiz" />
         <meta property="fc:frame:button:2:action" content="link" />
         <meta property="fc:frame:button:2:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
-
+        
+        <meta property="fc:frame:button:3" content="Random Quiz" />
         </head>
       <body>
       </body>
