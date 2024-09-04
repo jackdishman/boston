@@ -148,3 +148,52 @@ export type TokenBalance = {
   symbol: string;
   balance: number;
 };
+
+interface IcebreakerProfileChannel {
+  type: string;
+  isVerified: boolean;
+  isLocked: boolean;
+  value: string;
+  url: string;
+}
+
+interface IcebreakerProfileCredential {
+  name: string;
+  chain: string;
+  source: string;
+  reference: string;
+}
+
+interface IcebreakerProfileHighlight {
+  title: string;
+  url: string;
+}
+
+interface IcebreakerProfileWorkExperience {
+  jobTitle: string;
+  orgWebsite: string;
+  employmentType: string;
+  location: string;
+  startDate: string;
+  endDate: string | null;
+}
+
+export interface IIcebreakerProfile {
+  profileID: string;
+  walletAddress: string;
+  avatarUrl: string;
+  displayName: string;
+  bio: string;
+  jobTitle: string;
+  primarySkill: string;
+  networkingStatus: string;
+  location: string;
+  channels: IcebreakerProfileChannel[];
+  credentials: IcebreakerProfileCredential[];
+  highlights: IcebreakerProfileHighlight[]; // Updated to reflect the data structure for highlights
+  workExperience: IcebreakerProfileWorkExperience[]; // Updated to reflect the data structure for workExperience
+}
+
+export interface IIcebreakerProfilesResponse {
+  profiles: IIcebreakerProfile[];
+}

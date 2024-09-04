@@ -1,50 +1,12 @@
-import { getUsersByFids } from "@/middleware/helpers";
+import { getIcebreakerProfile, getUsersByFids } from "@/middleware/helpers";
 import React from "react";
 import { getAllBalances, IBalanceResponse } from "@/middleware/alchemy";
-import Link from "next/link";
 import TokenBalances from "./TokenBalances";
-
-type Props = {
-  params: { fidid: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-const TextToParagraph: React.FC<{ text: string }> = ({ text }) => {
-  const renderText = (text: string) => {
-    return text.split(" ").map((word, index) => {
-      if (word.startsWith("/")) {
-        const channel = word.substring(1);
-        return (
-          <React.Fragment key={index}>
-            <Link
-              href={`/channel/${channel}`}
-              className="underline text-purple-600"
-            >
-              {word}
-            </Link>{" "}
-          </React.Fragment>
-        );
-      } else if (word.startsWith("http://") || word.startsWith("https://")) {
-        return (
-          <React.Fragment key={index}>
-            <a
-              href={word}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline"
-            >
-              {word}
-            </a>{" "}
-          </React.Fragment>
-        );
-      } else {
-        return <span key={index}>{word} </span>;
-      }
-    });
-  };
-
-  return <p>{renderText(text)}</p>;
-};
+import UserInfo from "./UserInfo";
+import Credentials from "./Credentials";
+import Highlights from "./Highlights";
+import WorkExperience from "./WorkExperience";
+import Image from "next/image";
 
 interface IAddressBalance {
   address: string;
@@ -57,6 +19,8 @@ export default async function Page({ params }: { params: { fid: string } }) {
   // Fetch user by fid
   const user = await getUsersByFids([fid]);
   const p = user[0];
+  const icebreakerRes = await getIcebreakerProfile(fid);
+  const icebreakerProfile = icebreakerRes?.profiles[0];
 
   const addressBalances: IAddressBalance[] = await Promise.all(
     p.verified_addresses.eth_addresses.map(async (address) => {
@@ -71,29 +35,48 @@ export default async function Page({ params }: { params: { fid: string } }) {
   );
 
   return (
-    <div className="p-4">
-      {/* Top part with user info */}
-      <div className="flex">
-        <div>
-          <img
+    <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
+      <div className="sm:flex sm:space-x-8 items-center">
+        {/* Profile Picture */}
+        <div className="flex justify-center sm:w-1/3">
+          <Image
+            width={256}
+            height={256}
             src={p.pfp_url}
             alt="avatar"
-            className="w-64 h-64 rounded-full"
+            className="w-40 h-40 sm:w-64 sm:h-64 rounded object-cover shadow-md ring-4 ring-accent"
           />
         </div>
-        <div className="ml-5">
-          <h1 className="text-3xl font-semibold">{p.display_name}</h1>
-          <p className="text-xl">
-            @{p.username} ({p.fid})
-          </p>
-          {/* Use TextToParagraph component to render the bio */}
-          <div className="text-lg">
-            <TextToParagraph text={p.profile.bio.text} />
-          </div>
-          <p className="mt-2">Followers: {p.follower_count}</p>
-          <p>Following: {p.following_count}</p>
-        </div>
+
+        {/* User Info */}
+        <UserInfo
+          displayName={p.display_name}
+          username={p.username}
+          fid={p.fid.toString()}
+          bio={p.profile.bio.text}
+          followerCount={p.follower_count}
+          followingCount={p.following_count}
+          jobTitle={icebreakerProfile?.jobTitle || "N/A"}
+          location={icebreakerProfile?.location || "N/A"}
+          channels={icebreakerProfile?.channels || []}
+        />
       </div>
+
+      {/* Section Spacing */}
+      <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3">
+        {/* Credentials */}
+        <Credentials credentials={icebreakerProfile?.credentials || []} />
+
+        {/* Highlights */}
+        <Highlights highlights={icebreakerProfile?.highlights || []} />
+
+        {/* Work Experience */}
+        <WorkExperience
+          workExperience={icebreakerProfile?.workExperience || []}
+        />
+      </div>
+
+      {/* Token Balances */}
       <TokenBalances addressBalances={addressBalances} />
     </div>
   );
