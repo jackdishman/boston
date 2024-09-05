@@ -3,8 +3,7 @@ import FollowersList from "./FollowersList";
 import {
   getUsersByFids,
   getChannelById,
-  fetchChannelFollowerFids,
-  splitIntoBatches,
+  getChannelFollowers,
 } from "@/middleware/helpers";
 import ChannelLayout from "../ChannelLayout";
 
@@ -54,28 +53,15 @@ export default async function Page({ params }: Props) {
       ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
       : [];
 
-  const users = await fetchChannelFollowerFids(params.id);
-
-  if (!users || users.length === 0) return <div>Error fetching users</div>;
-
-  const batches = splitIntoBatches(users, 50);
-
-  // Get first batch and then pop it off
-  const firstBatch = batches.shift();
-  if (!firstBatch) return <div>Error fetching first batch</div>;
-
-  const usersBatch = await getUsersByFids(
-    firstBatch.map((item) => item.fid.toString())
-  );
+  const { users, cursor } = await getChannelFollowers(params.id);
 
   return (
     <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
       <FollowersList
-        allChannelFids={users}
-        firstBatch={usersBatch}
-        toFetch={batches}
+        users={users}
+        cursor={cursor}
         channelId={params.id}
-        numChannelMembers={users.length}
+        followerCount={channel.followerCount}
       />
     </ChannelLayout>
   );

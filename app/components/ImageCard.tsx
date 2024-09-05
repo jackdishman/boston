@@ -8,10 +8,13 @@ interface ImageCardProps {
 }
 
 const ImageCard: React.FC<ImageCardProps> = ({ imageUrl, linkUrl }) => {
+  // Check if the image URL is valid and secure (not http://)
+  const isValidImageUrl = imageUrl && !imageUrl.startsWith("http://");
+
   return (
     <div className="relative w-full h-full">
       <Link href={linkUrl}>
-        {imageUrl ? (
+        {isValidImageUrl ? (
           <Image
             src={imageUrl}
             alt="Profile"

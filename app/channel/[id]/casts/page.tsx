@@ -64,9 +64,10 @@ export default async function Page({ params }: Props) {
   if (!channel) return <div>Error fetching channel</div>;
 
   const leadMember = await getUsersByFids([channel.leadFid.toString()]);
-  const hosts = await getUsersByFids(
-    channel.hostFids.map((fid) => fid.toString())
-  );
+  const hosts =
+    channel.hostFids && channel.hostFids.length > 0
+      ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
+      : [];
 
   const casts = await getChannelCasts(channel.url);
   if (!casts) return <div>Error fetching casts</div>;
