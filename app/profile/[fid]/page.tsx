@@ -1,17 +1,12 @@
 import { getIcebreakerProfile, getUsersByFids } from "@/middleware/helpers";
+import {
+  getAllBalances,
+  getNFTs,
+  IBalanceResponse,
+} from "@/middleware/alchemy";
 import React from "react";
-import { getAllBalances, IBalanceResponse } from "@/middleware/alchemy";
-import TokenBalances from "./TokenBalances";
-import UserInfo from "./UserInfo";
-import Credentials from "./Credentials";
-import Highlights from "./Highlights";
-import WorkExperience from "./WorkExperience";
-import Image from "next/image";
-
-interface IAddressBalance {
-  address: string;
-  balances: IBalanceResponse;
-}
+import ClientContainer from "./ClientContainer";
+import { IAddressBalance, INFTs } from "@/types/interfaces";
 
 export default async function Page({ params }: { params: { fid: string } }) {
   const { fid } = params;
@@ -22,62 +17,41 @@ export default async function Page({ params }: { params: { fid: string } }) {
   const icebreakerRes = await getIcebreakerProfile(fid);
   const icebreakerProfile = icebreakerRes?.profiles[0];
 
+  // Fetch token balances for Ethereum and Base
   const addressBalances: IAddressBalance[] = await Promise.all(
     p.verified_addresses.eth_addresses.map(async (address) => {
-      const balances = await getAllBalances(address, "base");
+      const baseBalances = await getAllBalances(address, "base");
       const ethereumBalances = await getAllBalances(address, "ethereum");
-
       return {
         address,
-        balances: [...balances, ...ethereumBalances],
+        balances: [...baseBalances, ...ethereumBalances],
+      };
+    })
+  );
+
+  // Fetch NFTs for all verified Ethereum addresses
+  const nfts: INFTs[] = await Promise.all(
+    p.verified_addresses.eth_addresses.map(async (address) => {
+      const nftsForAddressEthereum = await getNFTs(address, 100, "ethereum");
+      const nftsForAddressBase = await getNFTs(address, 100, "base");
+      return {
+        address,
+        ethereumNFTs: nftsForAddressEthereum
+          ? nftsForAddressEthereum.ownedNfts
+          : [],
+        baseNFTs: nftsForAddressBase ? nftsForAddressBase.ownedNfts : [],
       };
     })
   );
 
   return (
     <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
-      <div className="sm:flex sm:space-x-8 items-center">
-        {/* Profile Picture */}
-        <div className="flex justify-center sm:w-1/3">
-          <Image
-            width={256}
-            height={256}
-            src={p.pfp_url}
-            alt="avatar"
-            className="w-40 h-40 sm:w-64 sm:h-64 rounded object-cover shadow-md ring-4 ring-accent"
-          />
-        </div>
-
-        {/* User Info */}
-        <UserInfo
-          displayName={p.display_name}
-          username={p.username}
-          fid={p.fid.toString()}
-          bio={p.profile.bio.text}
-          followerCount={p.follower_count}
-          followingCount={p.following_count}
-          jobTitle={icebreakerProfile?.jobTitle || "N/A"}
-          location={icebreakerProfile?.location || "N/A"}
-          channels={icebreakerProfile?.channels || []}
-        />
-      </div>
-
-      {/* Section Spacing */}
-      <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3">
-        {/* Credentials */}
-        <Credentials credentials={icebreakerProfile?.credentials || []} />
-
-        {/* Highlights */}
-        <Highlights highlights={icebreakerProfile?.highlights || []} />
-
-        {/* Work Experience */}
-        <WorkExperience
-          workExperience={icebreakerProfile?.workExperience || []}
-        />
-      </div>
-
-      {/* Token Balances */}
-      <TokenBalances addressBalances={addressBalances} />
+      <ClientContainer
+        user={p}
+        icebreakerProfile={icebreakerProfile}
+        addressBalances={addressBalances}
+        nfts={nfts}
+      />
     </div>
   );
 }
