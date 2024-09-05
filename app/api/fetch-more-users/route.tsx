@@ -1,5 +1,5 @@
 import { checkPrivyAuth } from "@/middleware/auth";
-import { getUsersByFids } from "@/middleware/helpers";
+import { getChannelFollowers } from "@/middleware/helpers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -16,8 +16,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   try {
-    const usersBatch = await getUsersByFids(request.fids as string[]);
-    return NextResponse.json({ users: usersBatch });
+    const usersBatch = await getChannelFollowers(
+      request.channelId,
+      request.cursor
+    );
+    return NextResponse.json({ users: usersBatch, cursor: usersBatch.cursor });
   } catch (error) {
     return NextResponse.json({ error: "Error fetching more users" });
   }

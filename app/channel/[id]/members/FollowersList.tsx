@@ -1,44 +1,72 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { IChannelUsersResponse, INeynarUserResponse } from "@/types/interfaces";
+import { INeynarUserResponse } from "@/types/interfaces";
 import ImageCard from "../../../components/ImageCard";
 import Filter from "@/app/components/icons/Filter";
 import ProgressBar from "@/app/components/ProgressBar"; // Import ProgressBar component
 import { getAccessToken } from "@privy-io/react-auth";
 
-interface FollowersListProps {
-  allChannelFids: IChannelUsersResponse[];
-  firstBatch: INeynarUserResponse[];
-  toFetch: IChannelUsersResponse[][];
+interface IFollowersListProps {
+  users: INeynarUserResponse[];
+  cursor: string | null;
   channelId: string;
-  numChannelMembers: number;
+  followerCount: number;
 }
 
 const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-const FollowersList: React.FC<FollowersListProps> = ({
-  allChannelFids,
-  firstBatch,
-  toFetch,
-  channelId,
-  numChannelMembers,
-}) => {
-  const [allUsers, setAllUsers] = useState<INeynarUserResponse[]>(firstBatch);
-  const [toBeFetched, setToBeFetched] =
-    useState<IChannelUsersResponse[][]>(toFetch);
+const FollowersList: React.FC<IFollowersListProps> = (
+  props: IFollowersListProps
+) => {
+  const { users, cursor, channelId, followerCount } = props;
+
   const [sortOption, setSortOption] = useState<string>("dateJoinedDesc");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [displayedUsers, setDisplayedUsers] =
-    useState<INeynarUserResponse[]>(firstBatch);
+    useState<INeynarUserResponse[]>(users);
+  const [nextCursor, setNextCursor] = useState<string | null>(cursor);
 
+  const MAX_FETCHED_USERS = 1000;
+
+  // Logic to fetch more users
+  const fetchMoreUsers = async () => {
+    setLoading(true);
+    const accessToken = await getAccessToken();
+    try {
+      const response = await fetch(`/api/fetch-more-users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          channelId,
+          cursor: nextCursor,
+        }),
+      });
+      const data = await response.json();
+      const fetchedUsers = data.users.users as INeynarUserResponse[];
+      console.log(fetchedUsers);
+      const cursor = data.cursor;
+      return { users: fetchedUsers, cursor };
+    } catch (error) {
+      console.error("Error fetching more users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logic to sort and filter users
   useEffect(() => {
-    if (toBeFetched.length > 0) return;
-    let sorted = [...allUsers].sort((a, b) => {
+    if (nextCursor) {
+      return;
+    }
+    let sorted = [...displayedUsers].sort((a, b) => {
       if (sortOption === "alphabeticalAsc") {
         return (a.display_name || "").localeCompare(b.display_name || "");
       }
@@ -79,54 +107,41 @@ const FollowersList: React.FC<FollowersListProps> = ({
     }
 
     setDisplayedUsers(sorted);
-  }, [sortOption, searchQuery, allUsers]);
-
-  // Logic to fetch more users
-  const fetchMoreUsers = async (batch: IChannelUsersResponse[]) => {
-    setLoading(true);
-    const accessToken = await getAccessToken();
-    try {
-      const response = await fetch(`/api/fetch-more-users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          fids: batch.map((item) => item.fid),
-        }),
-      });
-      const data = await response.json();
-      const usersWithFollowedAt = data.users.map(
-        (user: INeynarUserResponse) => {
-          const follower = batch.find((f) => f.fid === user.fid.toString());
-          if (follower) {
-            user.followedAt = follower.followedAt;
-          }
-          return user;
-        }
-      );
-      setAllUsers((prev) => {
-        const newUsers = [...prev, ...usersWithFollowedAt];
-        const uniqueUsers = newUsers.filter(
-          (user, index, self) =>
-            index === self.findIndex((u) => u.fid === user.fid)
-        );
-        return uniqueUsers;
-      });
-      setToBeFetched((prev) => prev.slice(1));
-    } catch (error) {
-      console.error("Error fetching more users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [sortOption, searchQuery]);
 
   useEffect(() => {
-    if (toBeFetched.length > 0) {
-      fetchMoreUsers(toBeFetched[0]);
-    }
-  }, [channelId, toBeFetched]);
+    const fetchUsers = async () => {
+      if (nextCursor && displayedUsers.length < MAX_FETCHED_USERS) {
+        const res = await fetchMoreUsers();
+        if (!res || !Array.isArray(res.users)) {
+          console.error("No users found or invalid response:", res);
+          return;
+        }
+        const { users, cursor } = res;
+
+        // Filter out any users already in displayedUsers by comparing their fid
+        setDisplayedUsers((prevUsers) => {
+          const newUsers = users.filter(
+            (newUser) =>
+              !prevUsers.some((prevUser) => prevUser.fid === newUser.fid)
+          );
+
+          // Ensure we don't go over 1000 users
+          const updatedUsers = [...prevUsers, ...newUsers];
+          return updatedUsers.slice(0, 1000); // Limit to 1000 users
+        });
+
+        // Stop updating the cursor if we've reached the limit
+        if (displayedUsers.length + users.length >= 1000) {
+          setNextCursor(null);
+        } else {
+          setNextCursor(cursor);
+        }
+      }
+    };
+
+    fetchUsers();
+  }, [nextCursor, displayedUsers.length]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
@@ -310,7 +325,7 @@ const FollowersList: React.FC<FollowersListProps> = ({
 
       {/* Main Content */}
       <div className="w-full lg:w-3/4 lg:ml-auto lg:pl-4 pt-20 lg:pt-0">
-        <ProgressBar loaded={allUsers.length} total={numChannelMembers} />
+        <ProgressBar loaded={displayedUsers.length} total={followerCount} />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 p-4">
           {displayedUsers.map((user) => (
             <div

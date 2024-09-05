@@ -1,9 +1,7 @@
 import {
   ApiResponse,
   IIcebreakerProfilesResponse,
-  IChannelFollowersResponse,
   IChannelResponse,
-  IChannelUsersResponse,
   INeynarUserResponse,
 } from "@/types/interfaces";
 
@@ -43,31 +41,28 @@ export const getChannelById = async (
   }
 };
 
-export const getChannelFids = async (
+export const getChannelFollowers = async (
   channelId: string,
-  nextCursor?: string | null,
-  limit: number = 50
-): Promise<{
-  followers: IChannelUsersResponse[];
-  nextCursor: string | null;
-}> => {
-  try {
-    const url = `https://api.warpcast.com/v1/channel-followers?channelId=${channelId}${
-      nextCursor ? `&cursor=${nextCursor}` : ""
-    }&limit=${limit}`;
-    const response = await fetchWithRetry(url, { method: "GET" });
-    const data: IChannelFollowersResponse = await response.json();
-    const followers: IChannelUsersResponse[] = data.result.users.map(
-      (item) => ({
-        fid: item.fid,
-        followedAt: item.followedAt,
-      })
-    );
-    return { followers, nextCursor: data.next?.cursor || null };
-  } catch (error) {
-    console.error(error);
-    return { followers: [], nextCursor: null };
+  cursor?: string | null,
+  limit: number = 100
+): Promise<{ users: INeynarUserResponse[]; cursor: string }> => {
+  const url = `https://api.neynar.com/v2/farcaster/channel/followers?id=${channelId}${
+    cursor ? `&cursor=${cursor}` : ""
+  }&limit=${limit}`;
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      api_key: process.env.NEYNAR_API_KEY ?? ``,
+    },
+  };
+  const response = await fetchWithRetry(url, options);
+  const data = await response.json();
+  const { users, next } = data;
+  if (!users) {
+    return { users: [], cursor: "" };
   }
+  return { users, cursor: next?.cursor || "" };
 };
 
 export const getUsersByFids = async (
@@ -118,33 +113,6 @@ export const getUsersByName = async (
     return [];
   }
 };
-
-export const fetchChannelFollowerFids = async (
-  channelId: string
-): Promise<IChannelUsersResponse[]> => {
-  let cursor: string | null = null;
-  const allFollowers: IChannelUsersResponse[] = [];
-
-  do {
-    const { followers, nextCursor } = await getChannelFids(channelId, cursor);
-    allFollowers.push(...followers);
-    cursor = nextCursor;
-  } while (cursor);
-
-  return allFollowers;
-};
-
-export function splitIntoBatches(
-  array: IChannelUsersResponse[],
-  batchSize: number
-): IChannelUsersResponse[][] {
-  const batches = [];
-  for (let i = 0; i < array.length; i += batchSize) {
-    const batch = array.slice(i, i + batchSize);
-    batches.push(batch);
-  }
-  return batches;
-}
 
 export async function getIcebreakerProfile(
   fid: string

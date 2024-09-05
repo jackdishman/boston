@@ -1,8 +1,3 @@
-export interface IChannelUsersResponse {
-  fid: string;
-  followedAt: string;
-}
-
 interface Bio {
   text: string;
 }
@@ -31,16 +26,6 @@ export interface INeynarUserResponse {
   active_status: string;
   power_badge: boolean;
   followedAt: string;
-}
-
-export interface IChannelFollowersResponse {
-  result: {
-    users: IChannelUsersResponse[];
-    fids: string[];
-  };
-  next: {
-    cursor: string;
-  };
 }
 
 export interface IChannelResponse {
