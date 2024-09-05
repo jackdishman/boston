@@ -32,7 +32,7 @@ export default function RecentEvents() {
       {events.map((event) => (
         <div key={event.id} className="mb-2">
           <p className="text-sm text-gray-700">
-            <Link href={`/fids/${event.fid}`} className="underline">
+            <Link href={`/profile/${event.fid}`} className="underline">
               @{event.display_name}
             </Link>{" "}
             {event.action} [

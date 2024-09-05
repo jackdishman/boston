@@ -167,3 +167,37 @@ export async function getAllBalances(
     ? [nativeBalance, ...erc20Balances]
     : erc20Balances;
 }
+
+import { INFTResponse } from "@/types/interfaces"; // Assuming the interface is in a file in /types/interfaces
+
+export async function getNFTs(
+  address: string,
+  pageSize: number = 10,
+  network: "ethereum" | "base" = "ethereum"
+): Promise<INFTResponse | null> {
+  const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+  const url = `https://${
+    network === "base" ? "base-mainnet" : "eth-mainnet"
+  }.g.alchemy.com/nft/v2/${alchemyApiKey}/getNFTs?owner=${address}&withMetadata=true&pageSize=${pageSize}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const nftData: INFTResponse = await res.json();
+
+    if (!nftData || !nftData.ownedNfts) {
+      console.warn(`No NFTs found for address: ${address}`);
+      return null;
+    }
+
+    return nftData; // Return the full NFT response
+  } catch (error) {
+    console.error(`Error fetching NFTs for ${address}:`, error);
+    return null;
+  }
+}

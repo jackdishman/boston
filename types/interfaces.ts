@@ -190,3 +190,105 @@ export interface IEvent {
   display_name: string;
   action: string;
 }
+
+export interface INFTResponse {
+  ownedNfts: OwnedNft[];
+  pageKey: string;
+  totalCount: number;
+  blockHash: string;
+}
+
+export interface OwnedNft {
+  contract: Contract;
+  id: NFTId;
+  balance: string;
+  title: string;
+  description: string;
+  tokenUri: TokenUri;
+  media: Media[];
+  metadata: Metadata;
+  timeLastUpdated: string;
+  contractMetadata: ContractMetadata;
+  spamInfo?: SpamInfo;
+}
+
+export interface Contract {
+  address: string;
+}
+
+export interface NFTId {
+  tokenId: string;
+  tokenMetadata: TokenMetadata;
+}
+
+export interface TokenMetadata {
+  tokenType: string;
+}
+
+export interface TokenUri {
+  gateway: string;
+  raw: string;
+}
+
+export interface Media {
+  gateway: string;
+  thumbnail?: string;
+  raw: string;
+  format?: string;
+  bytes?: number;
+}
+
+export interface Metadata {
+  background_image?: string;
+  image?: string;
+  external_url?: string;
+  is_normalized?: boolean;
+  image_url?: string;
+  name?: string;
+  description?: string;
+  attributes?: Attribute[];
+  version?: number;
+  url?: string;
+}
+
+export interface Attribute {
+  value: string | number | boolean;
+  trait_type: string;
+  display_type?: string;
+}
+
+export interface ContractMetadata {
+  name: string;
+  symbol: string;
+  tokenType: string;
+  contractDeployer: string;
+  deployedBlockNumber: number;
+  openSea: OpenSeaMetadata;
+}
+
+export interface OpenSeaMetadata {
+  floorPrice: number;
+  collectionName: string;
+  collectionSlug: string;
+  safelistRequestStatus: string;
+  imageUrl: string;
+  bannerImageUrl?: string;
+  description: string;
+  lastIngestedAt: string;
+}
+
+export interface SpamInfo {
+  isSpam: string;
+  classifications: string[];
+}
+
+export interface IAddressBalance {
+  address: string;
+  balances: IBalanceResponse;
+}
+
+export interface INFTs {
+  address: string;
+  ethereumNFTs: OwnedNft[];
+  baseNFTs: OwnedNft[];
+}
