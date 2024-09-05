@@ -31,39 +31,40 @@ const NFTGallery: React.FC<IProps> = (props: IProps) => {
       setFilteredNfts(allNfts);
       return;
     }
+
     if (activeAddress !== "all") {
       // filter by address
       const filteredByAddress = filterByAddress(activeAddress);
-      if (activeNetwork !== "all") {
-        // filter by both network and address
-        const filteredByBoth =
-          activeAddress === "base"
-            ? filteredByAddress?.baseNFTs
-            : filteredByAddress?.ethereumNFTs;
-        setFilteredNfts(filteredByBoth || []);
-        return;
+      if (filteredByAddress) {
+        if (activeNetwork !== "all") {
+          // filter by both network and address
+          const filteredByBoth =
+            activeNetwork === "base"
+              ? filteredByAddress.baseNFTs
+              : filteredByAddress.ethereumNFTs;
+          setFilteredNfts(filteredByBoth || []);
+        } else {
+          // only filter by address
+          const allByOwner = [
+            ...(filteredByAddress?.baseNFTs ?? []),
+            ...(filteredByAddress?.ethereumNFTs ?? []),
+          ];
+          setFilteredNfts(allByOwner);
+        }
+      } else {
+        setFilteredNfts([]);
       }
-      // only filter by address
-      const allByOwner = [
-        ...(filteredByAddress?.baseNFTs ?? []),
-        ...(filteredByAddress?.ethereumNFTs ?? []),
-      ];
-      setFilteredNfts(allByOwner);
       return;
     }
-    // filter by network
+
+    // filter by network only
     if (activeNetwork !== "all") {
-      let filtered: INFTs[] = [];
-      if (activeAddress !== "all") {
-        // handle this logic
-      }
-      const allBaseNfts = nfts.flatMap((nft) => nft.baseNFTs);
-      const allEthereumNfts = nfts.flatMap((nft) => nft.ethereumNFTs);
-      if (activeNetwork === "base") {
-        setFilteredNfts(allBaseNfts);
-        return;
-      }
-      setFilteredNfts(allEthereumNfts);
+      const filteredByNetwork =
+        activeNetwork === "base"
+          ? nfts.flatMap((nft) => nft.baseNFTs)
+          : nfts.flatMap((nft) => nft.ethereumNFTs);
+      setFilteredNfts(filteredByNetwork);
+      return;
     }
   }, [activeAddress, activeNetwork]);
 
