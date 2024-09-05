@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getAccessToken, useLogin, usePrivy } from "@privy-io/react-auth";
-import { IChannelResponse } from "@/types/interfaces";
+import { IChannelResponse, IEvent } from "@/types/interfaces";
 import Header from "./Header";
 import ChannelList from "./ChannelList";
 
@@ -23,14 +23,41 @@ const App: React.FC<AppProps> = ({ children }) => {
   };
 
   const { login } = useLogin({
-    onComplete: async (user, isNewUser) => {
+    onComplete: async (user, isNewUser, wasAlreadyAuthenticated) => {
+      const accessToken = await getAccessToken();
       if (isNewUser) {
-        const accessToken = await getAccessToken();
         fetch("/api/new-member", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+        });
+        const event: IEvent = {
+          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+          display_name: user.farcaster?.username ?? "Unknown",
+          action: "joined the platform",
+        };
+        fetch("/api/events", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ event }),
+        });
+        return;
+      }
+      if (!wasAlreadyAuthenticated) {
+        const event: IEvent = {
+          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+          display_name: user.farcaster?.username ?? "Unknown",
+          action: "logged in",
+        };
+        fetch("/api/events", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ event }),
         });
       }
     },

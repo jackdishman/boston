@@ -197,3 +197,11 @@ export interface IIcebreakerProfile {
 export interface IIcebreakerProfilesResponse {
   profiles: IIcebreakerProfile[];
 }
+
+export interface IEvent {
+  id?: number;
+  created_at?: string;
+  fid: string;
+  display_name: string;
+  action: string;
+}
