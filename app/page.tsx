@@ -1,4 +1,5 @@
 import React from "react";
+import RecentEvents from "./components/RecentEvents";
 
 export async function generateMetadata() {
   const fcMetadata: Record<string, string> = {
@@ -35,28 +36,31 @@ export async function generateMetadata() {
 
 export default function Page() {
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center overflow-x-hidden p-10">
-      <article className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg text-center ">
-        <div className="p-8">
-          <p className="text-2xl text-gray-700 mb-4">
-            Explorer for ANY channel on Farcaster
-          </p>
-          <p className="text-lg text-gray-600">
-            Enhanced view of channel followers, analyze channel casts, and more!
-          </p>
-          <p className="text-lg text-gray-600 mt-4 font-semibold">
-            Future Features:
-          </p>
-          <div className="flex justify-center">
-            <ul className="text-start text-gray-600 list-disc my-2">
-              <li>Events.xyz integration to view local events</li>
-              <li>BountyBot integration for channel-specific tasks</li>
-              <li>Advanced channel analytics, bringing back top casters</li>
-              {/* <li>Premium features for Hypersub subscribers</li> */}
-            </ul>
-          </div>
-        </div>
+    <section className="flex flex-col lg:flex-row min-h-screen p-4 lg:p-10">
+      <article className="flex-1 bg-white rounded-lg shadow-lg p-6 lg:p-8 mb-6 lg:mb-0 lg:mr-4">
+        <h1 className="text-xl lg:text-3xl text-gray-700 mb-4">
+          Your Farcaster explorer and more!
+        </h1>
+        <p className="text-md lg:text-lg text-gray-600 mb-4">
+          Features include:
+        </p>
+        <ul className="text-md lg:text-lg text-gray-600 list-disc list-inside space-y-2">
+          <li>Search Farcaster channels and profiles</li>
+          <li>View Credentials, Highlights, and Work Experiences of fids</li>
+          <li>
+            Browse Farcaster profile account token balances (ETH and Base)
+          </li>
+          <li>View most active casters in a channel and feeds</li>
+          <li>Trivia Quiz Frame, with rewards denominated in Stack.so</li>
+          <li>Create and take quizzes in this app</li>
+          <li>
+            Install cast action to check caster account balances in Warpcast
+          </li>
+        </ul>
       </article>
+      <aside className="w-full lg:w-80 h-64 lg:h-auto lg:flex-shrink-0">
+        <RecentEvents />
+      </aside>
     </section>
   );
 }

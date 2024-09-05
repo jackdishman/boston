@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { IChannelResponse, INeynarUserResponse } from "@/types/interfaces";
+import {
+  IChannelResponse,
+  IEvent,
+  INeynarUserResponse,
+} from "@/types/interfaces";
 import { useRouter } from "next/navigation";
-import { getAccessToken } from "@privy-io/react-auth";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 
 interface IChannelListProps {
@@ -19,6 +23,7 @@ const ChannelList: React.FC<IChannelListProps> = ({
 }) => {
   const router = useRouter();
   const [users, setUsers] = useState<INeynarUserResponse[]>([]);
+  const { user } = usePrivy();
 
   async function fetchUsers(input: string) {
     const accessToken = await getAccessToken();
@@ -32,6 +37,22 @@ const ChannelList: React.FC<IChannelListProps> = ({
       body: JSON.stringify({ search: uList }),
     }).then((res) => res.json());
     setUsers(users);
+  }
+
+  async function trackSearchEvent(searchTerm: string) {
+    const accessToken = await getAccessToken();
+    const event: IEvent = {
+      fid: user?.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+      display_name: user?.farcaster?.username ?? "Unknown",
+      action: " searched for user " + searchTerm,
+    };
+    fetch("/api/events", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ event }),
+    });
   }
 
   useEffect(() => {
@@ -80,8 +101,21 @@ const ChannelList: React.FC<IChannelListProps> = ({
     return uniqueMatches;
   }, [channels, searchTerm]);
 
-  const handleChannelClick = (id: string) => {
+  const handleChannelClick = async (id: string) => {
+    const accessToken = await getAccessToken();
     closeSearch();
+    const event: IEvent = {
+      fid: user?.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+      display_name: user?.farcaster?.username ?? "Unknown",
+      action: " searched for channel /" + id,
+    };
+    fetch("/api/events", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ event }),
+    });
     router.push(`/channel/${id}`);
   };
 
@@ -102,11 +136,14 @@ const ChannelList: React.FC<IChannelListProps> = ({
               <div
                 key={user.fid}
                 className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200 w-full sm:w-96"
+                onClick={() => {
+                  closeSearch();
+                  trackSearchEvent(user.username + " (" + user.fid + ")");
+                }}
               >
                 <Link
                   href={`/profile/${user.fid}`}
                   className="text-xl font-semibold mb-2 flex items-center"
-                  onClick={closeSearch}
                 >
                   <img src={user.pfp_url} className="w-12 h-12 rounded-full" />
                   <div className="ml-4">

@@ -2,12 +2,12 @@
 "use client";
 
 import React from "react";
-import { usePrivy, useLogin, useLinkAccount } from "@privy-io/react-auth";
+import { usePrivy, useLogin } from "@privy-io/react-auth";
 import Menu from "./icons/Menu";
 import X from "./icons/X";
 import Connect from "./icons/Connect";
-import LinkAccount from "./icons/LinkAccount";
 import Link from "next/link";
+import { IEvent } from "@/types/interfaces";
 
 interface HeaderProps {
   searchTerm: string;
@@ -27,14 +27,41 @@ const Header: React.FC<HeaderProps> = ({
   const { logout, ready, authenticated, getAccessToken, user } = usePrivy();
 
   const { login } = useLogin({
-    onComplete: async (user, isNewUser) => {
+    onComplete: async (user, isNewUser, wasAlreadyAuthenticated) => {
+      const accessToken = await getAccessToken();
       if (isNewUser) {
-        const accessToken = await getAccessToken();
         fetch("/api/new-member", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
+        });
+        const event: IEvent = {
+          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+          display_name: user.farcaster?.username ?? "Unknown",
+          action: "joined the platform",
+        };
+        fetch("/api/events", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ event }),
+        });
+        return;
+      }
+      if (!wasAlreadyAuthenticated) {
+        const event: IEvent = {
+          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
+          display_name: user.farcaster?.username ?? "Unknown",
+          action: "logged in",
+        };
+        fetch("/api/events", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ event }),
         });
       }
     },
@@ -44,13 +71,6 @@ const Header: React.FC<HeaderProps> = ({
   });
 
   const disableLogin = !ready || (ready && authenticated);
-
-  const { linkWallet } = useLinkAccount({
-    onSuccess: async (user, linkedAccount) => {
-      console.log(`account linked`, linkedAccount);
-    },
-    onError: (error) => {},
-  });
 
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -88,18 +108,24 @@ const Header: React.FC<HeaderProps> = ({
             {authenticated ? (
               <div className="flex space-x-4">
                 <Link
+                  href="/"
+                  className="hover:underline flex items-center text-start"
+                >
+                  Home
+                </Link>
+                <Link
                   href="/quiz"
                   className="hover:underline flex items-center text-start"
                 >
-                  Trivia Quiz
+                  Trivia Quiz Frame
                 </Link>
-                <button
-                  onClick={linkWallet}
+                <a
+                  href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
+                  target="_blank"
                   className="hover:underline flex items-center text-start"
                 >
-                  <LinkAccount />
-                  <span className="ml-2">Link account</span>
-                </button>
+                  Add Balance Cast Action
+                </a>
                 <button
                   onClick={logout}
                   className="hover:underline flex items-center text-start"
@@ -131,19 +157,26 @@ const Header: React.FC<HeaderProps> = ({
           {authenticated ? (
             <div className="flex flex-col space-y-4">
               <Link
+                href="/"
+                onClick={() => setIsOpen(false)}
+                className="hover:underline flex items-center text-start"
+              >
+                Home
+              </Link>
+              <Link
                 href="/quiz"
                 onClick={() => setIsOpen(false)}
                 className="hover:underline flex items-center text-start"
               >
-                Trivia Quiz
+                Trivia Quiz Frame
               </Link>
-              <button
-                onClick={linkWallet}
+              <a
+                href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
+                target="_blank"
                 className="hover:underline flex items-center text-start"
               >
-                <LinkAccount />
-                <span className="ml-2 w-32"> Link account</span>
-              </button>
+                Add Balance Cast Action
+              </a>
               <button
                 onClick={logout}
                 className="hover:underline flex items-center text-start"
