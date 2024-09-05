@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { INFTs, OwnedNft } from "@/types/interfaces";
+import NFTCard from "@/app/components/NFTCard";
 
 interface IProps {
   nfts: INFTs[];
@@ -71,27 +72,10 @@ const NFTGallery: React.FC<IProps> = (props: IProps) => {
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4">NFT Gallery</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {/* display nfts */}
         {filteredNfts.map((nft, index) => (
-          <div key={index} className="bg-white shadow-lg rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <h4 className="text-lg font-medium">{nft.metadata.name}</h4>
-              <p className="text-gray-700">{nft.metadata.description}</p>
-            </div>
-            <div className="mt-4">
-              {nft.metadata.image_url && (
-                <Image
-                  src={nft.metadata.image_url ?? "/nft-placeholder.png"}
-                  alt={nft.metadata.name ?? "NFT Image"}
-                  width={200}
-                  height={200}
-                  className="rounded-lg"
-                  unoptimized={true}
-                />
-              )}
-            </div>
-          </div>
+          <NFTCard key={index} nft={nft} />
         ))}
       </div>
     </div>
