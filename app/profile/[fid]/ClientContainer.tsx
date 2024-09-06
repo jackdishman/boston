@@ -22,7 +22,8 @@ interface ClientContainerProps {
   icebreakerProfile?: IIcebreakerProfile;
   addressBalances: IAddressBalance[];
   nfts: INFTs[];
-  profileRank: IOpenRankProfileResponse;
+  followingRank: IOpenRankProfileResponse;
+  engagementRank: IOpenRankProfileResponse;
 }
 
 const ClientContainer: React.FC<ClientContainerProps> = ({
@@ -30,7 +31,8 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
   icebreakerProfile,
   addressBalances,
   nfts,
-  profileRank,
+  followingRank,
+  engagementRank,
 }) => {
   const [selectedNetwork, setSelectedNetwork] = useState<
     "ethereum" | "base" | "all"
@@ -80,7 +82,10 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
         />
 
         {/* ProfileRank data */}
-        <OpenRankData profileRank={profileRank} />
+        <OpenRankData
+          followingRank={followingRank}
+          engagementRank={engagementRank}
+        />
       </div>
 
       {/* Network and Address Filter */}

@@ -3,7 +3,10 @@ import { getAllBalances, getNFTs } from "@/middleware/alchemy";
 import React from "react";
 import ClientContainer from "./ClientContainer";
 import { IAddressBalance, INFTs } from "@/types/interfaces";
-import { getOpenRank } from "@/middleware/openrank";
+import {
+  getProfileOpenRankByEngagement,
+  getProfileOpenRankByFollowing,
+} from "@/middleware/openrank";
 
 export default async function Page({ params }: { params: { fid: string } }) {
   const { fid } = params;
@@ -41,10 +44,15 @@ export default async function Page({ params }: { params: { fid: string } }) {
     })
   );
 
-  const profileRankRes = await getOpenRank([Number(params.fid)]);
-  const profileRank = profileRankRes
-    ? profileRankRes[0]
-    : { rank: 0, score: 0, fid: 0, percentile: 0, username: "" };
+  const profileRankRes = await Promise.all([
+    getProfileOpenRankByFollowing([Number(params.fid)]),
+    getProfileOpenRankByEngagement([Number(params.fid)]),
+  ]);
+  const followingRank = profileRankRes[0] ? profileRankRes[0] : [];
+  const engagementRank = profileRankRes[1] ? profileRankRes[1] : [];
+  // const profileRank = profileRankRes
+  //   ? profileRankRes[0]
+  //   : { rank: 0, score: 0, fid: 0, percentile: 0, username: "" };
 
   return (
     <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
@@ -53,7 +61,8 @@ export default async function Page({ params }: { params: { fid: string } }) {
         icebreakerProfile={icebreakerProfile}
         addressBalances={addressBalances}
         nfts={nfts}
-        profileRank={profileRank}
+        followingRank={followingRank[0]}
+        engagementRank={engagementRank[0]}
       />
     </div>
   );
