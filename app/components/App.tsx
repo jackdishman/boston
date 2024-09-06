@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { getAccessToken, useLogin, usePrivy } from "@privy-io/react-auth";
 import { IChannelResponse, IEvent } from "@/types/interfaces";
 import Header from "./Header";
-import ChannelList from "./ChannelList";
+import SearchList from "./SearchList";
 
 interface AppProps {
   children: React.ReactNode;
@@ -108,7 +108,7 @@ const App: React.FC<AppProps> = ({ children }) => {
         isSearchActive={isSearchActive}
       />
       {isSearchActive && (
-        <ChannelList
+        <SearchList
           channels={channels}
           searchTerm={searchTerm}
           closeSearch={closeSearch}

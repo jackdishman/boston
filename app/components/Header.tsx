@@ -5,9 +5,12 @@ import React from "react";
 import { usePrivy, useLogin } from "@privy-io/react-auth";
 import Menu from "./icons/Menu";
 import X from "./icons/X";
-import Connect from "./icons/Connect";
+import Power from "./icons/Power";
 import Link from "next/link";
 import { IEvent } from "@/types/interfaces";
+import Home from "./icons/Home";
+import DocumentText from "./icons/DocumentText";
+import SquarePlus from "./icons/SquarePlus";
 
 interface HeaderProps {
   searchTerm: string;
@@ -81,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex-1 mx-4 relative">
             <input
               type="text"
-              placeholder="🔎 Search channels or user"
+              placeholder="🔎 Search channels or Farcaster Profile"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-96 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -109,28 +112,31 @@ const Header: React.FC<HeaderProps> = ({
               <div className="flex space-x-4">
                 <Link
                   href="/"
-                  className="hover:underline flex items-center text-start"
+                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
                 >
-                  Home
+                  <Home />
+                  <span className="ml-2">Home</span>
                 </Link>
                 <Link
                   href="/quiz"
-                  className="hover:underline flex items-center text-start"
+                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
                 >
-                  Trivia Quiz Frame
+                  <DocumentText />
+                  <span className="ml-2">Trivia Quiz</span>
                 </Link>
                 <a
                   href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
                   target="_blank"
-                  className="hover:underline flex items-center text-start"
+                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
                 >
-                  Add Balance Cast Action
+                  <SquarePlus />
+                  <span className="ml-2">Balance Action</span>
                 </a>
                 <button
                   onClick={logout}
-                  className="hover:underline flex items-center text-start"
+                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
                 >
-                  <Connect />
+                  <Power />
                   <span className="ml-2">Disconnect</span>
                 </button>
               </div>
@@ -140,7 +146,7 @@ const Header: React.FC<HeaderProps> = ({
                 onClick={login}
                 className="hover:underline flex items-center text-start"
               >
-                <Connect />
+                <Power />
                 <span className="ml-2">Connect</span>
               </button>
             )}
@@ -159,29 +165,31 @@ const Header: React.FC<HeaderProps> = ({
               <Link
                 href="/"
                 onClick={() => setIsOpen(false)}
-                className="hover:underline flex items-center text-start"
+                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
-                Home
+                <Home />
+                <span className="ml-2">Home</span>
               </Link>
               <Link
                 href="/quiz"
                 onClick={() => setIsOpen(false)}
-                className="hover:underline flex items-center text-start"
+                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
                 Trivia Quiz Frame
               </Link>
               <a
                 href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
                 target="_blank"
-                className="hover:underline flex items-center text-start"
+                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
-                Add Balance Cast Action
+                <SquarePlus />
+                <span className="ml-2">Balance Action</span>
               </a>
               <button
                 onClick={logout}
-                className="hover:underline flex items-center text-start"
+                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
-                <Connect />
+                <Power />
                 <span className="ml-2 w-32">Disconnect</span>
               </button>
             </div>
@@ -191,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({
               onClick={login}
               className="hover:underline flex items-center text-start"
             >
-              <Connect />
+              <Power />
               <span className="ml-2 w-32">Connect</span>
             </button>
           )}

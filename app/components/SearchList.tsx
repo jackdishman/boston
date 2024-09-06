@@ -16,7 +16,7 @@ interface IChannelListProps {
   closeSearch: () => void;
 }
 
-const ChannelList: React.FC<IChannelListProps> = ({
+const SearchList: React.FC<IChannelListProps> = ({
   channels,
   searchTerm,
   closeSearch,
@@ -120,7 +120,7 @@ const ChannelList: React.FC<IChannelListProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-40 bg-white bg-opacity-90 p-8 overflow-y-auto">
+    <div className="fixed inset-0 z-40 bg-gray-100 bg-opacity-90 p-8 overflow-y-auto">
       <button
         onClick={closeSearch}
         className="absolute top-4 right-4 text-gray-500 text-2xl"
@@ -143,13 +143,16 @@ const ChannelList: React.FC<IChannelListProps> = ({
               >
                 <Link
                   href={`/profile/${user.fid}`}
-                  className="text-xl font-semibold mb-2 flex items-center"
+                  className="mb-2 flex items-center"
                 >
                   <img src={user.pfp_url} className="w-12 h-12 rounded-full" />
                   <div className="ml-4">
-                    <h2 className="text-xl font-semibold mb-2">
-                      {user.username} ({user.fid})
+                    <h2 className="text-lg font-semibold">
+                      {user.display_name}
                     </h2>
+                    <p className="text-gray-700">
+                      @{user.username} ({user.fid})
+                    </p>
                   </div>
                 </Link>
                 <p></p>
@@ -158,26 +161,27 @@ const ChannelList: React.FC<IChannelListProps> = ({
           </div>
         </div>
       )}
-      <h2 className="text-lg mt-16">Channels:</h2>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-8">
-        {filteredChannels.map((channel) => (
-          <div
-            key={channel.id}
-            onClick={() => handleChannelClick(channel.id)}
-            className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200"
-          >
-            <h2 className="text-xl font-semibold mb-2">
-              {channel.name} (/{channel.id})
-            </h2>
-            <p className="text-gray-700 mb-2">{channel.description}</p>
-            <p className="text-gray-600 mt-2">
-              Follower Count: {channel.followerCount}
-            </p>
+      {filteredChannels.length > 0 && (
+        <div>
+          <h2 className="text-lg mt-16">Channels:</h2>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 mt-8">
+            {filteredChannels.map((channel) => (
+              <div
+                key={channel.id}
+                onClick={() => handleChannelClick(channel.id)}
+                className="cursor-pointer border border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-md transition-shadow duration-200"
+              >
+                <h2 className="text-xl font-semibold mb-2">
+                  {channel.name} (/{channel.id})
+                </h2>
+                <p className="text-gray-700 mb-2">{channel.description}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ChannelList;
+export default SearchList;

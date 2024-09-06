@@ -2,6 +2,7 @@
 
 import Filter from "@/app/components/icons/Filter";
 import { INeynarCastResponse } from "@/types/interfaces";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
 
 interface IProps {
@@ -9,11 +10,9 @@ interface IProps {
 }
 
 export default function CastsContainer({ casts }: IProps) {
-  const [sortOption, setSortOption] = useState<string>("dateJoinedDesc");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const [topCasters, setTopCasters] = useState<
-    { username: string; displayName: string; score: number }[]
+    { username: string; displayName: string; score: number; fid: number }[]
   >([]);
 
   useEffect(() => {
@@ -22,7 +21,7 @@ export default function CastsContainer({ casts }: IProps) {
 
   const calculateTopCasters = () => {
     const casterScores: {
-      [key: string]: { displayName: string; score: number };
+      [key: string]: { displayName: string; score: number; fid: number };
     } = {};
 
     casts.forEach((cast) => {
@@ -30,19 +29,21 @@ export default function CastsContainer({ casts }: IProps) {
         cast.reactions.likes_count + cast.reactions.recasts_count * 2;
       const username = cast.author.username;
       const displayName = cast.author.display_name;
+      const fid = cast.author.fid;
 
       if (casterScores[username]) {
         casterScores[username].score += score;
       } else {
-        casterScores[username] = { displayName, score };
+        casterScores[username] = { displayName, score, fid };
       }
     });
 
     const sortedCasters = Object.entries(casterScores)
-      .map(([username, { displayName, score }]) => ({
+      .map(([username, { displayName, score, fid }]) => ({
         username,
         displayName,
         score,
+        fid, // Now included
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
@@ -62,7 +63,12 @@ export default function CastsContainer({ casts }: IProps) {
             <div className="flex flex-col space-y-2">
               {topCasters.map((caster, index) => (
                 <div key={index} className="flex justify-between">
-                  <span>{caster.displayName}</span>
+                  <Link
+                    href={`/profile/${caster.fid}`}
+                    className="hover:underline text-sm"
+                  >
+                    {caster.displayName} @{caster.username}
+                  </Link>
                   <span>{caster.score}</span>
                 </div>
               ))}
