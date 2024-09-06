@@ -1,12 +1,9 @@
 import { getIcebreakerProfile, getUsersByFids } from "@/middleware/helpers";
-import {
-  getAllBalances,
-  getNFTs,
-  IBalanceResponse,
-} from "@/middleware/alchemy";
+import { getAllBalances, getNFTs } from "@/middleware/alchemy";
 import React from "react";
 import ClientContainer from "./ClientContainer";
 import { IAddressBalance, INFTs } from "@/types/interfaces";
+import { getOpenRank } from "@/middleware/openrank";
 
 export default async function Page({ params }: { params: { fid: string } }) {
   const { fid } = params;
@@ -44,6 +41,11 @@ export default async function Page({ params }: { params: { fid: string } }) {
     })
   );
 
+  const profileRankRes = await getOpenRank([Number(params.fid)]);
+  const profileRank = profileRankRes
+    ? profileRankRes[0]
+    : { rank: 0, score: 0, fid: 0, percentile: 0, username: "" };
+
   return (
     <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
       <ClientContainer
@@ -51,6 +53,7 @@ export default async function Page({ params }: { params: { fid: string } }) {
         icebreakerProfile={icebreakerProfile}
         addressBalances={addressBalances}
         nfts={nfts}
+        profileRank={profileRank}
       />
     </div>
   );

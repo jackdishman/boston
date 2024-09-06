@@ -14,12 +14,15 @@ import {
   INeynarUserResponse,
   INFTs,
 } from "@/types/interfaces";
+import { IOpenRankProfileResponse } from "@/middleware/openrank";
+import OpenRankData from "./OpenRankData";
 
 interface ClientContainerProps {
   user: INeynarUserResponse;
   icebreakerProfile?: IIcebreakerProfile;
   addressBalances: IAddressBalance[];
   nfts: INFTs[];
+  profileRank: IOpenRankProfileResponse;
 }
 
 const ClientContainer: React.FC<ClientContainerProps> = ({
@@ -27,6 +30,7 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
   icebreakerProfile,
   addressBalances,
   nfts,
+  profileRank,
 }) => {
   const [selectedNetwork, setSelectedNetwork] = useState<
     "ethereum" | "base" | "all"
@@ -63,7 +67,7 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
       </div>
 
       {/* Section Spacing */}
-      <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3">
+      <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4">
         {/* Credentials */}
         <Credentials credentials={icebreakerProfile?.credentials || []} />
 
@@ -74,6 +78,9 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
         <WorkExperience
           workExperience={icebreakerProfile?.workExperience || []}
         />
+
+        {/* ProfileRank data */}
+        <OpenRankData profileRank={profileRank} />
       </div>
 
       {/* Network and Address Filter */}
