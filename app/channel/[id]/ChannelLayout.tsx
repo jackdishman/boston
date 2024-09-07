@@ -19,7 +19,7 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
   const MemberPreview = (member: INeynarUserResponse) => (
     <Link
       href={`/profile/${member.fid}`}
-      className="flex items-center p-2 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 transition"
+      className="flex items-center p-2 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 transition w-72"
     >
       <img
         src={member.pfp_url}
@@ -39,16 +39,16 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
   return (
     <section className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-10">
       <article className="bg-white rounded-lg shadow-lg text-center p-6 sm:p-8 w-full max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          {channel.name}
-        </h1>
-        <div className="flex flex-col sm:flex-row items-center mb-6">
+        <div className="flex flex-col sm:flex-row mb-6">
           <img
             src={channel.imageUrl}
             alt={channel.description}
-            className="w-32 h-32 rounded mb-4 sm:mb-0 sm:mr-4"
+            className="w-48 h-48 rounded mb-4 sm:mb-0 sm:mr-4 self-center sm:self-start"
           />
-          <div className="text-left">
+          <div className="text-center sm:text-left w-full">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              {channel.name}
+            </h1>
             <p className="text-lg text-gray-700 mb-2">{channel.description}</p>
             <p className="text-gray-600">Followers: {channel.followerCount}</p>
             <p className="text-gray-600">
@@ -64,17 +64,9 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
               Warpcast
             </a>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <div>
+          <div className="ml-4">
             <p className="text-lg font-semibold text-gray-700 mb-2">Lead:</p>
             <MemberPreview {...leadMember} />
-          </div>
-          <div>
-            <p className="text-lg font-semibold text-gray-700 mb-2">Hosts:</p>
-            {hosts.map((h) => (
-              <MemberPreview key={h.fid} {...h} />
-            ))}
           </div>
         </div>
         <ChannelNav />

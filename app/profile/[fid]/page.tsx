@@ -50,10 +50,6 @@ export default async function Page({ params }: { params: { fid: string } }) {
   ]);
   const followingRank = profileRankRes[0] ? profileRankRes[0] : [];
   const engagementRank = profileRankRes[1] ? profileRankRes[1] : [];
-  // const profileRank = profileRankRes
-  //   ? profileRankRes[0]
-  //   : { rank: 0, score: 0, fid: 0, percentile: 0, username: "" };
-
   return (
     <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
       <ClientContainer

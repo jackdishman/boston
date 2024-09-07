@@ -28,7 +28,7 @@ export default function RecentEvents() {
   }
 
   return (
-    <div className="h-full w-full overflow-y-scroll p-4 bg-gray-100 rounded-lg">
+    <div className="h-full w-full overflow-y-scroll p-4">
       {events.map((event) => (
         <div key={event.id} className="mb-2">
           <p className="text-sm text-gray-700">

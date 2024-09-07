@@ -139,7 +139,7 @@ export const EventsStats: React.FC<{ stats: EventStats }> = ({ stats }) => {
 
       <h3 className="text-xl font-semibold mb-2 text-gray-800">Total Stats</h3>
       {/* Total Stats */}
-      <div className="mb-6 flex gap-4">
+      <div className="mb-6 flex gap-4 flex-wrap">
         <StatsTile
           title="Events"
           value={stats.total_stats.num_events.toString()}
