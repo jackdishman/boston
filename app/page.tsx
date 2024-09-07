@@ -37,7 +37,7 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <section className="flex flex-col lg:flex-row min-h-screen p-4 lg:p-10">
-      <article className="flex-1 bg-white rounded-lg shadow-lg p-6 lg:p-8 mb-6 lg:mb-0 lg:mr-4">
+      <article className="flex-1 bg-white rounded-lg shadow-lg border border-gray-300 p-6 lg:p-8 mb-6 lg:mb-0 lg:mr-4">
         <h1 className="text-xl lg:text-3xl text-gray-700 mb-4">
           Your Farcaster explorer and more!
         </h1>
@@ -58,7 +58,7 @@ export default function Page() {
           </li>
         </ul>
       </article>
-      <aside className="w-full lg:w-80 h-64 lg:h-auto lg:flex-shrink-0">
+      <aside className="w-full lg:w-80 h-64 lg:h-auto lg:max-h-screen lg:flex-shrink-0 bg-white rounded-lg shadow-lg border border-gray-300">
         <RecentEvents />
       </aside>
     </section>

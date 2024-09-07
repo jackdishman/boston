@@ -2,6 +2,8 @@
 import React from "react";
 import { getChannelById, getUsersByFids } from "@/middleware/helpers";
 import ChannelLayout from "../ChannelLayout";
+import { EventStats } from "@/types/interfaces";
+import { EventsStats } from "./EventsStats";
 
 type Props = {
   params: { id: string };
@@ -49,9 +51,27 @@ export default async function Page({ params }: Props) {
       ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
       : [];
 
+  const events = await fetch(
+    `https://events.xyz/api/reports/channel/${params.id}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "sufficiently-centralized",
+      },
+    }
+  );
+  if (!events.ok)
+    return (
+      <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+        <div className="text-center text-xl">Error fetching events</div>
+      </ChannelLayout>
+    );
+  const stats = (await events.json()) as EventStats;
+
   return (
     <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
-      <div>coming soon :)</div>
+      <EventsStats stats={stats} />
     </ChannelLayout>
   );
 }
