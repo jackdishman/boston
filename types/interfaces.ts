@@ -292,3 +292,34 @@ export interface INFTs {
   ethereumNFTs: OwnedNft[];
   baseNFTs: OwnedNft[];
 }
+
+export interface EventStats {
+  channel_id: string;
+  total_stats: {
+    num_events: number;
+    num_rsvps: number;
+    num_shares: number;
+    num_likes: number;
+    num_recasts: number;
+  };
+  by_month: {
+    july: MonthlyStats;
+    august: MonthlyStats;
+    september: MonthlyStats;
+  };
+  leaderboard: LeaderboardEntry[];
+}
+
+export interface MonthlyStats {
+  num_shares: number;
+  num_likes: number;
+  num_recasts: number;
+  num_rsvps: number;
+}
+
+export interface LeaderboardEntry {
+  username: string;
+  user_likes: number;
+  user_recasts: number;
+  user_shares: number;
+}
