@@ -16,6 +16,7 @@ import {
 } from "@/types/interfaces";
 import { IOpenRankProfileResponse } from "@/middleware/openrank";
 import OpenRankData from "./OpenRankData";
+import ShareButton from "./ShareButton";
 
 interface ClientContainerProps {
   user: INeynarUserResponse;
@@ -67,6 +68,9 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
           channels={icebreakerProfile?.channels || []}
         />
       </div>
+
+      {/* Share Button */}
+      <ShareButton user={user} />
 
       {/* Section Spacing */}
       <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4">
