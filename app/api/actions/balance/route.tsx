@@ -21,8 +21,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       type: "message",
       message: `mainnet: ${ethBalance.balance.toFixed(
         2
-      )} ETH // base: ${baseBalance.balance.toFixed(2)} ETH`,
-      link: process.env.NEXT_PUBLIC_HOST + "/api/actions/balance",
+      )} ETH // base: ${baseBalance.balance.toFixed(
+        2
+      )} ETH. Click me for more 🧐`,
+      link: process.env.NEXT_PUBLIC_HOST + "/profile/" + fid,
     };
 
     return new NextResponse(JSON.stringify(body), {
