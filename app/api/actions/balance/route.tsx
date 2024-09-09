@@ -50,9 +50,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function GET(): Promise<NextResponse> {
   const body = {
-    name: "ETH balance checker",
+    name: "Investigate Profile",
     icon: "id-badge",
-    description: "Check ETH balance of a caster on mainnet and base",
+    description: "View tokens, verifications, and much more",
     aboutUrl: "https://dish.codes/",
     action: {
       type: "post",
