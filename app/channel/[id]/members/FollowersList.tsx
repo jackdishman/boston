@@ -23,7 +23,7 @@ const FollowersList: React.FC<IFollowersListProps> = (
 ) => {
   const { users, cursor, channelId, followerCount } = props;
 
-  const [sortOption, setSortOption] = useState<string>("dateJoinedDesc");
+  const [sortOption, setSortOption] = useState<string>("followersCountDesc");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -66,22 +66,13 @@ const FollowersList: React.FC<IFollowersListProps> = (
     if (nextCursor) {
       return;
     }
+
     let sorted = [...displayedUsers].sort((a, b) => {
       if (sortOption === "alphabeticalAsc") {
         return (a.display_name || "").localeCompare(b.display_name || "");
       }
       if (sortOption === "alphabeticalDesc") {
         return (b.display_name || "").localeCompare(a.display_name || "");
-      }
-      if (sortOption === "dateJoinedAsc") {
-        return (
-          new Date(a.followedAt).getTime() - new Date(b.followedAt).getTime()
-        );
-      }
-      if (sortOption === "dateJoinedDesc") {
-        return (
-          new Date(b.followedAt).getTime() - new Date(a.followedAt).getTime()
-        );
       }
       if (sortOption === "followersCountAsc") {
         return a.follower_count - b.follower_count;
@@ -91,10 +82,6 @@ const FollowersList: React.FC<IFollowersListProps> = (
       }
       return 0;
     });
-
-    if (sortOption === "dateJoinedDesc") {
-      sorted = sorted.reverse();
-    }
 
     if (searchQuery) {
       sorted = sorted.filter(
@@ -153,26 +140,6 @@ const FollowersList: React.FC<IFollowersListProps> = (
               Sort by:
             </label>
             <div className="flex flex-col space-y-2">
-              <button
-                onClick={() => setSortOption("dateJoinedDesc")}
-                className={`px-4 py-2 rounded ${
-                  sortOption === "dateJoinedDesc"
-                    ? "bg-gray-200 border-2 border-blue-500"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                Date Joined (Oldest First)
-              </button>
-              <button
-                onClick={() => setSortOption("dateJoinedAsc")}
-                className={`px-4 py-2 rounded ${
-                  sortOption === "dateJoinedAsc"
-                    ? "bg-gray-200 border-2 border-blue-500"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                Date Joined (Newest First)
-              </button>
               <button
                 onClick={() => setSortOption("alphabeticalAsc")}
                 className={`px-4 py-2 rounded ${
@@ -249,26 +216,6 @@ const FollowersList: React.FC<IFollowersListProps> = (
               Sort by:
             </label>
             <div className="flex flex-col space-y-2">
-              <button
-                onClick={() => setSortOption("dateJoinedDesc")}
-                className={`px-4 py-2 rounded ${
-                  sortOption === "dateJoinedDesc"
-                    ? "bg-gray-200 border-2 border-blue-500"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                Date Joined (Newest First)
-              </button>
-              <button
-                onClick={() => setSortOption("dateJoinedAsc")}
-                className={`px-4 py-2 rounded ${
-                  sortOption === "dateJoinedAsc"
-                    ? "bg-gray-200 border-2 border-blue-500"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                Date Joined (Oldest First)
-              </button>
               <button
                 onClick={() => setSortOption("alphabeticalAsc")}
                 className={`px-4 py-2 rounded ${
