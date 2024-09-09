@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateMessage } from "@/middleware/farcaster";
 import { getNativeBalance } from "@/middleware/alchemy";
+import { addEvent } from "@/middleware/events";
+import { IEvent } from "@/types/interfaces";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { fid, castSignerAddress, castAuthorFid } = await validateMessage(
-      req
-    );
+    const { fid, castSignerAddress, castAuthorFid, fname, castAuthorFname } =
+      await validateMessage(req);
 
     if (!fid) {
       return new NextResponse("Missing fid", { status: 400 });
@@ -18,6 +19,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const baseBalance = await getNativeBalance(castSignerAddress, "base");
     const ethBalance = await getNativeBalance(castSignerAddress, "ethereum");
+
+    // add event
+    const event: IEvent = {
+      fid: fid.toString(),
+      display_name: fname ?? "Unknown",
+      action: ` searched for user ${castAuthorFname} (${castAuthorFid})`,
+    };
+    const eventRes = await addEvent(event);
 
     const body = {
       type: "message",
