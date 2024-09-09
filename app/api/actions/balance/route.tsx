@@ -4,7 +4,9 @@ import { getNativeBalance } from "@/middleware/alchemy";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { fid, address, castSignerAddress } = await validateMessage(req);
+    const { fid, castSignerAddress, castAuthorFid } = await validateMessage(
+      req
+    );
 
     if (!fid) {
       return new NextResponse("Missing fid", { status: 400 });
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       )} ETH // base: ${baseBalance.balance.toFixed(
         2
       )} ETH. Click me for more 🧐`,
-      link: process.env.NEXT_PUBLIC_HOST + "/profile/" + fid,
+      link: process.env.NEXT_PUBLIC_HOST + "/profile/" + castAuthorFid,
     };
 
     return new NextResponse(JSON.stringify(body), {

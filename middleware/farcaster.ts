@@ -6,12 +6,14 @@ export async function validateMessage(req: NextRequest): Promise<{
   inputText?: string;
   address?: string;
   castSignerAddress?: string;
+  castAuthorFid?: number;
 }> {
   const HUB_URL = process.env["HUB_URL"];
   let body: any;
   let data: any;
   let address: string;
   let castSignerAddress: string | undefined;
+  let castAuthorFid: number | undefined;
 
   try {
     body = await req.json(); // Parse the request body as JSON
@@ -40,6 +42,7 @@ export async function validateMessage(req: NextRequest): Promise<{
       castSignerAddress =
         data.action.cast.author.verified_addresses.eth_addresses[0] ??
         data.action.cast.author.custody_address;
+      castAuthorFid = data.action.cast.author.fid;
     }
     if (!data.valid) {
       throw new Error("Unvalidated data!");
@@ -75,5 +78,12 @@ export async function validateMessage(req: NextRequest): Promise<{
     inputText = data.action.input.text;
   }
 
-  return { fid, buttonId, inputText, address, castSignerAddress };
+  return {
+    fid,
+    buttonId,
+    inputText,
+    address,
+    castSignerAddress,
+    castAuthorFid,
+  };
 }
