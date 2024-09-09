@@ -7,6 +7,54 @@ import {
   getProfileOpenRankByEngagement,
   getProfileOpenRankByFollowing,
 } from "@/middleware/openrank";
+import { Metadata, ResolvingMetadata } from "next";
+
+type Props = {
+  params: { fid: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const fid = params.fid;
+  const user = await getUsersByFids([fid]);
+  const p = user[0];
+  if (!user) {
+    return {
+      title: "Profile not found",
+      openGraph: {
+        title: "Profile not found",
+        description: "Profile not found",
+      },
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+    };
+  }
+  const imageUrl = p.pfp_url || `${process.env["NEXT_PUBLIC_HOST"]}/fc-og.png`;
+  const fcMetadata: Record<string, string> = {
+    "fc:frame": "vNext",
+    // "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/actions/mini-app`,
+    "fc:frame:image": imageUrl,
+    // "fc:frame:button:1": `View Profile`,
+    "fc:frame:button:1": `View in App`,
+    "fc:frame:button:1:action": `link`,
+    "fc:frame:button:1:target": `${process.env["NEXT_PUBLIC_HOST"]}/profile/${p.fid}`,
+  };
+
+  return {
+    title: p.username,
+    openGraph: {
+      title: p.username ?? `Proflie ${p.fid}`,
+      description: `View the profile of ${p.username}`,
+      images: [{ url: imageUrl }],
+    },
+    other: {
+      ...fcMetadata,
+    },
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+  };
+}
 
 export default async function Page({ params }: { params: { fid: string } }) {
   const { fid } = params;
