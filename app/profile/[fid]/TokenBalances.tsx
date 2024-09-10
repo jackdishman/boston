@@ -43,7 +43,14 @@ export default function TokenBalances(props: IProps) {
         if (activeNetwork === "base") return balance.chainName === "base";
         return balance.chainName === "ethereum";
       })
-      .sort((a, b) => (a.contractAddress ? 1 : -1)); // Sort native balances to the top
+      .sort((a, b) => {
+        if (!a.contractAddress) return -1; // Native balances first
+        if (a.contractAddress === "0x29D2EB697306e9Bd34644B143F43D164Cd0F41F0")
+          return -1; // Prioritize specific contract address
+        if (b.contractAddress === "0x29D2EB697306e9Bd34644B143F43D164Cd0F41F0")
+          return 1; // Prioritize specific contract address
+        return 1; // Everything else
+      });
   };
 
   return (
