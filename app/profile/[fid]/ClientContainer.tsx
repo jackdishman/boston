@@ -17,6 +17,8 @@ import {
 import { IOpenRankProfileResponse } from "@/middleware/openrank";
 import OpenRankData from "./OpenRankData";
 import ShareButton from "./ShareButton";
+import { NeynarProfileCard, useNeynarContext } from "@neynar/react";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface ClientContainerProps {
   user: INeynarUserResponse;
@@ -40,9 +42,17 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
   >("all");
   const [selectedAddress, setSelectedAddress] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<"coins" | "nft">("coins");
-
+  const privy = usePrivy();
+  const neynarUser = useNeynarContext();
+  console.log(neynarUser);
   return (
     <div>
+      {/* User Info */}
+      <NeynarProfileCard
+        fid={user.fid}
+        viewerFid={privy.user?.farcaster?.fid ?? undefined}
+      />
+
       <div className="sm:flex sm:space-x-8 items-center">
         {/* Profile Picture */}
         <div className="flex justify-center sm:w-1/3">
@@ -55,7 +65,6 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
           />
         </div>
 
-        {/* User Info */}
         <UserInfo
           displayName={user.display_name}
           username={user.username}

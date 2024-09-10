@@ -5,6 +5,7 @@ import { getAccessToken, useLogin, usePrivy } from "@privy-io/react-auth";
 import { IChannelResponse, IEvent } from "@/types/interfaces";
 import Header from "./Header";
 import SearchList from "./SearchList";
+import { NeynarContextProvider, Theme } from "@neynar/react";
 
 interface AppProps {
   children: React.ReactNode;
@@ -100,21 +101,32 @@ const App: React.FC<AppProps> = ({ children }) => {
 
   return (
     <>
-      <Header
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        clearSearch={clearSearch}
-        closeSearch={closeSearch}
-        isSearchActive={isSearchActive}
-      />
-      {isSearchActive && (
-        <SearchList
-          channels={channels}
+      <NeynarContextProvider
+        settings={{
+          clientId: process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID || "",
+          defaultTheme: Theme.Light,
+          eventsCallbacks: {
+            onAuthSuccess: () => {},
+            onSignout() {},
+          },
+        }}
+      >
+        <Header
           searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          clearSearch={clearSearch}
           closeSearch={closeSearch}
+          isSearchActive={isSearchActive}
         />
-      )}
-      {children}
+        {isSearchActive && (
+          <SearchList
+            channels={channels}
+            searchTerm={searchTerm}
+            closeSearch={closeSearch}
+          />
+        )}
+        {children}
+      </NeynarContextProvider>
     </>
   );
 };
