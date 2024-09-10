@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import TokenBalances from "./TokenBalances";
 import UserInfo from "./UserInfo";
 import Credentials from "./Credentials";

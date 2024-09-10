@@ -11,16 +11,11 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = ({ children }) => {
+  const [viewingInFrame, setViewingInFrame] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [channels, setChannels] = useState<IChannelResponse[]>([]);
   const { authenticated } = usePrivy();
-
-  const clearSearch = () => setSearchTerm("");
-  const closeSearch = () => {
-    setSearchTerm("");
-    setIsSearchActive(false);
-  };
 
   const { login } = useLogin({
     onComplete: async (user, isNewUser, wasAlreadyAuthenticated) => {
@@ -66,6 +61,17 @@ const App: React.FC<AppProps> = ({ children }) => {
     },
   });
 
+  const loginWrapper = async () => {
+    if (viewingInFrame || window !== window.parent) return;
+    await login(); // Trigger login here
+  };
+
+  const clearSearch = () => setSearchTerm("");
+  const closeSearch = () => {
+    setSearchTerm("");
+    setIsSearchActive(false);
+  };
+
   const fetchChannels = async (search: string): Promise<IChannelResponse[]> => {
     const channels = await fetch("/api/search-channels", {
       method: "POST",
@@ -80,8 +86,18 @@ const App: React.FC<AppProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log(window);
+    if (!window) setViewingInFrame(true);
+    if (window === window.parent) {
+      setViewingInFrame(false);
+    } else {
+      setViewingInFrame(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!authenticated) {
-      login(); // Automatically trigger login if user is not
+      loginWrapper();
     }
   }, [authenticated]);
 
@@ -94,19 +110,30 @@ const App: React.FC<AppProps> = ({ children }) => {
     }
   }, [searchTerm]);
 
-  if (!authenticated) {
-    return <div></div>;
-  }
+  if (!authenticated && !viewingInFrame) return null;
 
   return (
     <>
-      <Header
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        clearSearch={clearSearch}
-        closeSearch={closeSearch}
-        isSearchActive={isSearchActive}
-      />
+      {viewingInFrame ? (
+        <div className="fixed z-50 w-full bg-gray-100 shadow-md">
+          <header className="flex justify-center items-center">
+            <nav className="flex justify-between w-full max-w-7xl items-center h-16 px-4">
+              <div className="flex-1 mx-4 relative">
+                <p>Dish Codes: Frame Preview</p>
+              </div>
+            </nav>
+          </header>
+        </div>
+      ) : (
+        <Header
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          clearSearch={clearSearch}
+          closeSearch={closeSearch}
+          isSearchActive={isSearchActive}
+          login={loginWrapper}
+        />
+      )}
       {isSearchActive && (
         <SearchList
           channels={channels}
