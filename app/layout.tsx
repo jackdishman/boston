@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/privy";
 import App from "./components/App";
-import { IChannelResponse } from "@/types/interfaces";
+import "@neynar/react/dist/style.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
