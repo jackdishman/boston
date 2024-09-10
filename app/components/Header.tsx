@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { usePrivy, useLogin } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import Menu from "./icons/Menu";
 import X from "./icons/X";
 import Power from "./icons/Power";
@@ -18,6 +18,7 @@ interface HeaderProps {
   clearSearch: () => void;
   closeSearch: () => void;
   isSearchActive: boolean;
+  login: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -26,52 +27,9 @@ const Header: React.FC<HeaderProps> = ({
   clearSearch,
   closeSearch,
   isSearchActive,
+  login,
 }) => {
-  const { logout, ready, authenticated, getAccessToken, user } = usePrivy();
-
-  const { login } = useLogin({
-    onComplete: async (user, isNewUser, wasAlreadyAuthenticated) => {
-      const accessToken = await getAccessToken();
-      if (isNewUser) {
-        fetch("/api/new-member", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const event: IEvent = {
-          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
-          display_name: user.farcaster?.username ?? "Unknown",
-          action: "joined the platform",
-        };
-        fetch("/api/events", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ event }),
-        });
-        return;
-      }
-      if (!wasAlreadyAuthenticated) {
-        const event: IEvent = {
-          fid: user.farcaster?.fid ? user.farcaster.fid.toString() : "-1",
-          display_name: user.farcaster?.username ?? "Unknown",
-          action: "logged in",
-        };
-        fetch("/api/events", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ event }),
-        });
-      }
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  const { logout, ready, authenticated } = usePrivy();
 
   const disableLogin = !ready || (ready && authenticated);
 
@@ -160,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({
       </header>
       {isOpen && (
         <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-16 z-50">
-          {authenticated ? (
+          {authenticated && (
             <div className="flex flex-col space-y-4">
               <Link
                 href="/"
@@ -193,15 +151,6 @@ const Header: React.FC<HeaderProps> = ({
                 <span className="ml-2 w-32">Disconnect</span>
               </button>
             </div>
-          ) : (
-            <button
-              disabled={disableLogin}
-              onClick={login}
-              className="hover:underline flex items-center text-start"
-            >
-              <Power />
-              <span className="ml-2 w-32">Connect</span>
-            </button>
           )}
         </div>
       )}
