@@ -201,3 +201,47 @@ export async function getNFTs(
     return null;
   }
 }
+
+export async function getDishTokenBalance(address: string) {
+  const DISH_CONTRACT_ADDRESS = "0x29D2EB697306e9Bd34644B143F43D164Cd0F41F0";
+  const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+  const url = `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`;
+
+  const body = JSON.stringify({
+    id: 1,
+    jsonrpc: "2.0",
+    method: "alchemy_getTokenBalances",
+    params: [address, [DISH_CONTRACT_ADDRESS]],
+  });
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch, status: ${res.status}`);
+    }
+
+    const dishData = await res.json();
+    console.log(dishData.result.tokenBalances);
+    const tokenBalanceHex = dishData?.result.tokenBalances?.[0]?.tokenBalance;
+
+    if (tokenBalanceHex) {
+      // Convert hex to decimal and divide by 10^18 to get the actual balance
+      const balance = parseInt(tokenBalanceHex, 16) / 10 ** 18;
+      console.log("Dish Token balance:", balance);
+      return balance;
+    } else {
+      console.log("No balance found for the provided token.");
+      return 0;
+    }
+  } catch (error) {
+    console.error(`Error fetching Dish Token balance for ${address}:`, error);
+  }
+}

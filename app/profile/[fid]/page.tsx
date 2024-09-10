@@ -1,5 +1,9 @@
 import { getIcebreakerProfile, getUsersByFids } from "@/middleware/helpers";
-import { getAllBalances, getNFTs } from "@/middleware/alchemy";
+import {
+  getAllBalances,
+  getDishTokenBalance,
+  getNFTs,
+} from "@/middleware/alchemy";
 import React from "react";
 import ClientContainer from "./ClientContainer";
 import { IAddressBalance, INFTs } from "@/types/interfaces";
@@ -34,9 +38,7 @@ export async function generateMetadata(
   const imageUrl = p.pfp_url || `${process.env["NEXT_PUBLIC_HOST"]}/fc-og.png`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    // "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/actions/mini-app`,
     "fc:frame:image": imageUrl,
-    // "fc:frame:button:1": `View Profile`,
     "fc:frame:button:1": `View in App`,
     "fc:frame:button:1:action": `link`,
     "fc:frame:button:1:target": `${process.env["NEXT_PUBLIC_HOST"]}/profile/${p.fid}`,
@@ -45,7 +47,7 @@ export async function generateMetadata(
   return {
     title: p.username,
     openGraph: {
-      title: p.username ?? `Proflie ${p.fid}`,
+      title: p.username ?? `Profile ${p.fid}`,
       description: `View the profile of ${p.username}`,
       images: [{ url: imageUrl }],
     },
@@ -64,6 +66,18 @@ export default async function Page({ params }: { params: { fid: string } }) {
   const p = user[0];
   const icebreakerRes = await getIcebreakerProfile(fid);
   const icebreakerProfile = icebreakerRes?.profiles[0];
+
+  // Fetch dish balance for all verified Ethereum addresses and sum them
+  const dishBalances = await Promise.all(
+    p.verified_addresses.eth_addresses.map(async (address) => {
+      const balance = await getDishTokenBalance(address);
+      return balance ?? 0;
+    })
+  );
+  const totalDishBalance = dishBalances.reduce(
+    (acc, balance) => acc + balance,
+    0
+  );
 
   // Fetch token balances for Ethereum and Base
   const addressBalances: IAddressBalance[] = await Promise.all(
@@ -99,7 +113,11 @@ export default async function Page({ params }: { params: { fid: string } }) {
   const followingRank = profileRankRes[0] ? profileRankRes[0] : [];
   const engagementRank = profileRankRes[1] ? profileRankRes[1] : [];
   return (
-    <div className="p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
+    <div
+      className={`p-4 max-w-6xl mx-auto bg-white shadow-lg rounded-lg ${
+        totalDishBalance > 0 && "bg-gradient-to-r from-yellow-200 to-yellow-100"
+      }`}
+    >
       <ClientContainer
         user={p}
         icebreakerProfile={icebreakerProfile}
@@ -107,6 +125,7 @@ export default async function Page({ params }: { params: { fid: string } }) {
         nfts={nfts}
         followingRank={followingRank[0]}
         engagementRank={engagementRank[0]}
+        dishTokenBalance={totalDishBalance ?? 0}
       />
     </div>
   );

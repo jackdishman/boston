@@ -25,6 +25,7 @@ interface ClientContainerProps {
   nfts: INFTs[];
   followingRank: IOpenRankProfileResponse;
   engagementRank: IOpenRankProfileResponse;
+  dishTokenBalance: number;
 }
 
 const ClientContainer: React.FC<ClientContainerProps> = ({
@@ -34,6 +35,7 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
   nfts,
   followingRank,
   engagementRank,
+  dishTokenBalance,
 }) => {
   const [selectedNetwork, setSelectedNetwork] = useState<
     "ethereum" | "base" | "all"
@@ -68,6 +70,9 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
           channels={icebreakerProfile?.channels || []}
         />
       </div>
+
+      {/* Dish Token Balance */}
+      {dishTokenBalance > 0 && <p>Dish token balance: {dishTokenBalance}</p>}
 
       {/* Share Button */}
       <ShareButton user={user} />
