@@ -230,6 +230,60 @@ export default function CastsContainer({ channelId }: IProps) {
         <Filter />
       </button>
 
+      {/* Mobile Filter Panel */}
+      {isFilterOpen && (
+        <div className="fixed inset-0 z-30 bg-white p-4 mt-96 lg:hidden">
+          <button
+            onClick={() => setIsFilterOpen(false)}
+            className="absolute top-4 right-4 text-gray-500 text-2xl"
+          >
+            ✖
+          </button>
+          <div className="mt-8">
+            <div className="mb-5">
+              <h3 className="block mb-2 text-sm font-medium text-gray-700">
+                Filters
+              </h3>
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={() => {
+                    setWithReplies(!withReplies);
+                    setIsFilterOpen(false);
+                  }}
+                  className={`px-4 py-2 rounded ${
+                    withReplies ? "bg-blue-500 text-white" : "bg-gray-200"
+                  }`}
+                >
+                  {withReplies ? "Hide Replies" : "Show Replies"}
+                </button>
+                <button
+                  onClick={() => {
+                    setWithRecasts(!withRecasts);
+                    setIsFilterOpen(false);
+                  }}
+                  className={`px-4 py-2 rounded ${
+                    withRecasts ? "bg-blue-500 text-white" : "bg-gray-200"
+                  }`}
+                >
+                  {withRecasts ? "Hide Recasts" : "Show Recasts"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShouldModerate(!shouldModerate);
+                    setIsFilterOpen(false);
+                  }}
+                  className={`px-4 py-2 rounded ${
+                    shouldModerate ? "bg-blue-500 text-white" : "bg-gray-200"
+                  }`}
+                >
+                  {shouldModerate ? "Disable Moderation" : "Enable Moderation"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="w-full lg:w-3/4 lg:ml-auto lg:pl-4 pt-20 lg:pt-0 space-y-4 p-4">
         {rootCasts.length > 0 ? (
@@ -237,19 +291,6 @@ export default function CastsContainer({ channelId }: IProps) {
         ) : (
           <div className="text-center text-gray-500">No casts available</div>
         )}
-
-        {/* Fetch More Button */}
-        <div className="text-center">
-          {cursor && !loading && (
-            <button
-              onClick={handleFetchMore}
-              className="bg-blue-500 text-white py-2 px-4 rounded"
-              disabled={loading || !cursor}
-            >
-              Fetch More Casts
-            </button>
-          )}
-        </div>
 
         {/* Invisible div for triggering infinite scroll */}
         <div ref={bottomRef} className="h-10"></div>
