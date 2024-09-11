@@ -12,13 +12,11 @@ export function CastItem({ cast }: CastItemProps) {
     if (embed.metadata?.content_type?.includes("image")) {
       // Handle image embeds
       return (
-        <Image
+        <img
           key={index}
           src={embed.url}
           alt="embed"
           className="w-full h-auto rounded-md"
-          width={embed.metadata.image?.width_px || 500}
-          height={embed.metadata.image?.height_px || 500}
         />
       );
     } else if (embed.metadata?.content_type?.includes("text/html")) {
@@ -88,6 +86,7 @@ export function CastItem({ cast }: CastItemProps) {
           src={cast.author.pfp_url}
           alt="avatar"
           className="w-12 h-12 rounded-full"
+          style={{ objectFit: "cover" }}
           width={48}
           height={48}
         />

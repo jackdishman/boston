@@ -21,12 +21,10 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
       href={`/profile/${member.fid}`}
       className="flex items-center p-2 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 transition w-72"
     >
-      <Image
+      <img
         src={member.pfp_url}
         alt={member.username}
-        className="rounded-full"
-        width={64}
-        height={64}
+        className="w-12 h-12 rounded-full"
       />
       <div className="ml-4">
         <p className="text-lg font-semibold text-gray-800">
@@ -42,12 +40,10 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
     <section className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-10">
       <article className="bg-white rounded-lg shadow-lg text-center p-6 sm:p-8 w-full max-w-4xl">
         <div className="flex flex-col sm:flex-row mb-6">
-          <Image
+          <img
             src={channel.imageUrl}
             alt={channel.description}
-            className="rounded mb-4 sm:mb-0 sm:mr-4 self-center sm:self-start"
-            width={240}
-            height={240}
+            className="w-48 h-48 rounded mb-4 sm:mb-0 sm:mr-4 self-center sm:self-start"
           />
           <div className="text-center sm:text-left w-full">
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
