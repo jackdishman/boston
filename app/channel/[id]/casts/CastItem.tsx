@@ -29,11 +29,9 @@ export function CastItem({ cast }: CastItemProps) {
           className="w-full h-auto rounded-md border p-4 bg-gray-100"
         >
           {ogImage && (
-            <Image
+            <img
               src={ogImage}
               alt={ogTitle}
-              width={500}
-              height={300}
               className="mb-4 w-full h-auto rounded-md"
             />
           )}
@@ -82,13 +80,11 @@ export function CastItem({ cast }: CastItemProps) {
   return (
     <div className="border rounded-lg shadow-md p-6 bg-white overflow-hidden">
       <div className="flex items-center space-x-4">
-        <Image
+        <img
           src={cast.author.pfp_url}
           alt="avatar"
           className="w-12 h-12 rounded-full"
           style={{ objectFit: "cover" }}
-          width={48}
-          height={48}
         />
         <div>
           <h3 className="text-lg font-bold">{cast.author.display_name}</h3>
