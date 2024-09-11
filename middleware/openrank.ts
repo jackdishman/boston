@@ -47,3 +47,17 @@ export async function getProfileOpenRankByEngagement(
     console.error(error);
   }
 }
+
+export async function getChannelTopProfiles(channel: string) {
+  try {
+    const res = await fetch(
+      `https://graph.cast.k3l.io/channels/rankings/${channel}`,
+      { method: "GET" }
+    );
+    const data = await res.json();
+    console.log(data);
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+}

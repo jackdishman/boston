@@ -121,6 +121,10 @@ export interface INeynarCastResponse {
   replies: Reply;
   channel: Channel;
   mentioned_profiles: []; // Adjust the type according to the structure of the mentioned_profiles array
+  viewer_context?: {
+    liked: boolean;
+    recasted: boolean;
+  };
 }
 
 export interface IBalanceResponse extends Array<TokenBalance> {}

@@ -1,19 +1,19 @@
+"use client";
+
 import React from "react";
 import ChannelNav from "./ChannelNav";
 import { IChannelResponse, INeynarUserResponse } from "@/types/interfaces";
 import Link from "next/link";
-
+import Image from "next/image";
 interface ChannelLayoutProps {
   channel: IChannelResponse;
   leadMember: INeynarUserResponse;
-  hosts: INeynarUserResponse[];
   children: React.ReactNode;
 }
 
 const ChannelLayout: React.FC<ChannelLayoutProps> = ({
   channel,
   leadMember,
-  hosts,
   children,
 }) => {
   const MemberPreview = (member: INeynarUserResponse) => (
@@ -21,10 +21,12 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
       href={`/profile/${member.fid}`}
       className="flex items-center p-2 border border-gray-200 rounded-lg mb-2 hover:bg-gray-50 transition w-72"
     >
-      <img
+      <Image
         src={member.pfp_url}
         alt={member.username}
-        className="w-12 h-12 rounded-full"
+        className="rounded-full"
+        width={64}
+        height={64}
       />
       <div className="ml-4">
         <p className="text-lg font-semibold text-gray-800">
@@ -40,10 +42,12 @@ const ChannelLayout: React.FC<ChannelLayoutProps> = ({
     <section className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-10">
       <article className="bg-white rounded-lg shadow-lg text-center p-6 sm:p-8 w-full max-w-4xl">
         <div className="flex flex-col sm:flex-row mb-6">
-          <img
+          <Image
             src={channel.imageUrl}
             alt={channel.description}
-            className="w-48 h-48 rounded mb-4 sm:mb-0 sm:mr-4 self-center sm:self-start"
+            className="rounded mb-4 sm:mb-0 sm:mr-4 self-center sm:self-start"
+            width={240}
+            height={240}
           />
           <div className="text-center sm:text-left w-full">
             <h1 className="text-3xl font-bold text-gray-800 mb-4">

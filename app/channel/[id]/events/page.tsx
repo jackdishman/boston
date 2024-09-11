@@ -63,14 +63,14 @@ export default async function Page({ params }: Props) {
   );
   if (!events.ok)
     return (
-      <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
-        <div className="text-center text-xl">Error fetching events</div>
+      <ChannelLayout channel={channel} leadMember={leadMember[0]}>
+        <div className="text-center text-xl">No Events Found</div>
       </ChannelLayout>
     );
   const stats = (await events.json()) as EventStats;
 
   return (
-    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+    <ChannelLayout channel={channel} leadMember={leadMember[0]}>
       <EventsStats stats={stats} />
     </ChannelLayout>
   );

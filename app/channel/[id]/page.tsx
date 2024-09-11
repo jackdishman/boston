@@ -45,12 +45,9 @@ export default async function Page({ params }: Props) {
   if (!channel) return <div>Error fetching channel</div>;
 
   const leadMember = await getUsersByFids([channel.leadFid.toString()]);
-  const hosts = channel.hostFids
-    ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
-    : [];
 
   return (
-    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+    <ChannelLayout channel={channel} leadMember={leadMember[0]}>
       <p className="text-center"></p>
     </ChannelLayout>
   );
