@@ -1,31 +1,12 @@
 // pages/channel/[id]/casts.tsx
 import React from "react";
-import { IChannelResponse, INeynarCastResponse } from "@/types/interfaces";
 import { getChannelById, getUsersByFids } from "@/middleware/helpers";
-import { NeynarAPIClient, FeedType, FilterType } from "@neynar/nodejs-sdk";
 import CastsContainer from "./CastsContainer";
 import ChannelLayout from "../ChannelLayout";
 
 type Props = {
   params: { id: string };
 };
-
-async function getChannelCasts(
-  channelUrl: string
-): Promise<INeynarCastResponse[] | null> {
-  try {
-    const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY ?? "");
-    const res = await client.fetchFeed(FeedType.Filter, {
-      filterType: FilterType.ParentUrl,
-      parentUrl: channelUrl,
-      limit: 25,
-    });
-    return res.casts as unknown as INeynarCastResponse[];
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
 
 export async function generateMetadata({ params }: Props) {
   const channel = await getChannelById(params.id);
@@ -64,17 +45,10 @@ export default async function Page({ params }: Props) {
   if (!channel) return <div>Error fetching channel</div>;
 
   const leadMember = await getUsersByFids([channel.leadFid.toString()]);
-  const hosts =
-    channel.hostFids && channel.hostFids.length > 0
-      ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
-      : [];
-
-  const casts = await getChannelCasts(channel.url);
-  if (!casts) return <div>Error fetching casts</div>;
 
   return (
-    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
-      <CastsContainer casts={casts} />
+    <ChannelLayout channel={channel} leadMember={leadMember[0]}>
+      <CastsContainer channelId={channel.id} />
     </ChannelLayout>
   );
 }

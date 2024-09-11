@@ -3,6 +3,7 @@ import {
   IIcebreakerProfilesResponse,
   IChannelResponse,
   INeynarUserResponse,
+  INeynarCastResponse,
 } from "@/types/interfaces";
 
 const fetchWithRetry = async (
@@ -129,4 +130,39 @@ export async function getIcebreakerProfile(
   } catch {
     return null;
   }
+}
+
+export async function getChannelFeed(
+  channel_id: string,
+  with_recasts?: boolean,
+  viewer_fid?: number,
+  with_replies?: boolean,
+  limit?: number,
+  cursor?: string,
+  should_moderate?: boolean
+): Promise<{ casts: INeynarCastResponse[]; cursor: string }> {
+  console.log(channel_id);
+  // Construct the base URL
+  let url = `https://api.neynar.com/v2/farcaster/feed/channels?channel_ids=${channel_id}`;
+
+  // Conditionally append query parameters if they are present
+  if (with_recasts !== undefined) url += `&with_recasts=${with_recasts}`;
+  if (with_replies !== undefined) url += `&with_replies=${with_replies}`;
+  if (limit !== undefined) url += `&limit=${limit}`;
+  if (cursor) url += `&cursor=${cursor}`;
+  if (viewer_fid !== undefined) url += `&viewer_fid=${viewer_fid}`;
+  if (should_moderate !== undefined)
+    url += `&should_moderate=${should_moderate}`;
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      api_key: process.env.NEYNAR_API_KEY ?? ``,
+    },
+  };
+
+  const response = await fetchWithRetry(url, options);
+  const data = await response.json();
+  return { casts: data.casts, cursor: data.next?.cursor || "" };
 }

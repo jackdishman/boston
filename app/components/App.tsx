@@ -86,7 +86,6 @@ const App: React.FC<AppProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    console.log(window);
     if (!window) setViewingInFrame(true);
     if (window === window.parent) {
       setViewingInFrame(false);

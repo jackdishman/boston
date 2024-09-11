@@ -57,7 +57,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       submission.created_at,
       submission.time_completed
     );
-    console.log("Elapsed Time", elapsedTime);
 
     const svg = await satori(
       <div

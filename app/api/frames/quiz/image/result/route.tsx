@@ -18,7 +18,6 @@ function getRandomImage(isCorrect: boolean): string {
     "-" +
     random +
     ".png";
-  console.log(`Image URL: ${imgUrl}`);
   return imgUrl;
 }
 
@@ -37,7 +36,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const answer = question.answer;
     const explanation = question.explanation;
-    console.log(`Answer: ${answer}, Explanation: ${explanation}`);
 
     const svg = await satori(
       <div

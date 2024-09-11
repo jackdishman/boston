@@ -56,7 +56,7 @@ export default async function Page({ params }: Props) {
   const { users, cursor } = await getChannelFollowers(params.id);
 
   return (
-    <ChannelLayout channel={channel} leadMember={leadMember[0]} hosts={hosts}>
+    <ChannelLayout channel={channel} leadMember={leadMember[0]}>
       <FollowersList
         users={users}
         cursor={cursor}
