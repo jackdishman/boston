@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   //   perform logic
   try {
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json({ error: "Error adding member" }, { status: 500 });
   } finally {
     return NextResponse.json({ message: "Member added" }, { status: 200 });

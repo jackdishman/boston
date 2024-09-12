@@ -120,7 +120,6 @@ export default function QuizTaker(props: IProps) {
         (q) => !updatedSubmission.answers.find((a) => a.question_id === q.id)
       );
       if (!nextQuestion) {
-        console.log("No more questions to answer");
         await updateSubmissionScore(isCorrect); // Update the submission score
         setIsComplete(true);
         return;

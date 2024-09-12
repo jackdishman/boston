@@ -229,16 +229,14 @@ export async function getDishTokenBalance(address: string) {
     }
 
     const dishData = await res.json();
-    console.log(dishData.result.tokenBalances);
     const tokenBalanceHex = dishData?.result.tokenBalances?.[0]?.tokenBalance;
 
     if (tokenBalanceHex) {
       // Convert hex to decimal and divide by 10^18 to get the actual balance
       const balance = parseInt(tokenBalanceHex, 16) / 10 ** 18;
-      console.log("Dish Token balance:", balance);
       return balance;
     } else {
-      console.log("No balance found for the provided token.");
+      // No balance found for the provided token.
       return 0;
     }
   } catch (error) {

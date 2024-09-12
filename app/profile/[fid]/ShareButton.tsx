@@ -13,7 +13,7 @@ export default function ShareButton(props: IProps) {
     // Listen for messages from the parent
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "createCastResponse") {
-        console.log("Received confirmation from parent:", event.data);
+        // ("Received confirmation from parent:", event.data);
       }
     };
 
@@ -34,7 +34,6 @@ export default function ShareButton(props: IProps) {
           <button
             className="px-4 py-2 text-white bg-blue-500 rounded-md shadow-md hover:bg-blue-600"
             onClick={() => {
-              console.log(window.parent);
               try {
                 window.parent.postMessage(
                   {
@@ -48,7 +47,6 @@ export default function ShareButton(props: IProps) {
                   },
                   "*"
                 );
-                console.log("Message sent to parent.");
               } catch (error) {
                 console.error("Error processing request:", error);
               }

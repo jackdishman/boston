@@ -141,7 +141,6 @@ export async function getChannelFeed(
   cursor?: string,
   should_moderate?: boolean
 ): Promise<{ casts: INeynarCastResponse[]; cursor: string }> {
-  console.log(channel_id);
   // Construct the base URL
   let url = `https://api.neynar.com/v2/farcaster/feed/channels?channel_ids=${channel_id}`;
 

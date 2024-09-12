@@ -10,8 +10,14 @@ interface IProps {
 export default function NFTCard(props: IProps) {
   const { nft } = props;
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+
   const toggleAccordion = () => {
     setIsAccordionOpen(!isAccordionOpen);
+  };
+
+  const toggleDescription = () => {
+    setIsDescriptionOpen(!isDescriptionOpen);
   };
 
   if (!nft.title) {
@@ -50,9 +56,24 @@ export default function NFTCard(props: IProps) {
         <h4 className="text-xl font-semibold text-gray-900">
           {nft.metadata.name ?? "Untitled"}
         </h4>
-        <p className="text-sm text-gray-600">
-          {nft.metadata.description ?? "No description available."}
-        </p>
+
+        {/* Expandable Description */}
+        <div className="mt-2">
+          <button
+            onClick={toggleDescription}
+            className="bg-gray-200 px-4 py-2 w-full text-left font-semibold text-gray-800 rounded"
+          >
+            {isDescriptionOpen ? "Hide Description" : "Show Description"}
+          </button>
+          {isDescriptionOpen && (
+            <div className="mt-2 bg-gray-100 rounded-lg p-4">
+              <p className="text-sm text-gray-600">
+                {nft.metadata.description ?? "No description available."}
+              </p>
+            </div>
+          )}
+        </div>
+
         {nft.contractMetadata && (
           <div className="mt-4">
             <p className="text-sm text-gray-500">
@@ -61,7 +82,7 @@ export default function NFTCard(props: IProps) {
           </div>
         )}
 
-        {/* copy contract address to clipboard */}
+        {/* Copy contract address to clipboard */}
         <div className="flex items-center space-x-2">
           <button
             onClick={() => {

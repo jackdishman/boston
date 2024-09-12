@@ -55,7 +55,6 @@ export async function getChannelTopProfiles(channel: string) {
       { method: "GET" }
     );
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (err) {
     console.error(err);

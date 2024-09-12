@@ -51,7 +51,6 @@ const FollowersList: React.FC<IFollowersListProps> = (
       });
       const data = await response.json();
       const fetchedUsers = data.users.users as INeynarUserResponse[];
-      console.log(fetchedUsers);
       const cursor = data.cursor;
       return { users: fetchedUsers, cursor };
     } catch (error) {

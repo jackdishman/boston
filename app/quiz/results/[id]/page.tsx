@@ -41,7 +41,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/image/share-results?submissionId=${id}`;
-  console.log("Image URL", imageUrl);
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/quiz/question?quiz_id=${quiz.id}&question_id=${quiz.first_question_id}`,
