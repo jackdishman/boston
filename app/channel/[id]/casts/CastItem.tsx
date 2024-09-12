@@ -1,6 +1,5 @@
 "use client";
 import { INeynarCastResponse } from "@/types/interfaces";
-import Image from "next/image";
 
 interface CastItemProps {
   cast: INeynarCastResponse;
