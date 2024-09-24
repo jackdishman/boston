@@ -24,7 +24,7 @@ export const walletClient = () => {
     throw new Error("Private key is missing from environment variables");
   }
 
-  const account = privateKeyToAccount(privateKey);
+  const account = privateKeyToAccount(`0x${privateKey}`);
 
   return createWalletClient({
     account,
@@ -35,4 +35,4 @@ export const walletClient = () => {
 
 // Optionally, if you're using ethers.js in combination with viem,
 // here's an ethers.js provider as well:
-export const ethersProvider = new ethers.providers.JsonRpcProvider(providerUrl);
+export const ethersProvider = new ethers.JsonRpcProvider(providerUrl);
