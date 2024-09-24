@@ -42,8 +42,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     };
     const eventRes = await addEvent(event);
 
-    // loop through credentials and make into string:
-
     if (!icebreakerProfile) {
       const body = {
         type: "message",

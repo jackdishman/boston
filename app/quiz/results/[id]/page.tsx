@@ -8,6 +8,7 @@ import PageContainer from "./PageContainer";
 import Link from "next/link";
 import { Metadata, ResolvingMetadata } from "next";
 import ShareLink from "../../[id]/ShareLink";
+import { getUsersByFids } from "@/middleware/helpers";
 
 type Props = {
   params: { id: string };
@@ -98,7 +99,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     const quizRes = await getQuiz(quizId);
     if (!quizRes) return <div>no quiz</div>;
     quiz = quizRes;
-    proctorFid = quizRes.proctor_fid;
+    proctorFid = quizRes.proctor_fid ?? null;
   } catch (error) {
     console.error("Error fetching quiz", error);
   }
@@ -133,6 +134,11 @@ export default async function Page({ params }: { params: { id: string } }) {
   });
 
   if (!quiz) return <div>cannot find quiz</div>;
+
+  // fetch user by fid
+  const user = await getUsersByFids([fid, proctorFid ?? ""]);
+  const p = user[0];
+  const proctor = user[1] ?? user[0];
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -176,9 +182,11 @@ export default async function Page({ params }: { params: { id: string } }) {
       <PageContainer
         id={id}
         quizId={quizId}
-        proctorFid={proctorFid ?? ""}
         submissions={submissions}
         joinedData={joinedData}
+        quizTaker={p}
+        score={finalScore}
+        proctor={proctor}
       />
     </div>
   );
