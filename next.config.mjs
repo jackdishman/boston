@@ -13,6 +13,8 @@ const nextConfig = {
     STACK_API_KEY: process.env.STACK_API_KEY,
     NEXT_PUBLIC_REWARD_POINTS: process.env.NEXT_PUBLIC_REWARD_POINTS,
     ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
+    PINATA_API_KEY: process.env.PINATA_API_KEY,
+    PINATA_DEDICATED_GATEWAY: process.env.PINATA_API_SECRET,
   },
   images: {
     remotePatterns: [

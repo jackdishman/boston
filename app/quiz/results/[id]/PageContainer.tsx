@@ -2,30 +2,39 @@
 import React from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { IAnswerEntry, IQuestion, ISubmission } from "@/types/quiz";
-import Link from "next/link";
+import MintResults from "./MintResults";
+import { INeynarUserResponse } from "@/types/interfaces";
 
 interface IProps {
   id: string;
   quizId: number;
-  proctorFid: string;
   submissions: ISubmission[];
   joinedData: Map<number, { submission: IAnswerEntry; question: IQuestion }>;
+  quizTaker: INeynarUserResponse;
+  score: number;
+  proctor: INeynarUserResponse;
 }
 
 export default function PageContainer(props: IProps) {
-  const { id, quizId, proctorFid, submissions, joinedData } = props;
+  const { id, quizId, submissions, joinedData, quizTaker, score, proctor } = props;
   const { user } = usePrivy();
 
   // check if user is authorized to view this quiz
   if (
     user?.farcaster?.fid !== submissions[0].fid &&
-    Number(proctorFid) !== user?.farcaster?.fid
+    Number(proctor.fid) !== user?.farcaster?.fid
   ) {
     return <div>Unauthorized</div>;
   }
 
+  const submission = submissions.find((s) => s.id === Number(id));
+
+
+
   return (
     <div>
+      {/* Mint Results */}
+      {submission && <MintResults submission={submission} quizId={quizId} quizTaker={quizTaker.verified_addresses.eth_addresses[0]} score={score} timeCompleted={0} proctor={proctor} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Array.from(joinedData).map(([key, value]) => (
           <div key={key} className="border rounded-lg p-4 shadow-sm bg-gray-50">
