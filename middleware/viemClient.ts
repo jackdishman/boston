@@ -15,24 +15,6 @@ export const publicClient = createPublicClient({
   transport: http(providerUrl),
 });
 
-// Initialize the wallet client for sending transactions
-export const walletClient = () => {
-  // Retrieve the private key from environment variables (never hardcode this)
-  const privateKey = process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY;
-
-  if (!privateKey) {
-    throw new Error("Private key is missing from environment variables");
-  }
-
-  const account = privateKeyToAccount(`0x${privateKey}`);
-
-  return createWalletClient({
-    account,
-    chain,
-    transport: http(providerUrl),
-  });
-};
-
 // Optionally, if you're using ethers.js in combination with viem,
 // here's an ethers.js provider as well:
 export const ethersProvider = new ethers.JsonRpcProvider(providerUrl);
