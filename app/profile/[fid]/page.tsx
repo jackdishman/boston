@@ -12,6 +12,8 @@ import {
   getProfileOpenRankByFollowing,
 } from "@/middleware/openrank";
 import { Metadata, ResolvingMetadata } from "next";
+import { Suspense } from 'react'
+import Skeleton from "@/app/components/Skeleton";
 
 type Props = {
   params: { fid: string };
@@ -118,15 +120,17 @@ export default async function Page({ params }: { params: { fid: string } }) {
         totalDishBalance > 0 && "bg-gradient-to-r from-yellow-200 to-yellow-100"
       }`}
     >
-      <ClientContainer
-        user={p}
-        icebreakerProfile={icebreakerProfile}
-        addressBalances={addressBalances}
-        nfts={nfts}
-        followingRank={followingRank[0]}
-        engagementRank={engagementRank[0]}
-        dishTokenBalance={totalDishBalance ?? 0}
-      />
+      <Suspense fallback={<Skeleton />}>
+        <ClientContainer
+          user={p}
+          icebreakerProfile={icebreakerProfile}
+          addressBalances={addressBalances}
+          nfts={nfts}
+          followingRank={followingRank[0]}
+          engagementRank={engagementRank[0]}
+          dishTokenBalance={totalDishBalance ?? 0}
+        />
+      </Suspense>
     </div>
   );
 }

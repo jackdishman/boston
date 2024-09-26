@@ -11,7 +11,7 @@ const contractAddress = '0x840B72a9b16Dc28f3a94f3cD1d628fA941828749';
 interface IProps {
   submission: ISubmission;
   quizId: number;
-  quizTaker: string; //address of quiz taker
+  quizTaker: string;
   score: number;
   timeCompleted: number;
   proctor: INeynarUserResponse;

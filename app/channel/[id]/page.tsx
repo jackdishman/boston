@@ -1,7 +1,8 @@
 // pages/channel/[id]/index.tsx
 import { getChannelById, getUsersByFids } from "@/middleware/helpers";
-import React from "react";
+import React, { Suspense } from "react";
 import ChannelLayout from "./ChannelLayout";
+import Skeleton from "@/app/components/Skeleton";
 
 type Props = {
   params: { id: string };
@@ -47,8 +48,10 @@ export default async function Page({ params }: Props) {
   const leadMember = await getUsersByFids([channel.leadFid.toString()]);
 
   return (
-    <ChannelLayout channel={channel} leadMember={leadMember[0]}>
-      <p className="text-center"></p>
-    </ChannelLayout>
+    <Suspense fallback={<Skeleton />}>
+      <ChannelLayout channel={channel} leadMember={leadMember[0]}>
+        <p className="text-center"></p>
+      </ChannelLayout>
+    </Suspense>
   );
 }
