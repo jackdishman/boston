@@ -44,7 +44,7 @@ export async function GET(): Promise<NextResponse> {
     type: "composer",
     name: "view-fid",
     icon: "id-badge",
-    description: "View tokens, verifications, and much more",
+    description: "Farcaster toolbelt",
     imageUrl: process.env.NEXT_PUBLIC_HOST + "/fc-og.png",
     aboutUrl: process.env.NEXT_PUBLIC_HOST + "/about",
     action: {
