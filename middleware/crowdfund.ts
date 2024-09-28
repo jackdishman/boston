@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 
-export const usdcAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+export const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 export const getCrowdfund = async (id: string) => {
   const { data, error } = await supabase
@@ -37,4 +37,9 @@ export const getCrowdfundABI = async () => {
 export const getCrowdfundBytecode = async () => {
   const CrowdfundArtifact = await import('../abi/Crowdfund.json');
   return CrowdfundArtifact.bytecode.object;
+}
+
+export const getERC20ABI = async () => {
+  const ERC20Artifact = await import('../abi/ERC20.json');
+  return ERC20Artifact.abi;
 }
