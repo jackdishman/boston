@@ -20,6 +20,8 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   const [isConnected, setIsConnected] = useState(false);
   const [account, setAccount] = useState<string | null>(null);
   const [isUSDCApproved, setIsUSDCApproved] = useState(false);
+  const [deadline, setDeadline] = useState<number | null>(null);
+  const [isApprovingUSDC, setIsApprovingUSDC] = useState(false);
 
   // Initialize clients
   const publicClient = createPublicClient({ chain: base, transport: http() });
@@ -120,12 +122,35 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
       }
     };
 
+    const fetchDeadline = async () => {
+      try {
+        const deadlineTimestamp = await publicClient.readContract({
+          address: contractAddress as `0x${string}`,
+          abi: contractABI,
+          functionName: 'deadline',
+          args: [],
+        }) as bigint;
+
+        setDeadline(Number(deadlineTimestamp));
+      } catch (error) {
+        console.error('Error fetching deadline:', error);
+      }
+    };
+
     fetchContributors();
     fetchTotalAmountRaised();
     fetchTargetAmountInUSD();
     fetchContributionsUSD();
+    fetchDeadline();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractABI, contractAddress]);
+
+  // Add this new useEffect to check USDC approval on component mount and when account changes
+  useEffect(() => {
+    if (account) {
+      checkUSDCApproval();
+    }
+  }, [account]);
 
   const connectWallet = async () => {
     if (!walletClient) {
@@ -147,11 +172,31 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
     setIsConnected(false);
   };
 
+  const checkUSDCApproval = async () => {
+    if (!ERC20ABI || !account) return;
+
+    try {
+      const allowance = await publicClient.readContract({
+        address: USDC_ADDRESS as `0x${string}`,
+        abi: ERC20ABI,
+        functionName: 'allowance',
+        args: [account, contractAddress],
+      }) as bigint;
+
+      const sufficientAllowance = allowance >= parseUnits('1000000', 6); // Check for a large allowance (e.g., 1 million USDC)
+      setIsUSDCApproved(sufficientAllowance);
+    } catch (error) {
+      console.error('Error checking USDC allowance:', error);
+    }
+  };
+
   const approveUSDC = async (amount: string) => {
     if (!ERC20ABI || !walletClient || !account) {
       console.error('ERC20ABI, walletClient, or account is not available');
       return;
     }
+
+    setIsApprovingUSDC(true);
 
     try {
       const amountToApprove = parseUnits(amount, 6); // USDC has 6 decimal places
@@ -166,10 +211,16 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
 
       const hash = await walletClient.writeContract(request);
       console.log('USDC approval successful:', hash);
+      
+      // Wait for the transaction to be mined
+      await publicClient.waitForTransactionReceipt({ hash });
+      
       setIsUSDCApproved(true);
+      setIsApprovingUSDC(false);
       return hash;
     } catch (error) {
       console.error('Error approving USDC:', error);
+      setIsApprovingUSDC(false);
       throw error;
     }
   };
@@ -246,56 +297,93 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Contributors</h2>
-      {contributors.length === 0 ? (
-        <p>No contributors found.</p>
-      ) : (
-        <ul className="list-disc ml-5">
-          {contributors.map((contributor, index) => (
-            <li key={index}>
-              {contributor} - Total Contribution: ${contributionsUSD[index]?.toFixed(2) ?? '0.00'}
-            </li>
-          ))}
-        </ul>
-      )}
-      {/* <p>Total amount raised: {totalAmountRaised}</p>
-      <p>Target amount: {targetAmountInUSD}</p> */}
-
-      <ProgressTracker currentAmount={parseInt(totalAmountRaised)} targetAmount={parseInt(targetAmountInUSD)} />
-
-      {!isConnected ? (
-        <button 
-          onClick={connectWallet}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Connect Wallet
-        </button>
-      ) : (
-        <button 
-          onClick={disconnectWallet}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Disconnect Wallet ({account?.slice(0, 6)}...{account?.slice(-4)})
-        </button>
-      )}
-
-      <DonationInput
-        donationCurrency={donationCurrency}
-        setDonationCurrency={setDonationCurrency}
-        donationAmount={donationAmount}
-        setDonationAmount={setDonationAmount}
-        approveUSDC={(amount: string) => approveUSDC(amount).then(result => result || '0x')}
-        isUSDCApproved={isUSDCApproved}
-        showApproveButton={donationCurrency === 'USDC' && !isUSDCApproved}
+    <div className="max-w-2xl mx-auto p-6 space-y-8">
+      <h1 className="text-3xl font-bold mb-6">Crowdfunding Campaign</h1>
+      
+      <ProgressTracker
+        currentAmount={parseFloat(totalAmountRaised.replace('$', ''))}
+        targetAmount={parseFloat(targetAmountInUSD.replace('$', ''))}
+        deadline={deadline ?? 0}
+        sponsors={contributors.length}
       />
-      <button 
-        onClick={handleDonate}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        disabled={!isConnected || (donationCurrency === 'USDC' && !isUSDCApproved)}
-      >
-        Donate
-      </button>
+
+      <div className="bg-gray-100 p-4 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Contributors</h2>
+        {contributors.length === 0 ? (
+          <p>No contributors yet. Be the first to donate!</p>
+        ) : (
+          <ul className="list-disc ml-5 space-y-2">
+            {contributors.map((contributor, index) => (
+              <li key={index}>
+                {contributor.slice(0, 6)}...{contributor.slice(-4)} - 
+                Total Contribution: ${contributionsUSD[index]?.toFixed(2) ?? '0.00'}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {!isConnected ? (
+          <button 
+            onClick={connectWallet}
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded"
+          >
+            Connect Wallet
+          </button>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span>Connected: {account?.slice(0, 6)}...{account?.slice(-4)}</span>
+              <button 
+                onClick={disconnectWallet}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Disconnect
+              </button>
+            </div>
+
+            <DonationInput
+              donationCurrency={donationCurrency}
+              setDonationCurrency={setDonationCurrency}
+              donationAmount={donationAmount}
+              setDonationAmount={setDonationAmount}
+            />
+
+            {donationCurrency === 'USDC' && !isUSDCApproved ? (
+              <button 
+                onClick={() => approveUSDC(donationAmount)}
+                className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded"
+                disabled={isApprovingUSDC}
+              >
+                {isApprovingUSDC ? 'Approving...' : 'Approve USDC'}
+              </button>
+            ) : (
+              <button 
+                onClick={handleDonate}
+                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded"
+                disabled={!isConnected || (donationCurrency === 'USDC' && !isUSDCApproved)}
+              >
+                Donate
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Success Alert - Add state to control visibility */}
+      {/* 
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h3 className="text-xl font-bold mb-4">Donation Successful!</h3>
+          <p>Thank you for your contribution.</p>
+          <a href="#" className="text-blue-500 hover:underline">View Transaction</a>
+          <button className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Close
+          </button>
+        </div>
+      </div>
+      */}
     </div>
   );
 }

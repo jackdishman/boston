@@ -7,9 +7,6 @@ interface DonationInputProps {
   setDonationCurrency: (currency: 'ETH' | 'USDC') => void;
   donationAmount: string;
   setDonationAmount: (amount: string) => void;
-  approveUSDC: (amount: string) => Promise<string>;
-  isUSDCApproved: boolean;
-  showApproveButton: boolean;
 }
 
 export default function DonationInput({
@@ -17,21 +14,8 @@ export default function DonationInput({
   setDonationCurrency,
   donationAmount,
   setDonationAmount,
-  approveUSDC,
-  isUSDCApproved,
-  showApproveButton
 }: DonationInputProps) {
-  const handleApproveUSDC = async () => {
-    try {
-      const hash = await approveUSDC(donationAmount);
-      console.log('USDC approved with transaction hash:', hash);
-      // You can add user feedback here, e.g., show a success message
-    } catch (error) {
-      console.error('Error approving USDC:', error);
-      // You can add user feedback here, e.g., show an error message
-    }
-  };
-
+ 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     // Allow only numbers and decimal point
@@ -67,15 +51,6 @@ export default function DonationInput({
             </select>
           </div>
         </div>
-        {showApproveButton && (
-          <button
-            onClick={handleApproveUSDC}
-            className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mt-2"
-            disabled={isUSDCApproved}
-          >
-            Approve USDC
-          </button>
-        )}
       </div>
     </div>
   );
