@@ -7,6 +7,10 @@ import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import DonationInput from './DonationInput';
 import { parseUnits, formatUnits } from 'viem';
 import ProgressTracker from './ProgressTracker';
+import { getUserByEthAddress } from '@/middleware/helpers';
+import { INeynarUserResponse } from "@/types/interfaces";
+import { usePrivy, getAccessToken } from "@privy-io/react-auth";
+
 
 export default function CrowdfundContainer({ contractAddress }: { contractAddress: string }) {
   const [contributors, setContributors] = useState<string[]>([]);
@@ -22,6 +26,8 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   const [isUSDCApproved, setIsUSDCApproved] = useState(false);
   const [deadline, setDeadline] = useState<number | null>(null);
   const [isApprovingUSDC, setIsApprovingUSDC] = useState(false);
+  const [donorProfiles, setDonorProfiles] = useState<Record<string, INeynarUserResponse> | null>(null);
+  const { user } = usePrivy();
 
   // Initialize clients
   const publicClient = createPublicClient({ chain: base, transport: http() });
@@ -65,6 +71,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
           functionName: 'getContributors',
           args: [],
         }) as string[];
+        console.log('Contributors fetched:', contributorsList); // Add this line
         setContributors(contributorsList);
       } catch (error) {
         console.error("Error fetching contributors:", error);
@@ -150,7 +157,38 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
     if (account) {
       checkUSDCApproval();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
+
+  // Replace the existing useEffect for fetching donor profiles with this one
+  useEffect(() => {
+    const fetchDonorProfiles = async () => {
+      if (!user || contributors.length === 0) return;
+
+      try {
+        const accessToken = await getAccessToken();
+        const response = await fetch('/api/search-users/by-eth-address', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ addresses: contributors }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profiles');
+        }
+
+        const data = await response.json();
+        setDonorProfiles(data);
+      } catch (error) {
+        console.error('Error fetching donor profiles:', error);
+      }
+    };
+
+    fetchDonorProfiles();
+  }, [contributors, user]);
 
   const connectWallet = async () => {
     if (!walletClient) {
@@ -296,6 +334,25 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
     }
   };
 
+  const renderDonorProfile = (address: string, neynarProfile: INeynarUserResponse | null) => {
+    console.log('Rendering donor profile:', neynarProfile);
+    if (!neynarProfile) {
+      return (
+        <span>
+          {address.slice(0, 6)}...{address.slice(-4)}
+        </span>
+      );
+    }
+    return (
+      <div className="flex items-center space-x-2">
+        {neynarProfile.pfp_url && (
+          <img src={neynarProfile.pfp_url} alt="Profile" className="w-6 h-6 rounded-full" />
+        )}
+        <span>{neynarProfile.display_name || neynarProfile.username || `${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
       <h1 className="text-3xl font-bold mb-6">Crowdfunding Campaign</h1>
@@ -312,14 +369,21 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
         {contributors.length === 0 ? (
           <p>No contributors yet. Be the first to donate!</p>
         ) : (
-          <ul className="list-disc ml-5 space-y-2">
-            {contributors.map((contributor, index) => (
-              <li key={index}>
-                {contributor.slice(0, 6)}...{contributor.slice(-4)} - 
-                Total Contribution: ${contributionsUSD[index]?.toFixed(2) ?? '0.00'}
-              </li>
-            ))}
+          <>
+          {donorProfiles && (
+            <ul className="space-y-4">
+            {contributors.map((contributor, index) => {
+              const profile = donorProfiles[contributor.toLowerCase()];
+              return (
+                <li key={index} className="flex justify-between items-center">
+                  {renderDonorProfile(contributor, profile || null)}
+                  <span>Total Contribution: ${contributionsUSD[index]?.toFixed(2) ?? '0.00'}</span>
+                </li>
+              );
+            })}
           </ul>
+          )}
+          </>
         )}
       </div>
 
