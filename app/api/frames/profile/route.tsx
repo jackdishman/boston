@@ -21,7 +21,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         <meta name="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
         <meta property="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/actions/mini-app}">
-        <meta property="fc:frame:input:text" content="">
         <meta property="fc:frame:button:1" content="View Profile">
         </head>
       <body>
