@@ -5,15 +5,15 @@ import { getCrowdfundABI, USDC_ADDRESS, getERC20ABI } from '@/middleware/crowdfu
 import { base } from 'viem/chains';
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import DonationInput from './DonationInput';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 import ProgressTracker from './ProgressTracker';
-import { getUserByEthAddress } from '@/middleware/helpers';
 import { INeynarUserResponse } from "@/types/interfaces";
 import { usePrivy, getAccessToken } from "@privy-io/react-auth";
+import Contributions from './Contributions';
 
 
 export default function CrowdfundContainer({ contractAddress }: { contractAddress: string }) {
-  const [contributors, setContributors] = useState<string[]>([]);
+  const [contributors, setContributors] = useState<string[] | null>();
   const [contributionsUSD, setContributionsUSD] = useState<number[]>([]);
   const [contractABI, setContractABI] = useState<any>(null);
   const [ERC20ABI, setERC20ABI] = useState<any>(null);
@@ -26,7 +26,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   const [isUSDCApproved, setIsUSDCApproved] = useState(false);
   const [deadline, setDeadline] = useState<number | null>(null);
   const [isApprovingUSDC, setIsApprovingUSDC] = useState(false);
-  const [donorProfiles, setDonorProfiles] = useState<Record<string, INeynarUserResponse> | null>(null);
+  const [donorProfiles, setDonorProfiles] = useState<Record<string, INeynarUserResponse[]> | null>(null);
   const { user } = usePrivy();
 
   // Initialize clients
@@ -163,7 +163,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   // Replace the existing useEffect for fetching donor profiles with this one
   useEffect(() => {
     const fetchDonorProfiles = async () => {
-      if (!user || contributors.length === 0) return;
+      if (!contributors || contributors.length === 0) return;
 
       try {
         const accessToken = await getAccessToken();
@@ -188,7 +188,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
     };
 
     fetchDonorProfiles();
-  }, [contributors, user]);
+  }, [contributors]);
 
   const connectWallet = async () => {
     if (!walletClient) {
@@ -334,25 +334,6 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
     }
   };
 
-  const renderDonorProfile = (address: string, neynarProfile: INeynarUserResponse | null) => {
-    console.log('Rendering donor profile:', neynarProfile);
-    if (!neynarProfile) {
-      return (
-        <span>
-          {address.slice(0, 6)}...{address.slice(-4)}
-        </span>
-      );
-    }
-    return (
-      <div className="flex items-center space-x-2">
-        {neynarProfile.pfp_url && (
-          <img src={neynarProfile.pfp_url} alt="Profile" className="w-6 h-6 rounded-full" />
-        )}
-        <span>{neynarProfile.display_name || neynarProfile.username || `${address.slice(0, 6)}...${address.slice(-4)}`}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
       <h1 className="text-3xl font-bold mb-6">Crowdfunding Campaign</h1>
@@ -361,31 +342,16 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
         currentAmount={parseFloat(totalAmountRaised.replace('$', ''))}
         targetAmount={parseFloat(targetAmountInUSD.replace('$', ''))}
         deadline={deadline ?? 0}
-        sponsors={contributors.length}
+        sponsors={contributors?.length ?? 0}
       />
 
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Contributors</h2>
-        {contributors.length === 0 ? (
-          <p>No contributors yet. Be the first to donate!</p>
-        ) : (
-          <>
-          {donorProfiles && (
-            <ul className="space-y-4">
-            {contributors.map((contributor, index) => {
-              const profile = donorProfiles[contributor.toLowerCase()];
-              return (
-                <li key={index} className="flex justify-between items-center">
-                  {renderDonorProfile(contributor, profile || null)}
-                  <span>Total Contribution: ${contributionsUSD[index]?.toFixed(2) ?? '0.00'}</span>
-                </li>
-              );
-            })}
-          </ul>
-          )}
-          </>
-        )}
-      </div>
+      {donorProfiles && (
+        <Contributions 
+          contributors={contributors ?? []}
+          contributionsUSD={contributionsUSD}
+          donorProfiles={donorProfiles}
+        />
+      )}
 
       <div className="space-y-4">
         {!isConnected ? (
