@@ -25,7 +25,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const body: ComposerActionFormResponse = {
       type: "form",
-      title: "Viewing " + fname,
+      title: "fid: " + fid,
       url: process.env.NEXT_PUBLIC_HOST + `/profile/${fid}`,
     };
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 export async function GET(): Promise<NextResponse> {
   const body: ComposerActionMetadata = {
     type: "composer",
-    name: "Investigate Profile",
+    name: "view-fid",
     icon: "id-badge",
     description: "View tokens, verifications, and much more",
     imageUrl: process.env.NEXT_PUBLIC_HOST + "/fc-og.png",

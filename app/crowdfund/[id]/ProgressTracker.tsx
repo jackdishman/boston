@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useSpring, animated } from 'react-spring';
+import CountUp from 'react-countup';
 
 interface ProgressTrackerProps {
   currentAmount: number;
@@ -32,6 +34,13 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
     }
   }, [currentAmount, targetAmount, deadline]);
 
+  // Add animation for the progress bar
+  const progressAnimation = useSpring({
+    width: `${percentage}%`,
+    from: { width: '0%' },
+    config: { duration: 1000 },
+  });
+
   return (
     <div className="w-full max-w-xl mx-auto my-8 p-4 bg-blue-900 text-white rounded-lg">
       {/* Goal Amount */}
@@ -39,37 +48,43 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
 
       {/* Progress Bar */}
       <div className="w-full h-6 bg-gray-300 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-red-500 rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${percentage}%` }}
-        ></div>
+        <animated.div
+          className="h-full bg-red-500 rounded-full"
+          style={progressAnimation}
+        ></animated.div>
       </div>
 
       {/* Statistics */}
       <div className="flex flex-wrap mt-6 -mx-2 text-center">
         {/* Percentage Funded */}
         <div className="w-1/2 md:w-1/4 px-2 mb-4">
-          <span className="block text-2xl font-bold">{percentage.toFixed(0)}%</span>
+          <span className="block text-2xl font-bold">
+            <CountUp end={percentage} duration={1.5} decimals={0} suffix="%" />
+          </span>
           <span className="block text-sm">Funded</span>
         </div>
 
         {/* Amount Raised */}
         <div className="w-1/2 md:w-1/4 px-2 mb-4">
           <span className="block text-2xl font-bold">
-            ${currentAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            $<CountUp end={currentAmount} duration={1.5} separator="," decimals={2} />
           </span>
           <span className="block text-sm">Raised</span>
         </div>
 
         {/* Days to Go */}
         <div className="w-1/2 md:w-1/4 px-2 mb-4">
-          <span className="block text-2xl font-bold">{daysRemaining}</span>
+          <span className="block text-2xl font-bold">
+            <CountUp end={daysRemaining} duration={1.5} />
+          </span>
           <span className="block text-sm">Days to Go</span>
         </div>
 
         {/* Sponsors */}
         <div className="w-1/2 md:w-1/4 px-2 mb-4">
-          <span className="block text-2xl font-bold">{sponsors}</span>
+          <span className="block text-2xl font-bold">
+            <CountUp end={sponsors} duration={1.5} />
+          </span>
           <span className="block text-sm">Sponsors</span>
         </div>
       </div>
