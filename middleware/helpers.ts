@@ -165,3 +165,24 @@ export async function getChannelFeed(
   const data = await response.json();
   return { casts: data.casts, cursor: data.next?.cursor || "" };
 }
+
+export const getUserByEthAddress = async (
+  address: string
+): Promise<Record<string, INeynarUserResponse>[] | null> => {
+  try {
+    const url = `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${address}`;
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY ?? ``,
+      },
+    };
+    const response = await fetchWithRetry(url, options);
+    const data = await response.json();
+    return data as Record<string, INeynarUserResponse>[];
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

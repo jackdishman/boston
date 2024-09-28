@@ -7,10 +7,12 @@ import Menu from "./icons/Menu";
 import X from "./icons/X";
 import Power from "./icons/Power";
 import Link from "next/link";
-import { IEvent } from "@/types/interfaces";
 import Home from "./icons/Home";
 import DocumentText from "./icons/DocumentText";
 import SquarePlus from "./icons/SquarePlus";
+import { useState, useRef, useEffect } from "react";
+import ChevronDown from "./icons/ChevronDown";
+import CurrencyDollar from "./icons/Currency"; // You'll need to create this icon component
 
 interface HeaderProps {
   searchTerm: string;
@@ -33,7 +35,31 @@ const Header: React.FC<HeaderProps> = ({
 
   const disableLogin = !ready || (ready && authenticated);
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleActionClick = () => {
+    setIsDropdownOpen(false);
+    setIsOpen(false);
+  };
 
   return (
     <div className="fixed z-50 w-full bg-gray-100 shadow-md">
@@ -82,14 +108,47 @@ const Header: React.FC<HeaderProps> = ({
                   <DocumentText />
                   <span className="ml-2">Trivia Quiz</span>
                 </Link>
-                <a
-                  href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
-                  target="_blank"
+                <Link
+                  href="/crowdfund"
                   className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
                 >
-                  <SquarePlus />
-                  <span className="ml-2">Balance Action</span>
-                </a>
+                  <CurrencyDollar />
+                  <span className="ml-2">Crowdfund</span>
+                </Link>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
+                  >
+                    <SquarePlus />
+                    <span className="ml-2">Actions</span>
+                    <ChevronDown className="ml-1" />
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <a
+                          href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Flegitness"
+                          target="_blank"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                          onClick={handleActionClick}
+                        >
+                          Icebreaker Action
+                        </a>
+                        <a
+                          href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
+                          target="_blank"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                          onClick={handleActionClick}
+                        >
+                          Balance Action
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={logout}
                   className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
@@ -117,12 +176,12 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
       </header>
       {isOpen && (
-        <div className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-16 z-50">
+        <div ref={mobileMenuRef} className="md:hidden absolute flex flex-col items-center bg-gray-100 shadow-lg w-full py-4 space-y-4 rounded-b-xl top-16 z-50">
           {authenticated && (
             <div className="flex flex-col space-y-4">
               <Link
                 href="/"
-                onClick={() => setIsOpen(false)}
+                onClick={handleActionClick}
                 className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
                 <Home />
@@ -130,19 +189,54 @@ const Header: React.FC<HeaderProps> = ({
               </Link>
               <Link
                 href="/quiz"
-                onClick={() => setIsOpen(false)}
+                onClick={handleActionClick}
                 className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
-                Trivia Quiz Frame
+                <DocumentText />
+                <span className="ml-2">Trivia Quiz</span>
               </Link>
-              <a
-                href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
-                target="_blank"
+              <Link
+                href="/crowdfund"
+                onClick={handleActionClick}
                 className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
               >
-                <SquarePlus />
-                <span className="ml-2">Balance Action</span>
-              </a>
+                <CurrencyDollar />
+                <span className="ml-2">Crowdfund</span>
+              </Link>
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="bg-white hover:shadow flex items-center text-start rounded-lg p-2 w-full"
+                >
+                  <SquarePlus />
+                  <span className="ml-2">Actions</span>
+                  <ChevronDown className="ml-auto" />
+                </button>
+                {isDropdownOpen && (
+                  <div className="mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <a
+                        href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Flegitness"
+                        target="_blank"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                        onClick={handleActionClick}
+                      >
+                        Icebreaker Action
+                      </a>
+                      <a
+                        href="https://warpcast.com/~/add-cast-action?url=https%3A%2F%2Fdish.codes%2Fapi%2Factions%2Fbalance"
+                        target="_blank"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                        onClick={handleActionClick}
+                      >
+                        Balance Action
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={logout}
                 className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"

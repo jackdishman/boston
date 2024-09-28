@@ -3,14 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/providers/privy";
 import App from "./components/App";
-import { IChannelResponse } from "@/types/interfaces";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Farcaster Channel",
+  title: "Farcaster Toolbelt",
   description:
-    "Browse channel members, view channel stats, and view recent casts!",
+    "Browse channel stats, advanced profile search, install Cast Actions, and frames!",
 };
 
 export default async function RootLayout({
