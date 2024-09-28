@@ -41,9 +41,11 @@ export async function generateMetadata(
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:image": imageUrl,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/actions/mini-app`,
     "fc:frame:button:1": `View in App`,
     "fc:frame:button:1:action": `link`,
     "fc:frame:button:1:target": `${process.env["NEXT_PUBLIC_HOST"]}/profile/${p.fid}`,
+    "fc:frame:button:1:title": `View Profile`,
   };
 
   return {

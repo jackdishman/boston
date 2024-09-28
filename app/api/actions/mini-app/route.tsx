@@ -1,23 +1,7 @@
 import { validateMessage } from "@/middleware/farcaster";
+import { ComposerActionFormResponse, ComposerActionMetadata } from "@/types/actions";
 import { NextRequest, NextResponse } from "next/server";
 
-type ComposerActionFormResponse = {
-  type: "form";
-  title: string;
-  url: string;
-};
-
-type ComposerActionMetadata = {
-  type: "composer";
-  name: string;
-  icon: string;
-  description: string;
-  imageUrl: string;
-  aboutUrl?: string;
-  action: {
-    type: "post";
-  };
-};
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
