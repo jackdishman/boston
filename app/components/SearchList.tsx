@@ -9,6 +9,7 @@ import {
 import { useRouter } from "next/navigation";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
+import { isValidEthereumAddress } from '@/middleware/checks';
 
 interface IChannelListProps {
   channels: IChannelResponse[];
@@ -27,16 +28,32 @@ const SearchList: React.FC<IChannelListProps> = ({
 
   async function fetchUsers(input: string) {
     const accessToken = await getAccessToken();
-    const uList: string[] = [input];
-    const users = await fetch("/api/search-users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ search: uList }),
-    }).then((res) => res.json());
-    setUsers(users);
+    let users;
+
+    if (isValidEthereumAddress(input)) {
+      const response = await fetch("/api/search-users/by-eth-address", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ addresses: [input] }),
+      }).then((res) => res.json());
+      // Extract the array associated with the address
+      users = Object.values(response).flat();
+    } else {
+      const uList: string[] = [input];
+      users = await fetch("/api/search-users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ search: uList }),
+      }).then((res) => res.json());
+    }
+
+    setUsers(Array.isArray(users) ? users : []);
   }
 
   async function trackSearchEvent(searchTerm: string) {
@@ -155,7 +172,6 @@ const SearchList: React.FC<IChannelListProps> = ({
                     </p>
                   </div>
                 </Link>
-                <p></p>
               </div>
             ))}
           </div>

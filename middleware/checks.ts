@@ -51,3 +51,7 @@ export async function testImageSSR(url: string): Promise<boolean> {
     return false;
   }
 }
+
+export const isValidEthereumAddress = (address: string): boolean => {
+  return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
+};
