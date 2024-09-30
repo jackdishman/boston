@@ -9,7 +9,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // get open launches with creator fid
 
     // get open
-    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/boston.png`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/proxy/?fid=${fid}`;
 
     const responseHtml = `
     <!DOCTYPE html>
@@ -20,8 +20,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
-        <meta property="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/actions/mini-app}">
-        <meta property="fc:frame:button:1" content="View Profile">
+        <meta property="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/proxy/send-reference}">
+        <meta property="fc:frame:input:text" content="Enter fname of reference">
+        <meta property="fc:frame:button:1" content="Submit">
         </head>
       <body>
       </body>
