@@ -35,12 +35,13 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   }, [currentAmount, targetAmount, deadline]);
 
   // Add animation for the progress bar
+  const validPercentage = Number.isNaN(percentage) ? 0 : percentage;
   const progressAnimation = useSpring({
-    width: `${percentage}%`,
     from: { width: '0%' },
+    to: { width: `${validPercentage}%` },
     config: { duration: 1000 },
   });
-
+      
   return (
     <div className="w-full max-w-xl mx-auto my-8 p-4 bg-blue-900 text-white rounded-lg">
       {/* Goal Amount */}

@@ -20,11 +20,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame" content="vNext">
         <meta property="fc:frame:image" content="${imageUrl}">
-        <meta property="fc:frame:input:text" content="Enter Base ETH amount">
-        <meta property="fc:frame:button:1" content="Contribute">
-        <meta property="fc:frame:button:1:action" content="tx">
-        <meta property="fc:frame:button:1:target" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund/send-eth?id=${id}" />
-        <meta property="fc:frame:button:1:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund/success?id=${id}&fid=${fid}" />
         </head>
       <body>
       </body>

@@ -24,10 +24,10 @@ export async function generateMetadata(
       metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
     };
   }
-  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund/image?title=${crowdfund.title}&description=${crowdfund.description}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund/image?id=${id}`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund/contribute?id=${id}`,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/frames/crowdfund?id=${id}`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Contribute`,
     "fc:frame:button:2": `View in App`,
@@ -39,9 +39,9 @@ export async function generateMetadata(
   };
 
   return {
-    title: crowdfund.title,
+    title: crowdfund.name,
     openGraph: {
-      title: crowdfund.title ?? `Crowdfund ${id}`,
+      title: crowdfund.name ?? `Crowdfund ${id}`,
       description: crowdfund.description ?? `Crowdfund ${id}`,
       images: [{ url: imageUrl }],
     },
@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <CrowdfundContainer contractAddress={contractAddress} />
+      {contractAddress && <CrowdfundContainer contractAddress={contractAddress} />}
     </div>
   )
 }
