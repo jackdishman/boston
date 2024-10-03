@@ -1,6 +1,5 @@
-// pages/channel/[id]/index.tsx
+import React from "react";
 import { getChannelById, getUsersByFids } from "@/middleware/helpers";
-import React, { Suspense } from "react";
 import ChannelLayout from "./ChannelLayout";
 import Skeleton from "@/app/components/Skeleton";
 
@@ -19,7 +18,7 @@ export async function generateMetadata({ params }: Props) {
   };
 
   return {
-    title: channel?.name + " Channel",
+    title: `${channel?.name} Channel`,
     description: channel?.description,
     openGraph: {
       title: channel?.name,
@@ -45,13 +44,13 @@ export default async function Page({ params }: Props) {
 
   if (!channel) return <div>Error fetching channel</div>;
 
-  const leadMember = await getUsersByFids([channel.leadFid.toString()]);
+  const [leadMember] = await getUsersByFids([channel.leadFid.toString()]);
 
   return (
-    <Suspense fallback={<Skeleton />}>
-      <ChannelLayout channel={channel} leadMember={leadMember[0]}>
+    <React.Suspense fallback={<Skeleton />}>
+      <ChannelLayout channel={channel} leadMember={leadMember}>
         <p className="text-center"></p>
       </ChannelLayout>
-    </Suspense>
+    </React.Suspense>
   );
 }
