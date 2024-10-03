@@ -1,8 +1,9 @@
 import React from "react";
-import MembersList from "./MembersList";
+import FollowersList from "./FollowersList";
 import {
   getUsersByFids,
   getChannelById,
+  getChannelFollowers,
   getChannelMembers,
 } from "@/middleware/helpers";
 import ChannelLayout from "../ChannelLayout";
@@ -53,14 +54,15 @@ export default async function Page({ params }: Props) {
       ? await getUsersByFids(channel.hostFids.map((fid) => fid.toString()))
       : [];
 
-  const { users, cursor } = await getChannelMembers(params.id);
+  const { users, cursor } = await getChannelFollowers(params.id);
 
   return (
     <ChannelLayout channel={channel} leadMember={leadMember[0]}>
-      <MembersList
+      <FollowersList
         users={users}
         cursor={cursor}
         channelId={params.id}
+        followerCount={channel.followerCount}
       />
     </ChannelLayout>
   );

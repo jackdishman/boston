@@ -4,6 +4,7 @@ import {
   IChannelResponse,
   INeynarUserResponse,
   INeynarCastResponse,
+  INeynarChannelMemberResponse,
 } from "@/types/interfaces";
 
 const fetchWithRetry = async (
@@ -65,6 +66,29 @@ export const getChannelFollowers = async (
   }
   return { users, cursor: next?.cursor || "" };
 };
+
+export const getChannelMembers = async (
+  channelId: string,
+  cursor?: string | null,
+  limit: number = 100
+): Promise<{ users: INeynarChannelMemberResponse[]; cursor: string }> => {
+  const url = `https://api.neynar.com/v2/farcaster/channel/member/list?channel_id=${channelId}`;
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      api_key: process.env.NEYNAR_API_KEY ?? ``,
+    },
+  };
+  const response = await fetchWithRetry(url, options);
+  const data = await response.json();
+  const { members, next } = data;
+  if (!members) {
+    return { users: [], cursor: "" };
+  }
+  return { users: members, cursor: next?.cursor || "" };
+};
+
 
 export const getUsersByFids = async (
   fids: string[]

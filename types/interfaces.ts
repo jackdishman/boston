@@ -28,6 +28,13 @@ export interface INeynarUserResponse {
   followedAt: string;
 }
 
+export interface INeynarChannelMemberResponse {
+  object: "member";
+  channel_id: string;
+  role: "moderator" | "member";
+  user: INeynarUserResponse;
+}
+
 export interface IChannelResponse {
   id: string;
   url: string;
