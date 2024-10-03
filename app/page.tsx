@@ -51,7 +51,7 @@ export default function Page() {
             Browse Farcaster profile account token balances (ETH and Base)
           </li>
           <li>View most active casters in a channel and feeds</li>
-          <li>Trivia Quiz Frame, with rewards denominated in Stack.so</li>
+          <li>Quiz Frame, with rewards denominated in Stack.so</li>
           <li>Create and take quizzes in this app</li>
           <li>
             Install cast action to check caster account balances in Warpcast

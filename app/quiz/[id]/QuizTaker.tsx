@@ -4,6 +4,8 @@ import { usePrivy } from "@privy-io/react-auth";
 import { IQuestion, ISubmission } from "@/types/quiz";
 import { getElapsedTimeString } from "@/middleware/quiz";
 import Link from "next/link";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface IProps {
   quizQuestions: IQuestion[] | undefined;
@@ -138,7 +140,14 @@ export default function QuizTaker(props: IProps) {
     if (!activeQuestion) return;
     const answer = shortAnswer.current?.value.trim();
     if (!answer) {
-      alert("Please enter an answer");
+      toast.error("Please enter an answer", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
     const isCorrect =
@@ -216,6 +225,7 @@ export default function QuizTaker(props: IProps) {
 
   return (
     <div className="w-full rounded-lg border-gray-200 border-2 p-10 mt-10">
+      <ToastContainer />
       {/* top header */}
       <div className="flex justify-between mb-5 text-sm items-center">
         <h6 className="font-semibold">
