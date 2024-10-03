@@ -20,6 +20,10 @@ export default function PageContainer(props: IProps) {
   const { user } = usePrivy();
 
   // check if user is authorized to view this quiz
+  console.log(`user farcaster fid`, user?.farcaster?.fid)
+  console.log(`proctor farcaster fid`, proctor.fid)
+  console.log(`submissions[0].fid`, submissions[0].fid)
+  
   if (
     user?.farcaster?.fid !== submissions[0].fid &&
     Number(proctor.fid) !== user?.farcaster?.fid

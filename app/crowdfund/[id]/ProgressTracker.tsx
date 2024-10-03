@@ -43,7 +43,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   });
       
   return (
-    <div className="w-full max-w-xl mx-auto my-8 p-4 bg-blue-900 text-white rounded-lg">
+    <div className="w-full max-w-xl mx-auto my-8 p-4 bg-blue-900 text-white rounded-lg shadow-md border border-blue-500">
       {/* Goal Amount */}
       <div className="text-right text-4xl font-bold mb-4">${targetAmount.toLocaleString()}</div>
 

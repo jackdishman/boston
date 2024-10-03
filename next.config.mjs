@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // add dotenv keys
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      Object.assign(config.resolve.alias, {
+        'react-toastify/dist/ReactToastify.css': 'react-toastify/dist/ReactToastify.minimal.css',
+      });
+    }
+    return config;
+  },
+// add dotenv keys
   env: {
     NEYNAR_API_KEY: process.env.NEYNAR_API_KEY,
     SUPABASE_URL: process.env.SUPABASE_URL,

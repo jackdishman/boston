@@ -37,13 +37,18 @@ const Header: React.FC<HeaderProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFeatureDropdownOpen, setIsFeatureDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const featureDropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (featureDropdownRef.current && !featureDropdownRef.current.contains(event.target as Node)) {
+        setIsFeatureDropdownOpen(false);
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -58,6 +63,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleActionClick = () => {
     setIsDropdownOpen(false);
+    setIsFeatureDropdownOpen(false);
     setIsOpen(false);
   };
 
@@ -101,20 +107,38 @@ const Header: React.FC<HeaderProps> = ({
                   <Home />
                   <span className="ml-2">Home</span>
                 </Link>
-                <Link
-                  href="/quiz"
-                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
-                >
-                  <DocumentText />
-                  <span className="ml-2">Trivia Quiz</span>
-                </Link>
-                <Link
-                  href="/crowdfund"
-                  className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
-                >
-                  <CurrencyDollar />
-                  <span className="ml-2">Crowdfund</span>
-                </Link>
+                <div className="relative" ref={featureDropdownRef}>
+                  <button
+                    onClick={() => setIsFeatureDropdownOpen(!isFeatureDropdownOpen)}
+                    className="hover:bg-white hover:shadow flex items-center text-start rounded-lg p-2"
+                  >
+                    <DocumentText />
+                    <span className="ml-2">Features</span>
+                    <ChevronDown className="ml-1" />
+                  </button>
+                  {isFeatureDropdownOpen && (
+                    <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <Link
+                          href="/quiz"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                          onClick={handleActionClick}
+                        >
+                          Quiz
+                        </Link>
+                        <Link
+                          href="/crowdfund"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                          onClick={handleActionClick}
+                        >
+                          Crowdfund
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -187,22 +211,38 @@ const Header: React.FC<HeaderProps> = ({
                 <Home />
                 <span className="ml-2">Home</span>
               </Link>
-              <Link
-                href="/quiz"
-                onClick={handleActionClick}
-                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
-              >
-                <DocumentText />
-                <span className="ml-2">Trivia Quiz</span>
-              </Link>
-              <Link
-                href="/crowdfund"
-                onClick={handleActionClick}
-                className="bg-white hover:shadow flex items-center text-start rounded-lg p-2"
-              >
-                <CurrencyDollar />
-                <span className="ml-2">Crowdfund</span>
-              </Link>
+              <div className="relative w-full" ref={featureDropdownRef}>
+                <button
+                  onClick={() => setIsFeatureDropdownOpen(!isFeatureDropdownOpen)}
+                  className="bg-white hover:shadow flex items-center text-start rounded-lg p-2 w-full"
+                >
+                  <DocumentText />
+                  <span className="ml-2">Features</span>
+                  <ChevronDown className="ml-auto" />
+                </button>
+                {isFeatureDropdownOpen && (
+                  <div className="mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <Link
+                        href="/quiz"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                        onClick={handleActionClick}
+                      >
+                        Quiz
+                      </Link>
+                      <Link
+                        href="/crowdfund"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
+                        onClick={handleActionClick}
+                      >
+                        Crowdfund
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}

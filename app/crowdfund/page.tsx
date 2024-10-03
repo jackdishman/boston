@@ -16,7 +16,6 @@ export default async function page() {
   // get all crowdfunds
   const crowdfunds = await getAllCrowdfunds();
 
-  console.log(crowdfunds);
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">All Crowdfunds</h1>

@@ -60,7 +60,7 @@ export default async function page() {
           href="/quiz/create"
           className="rounded-lg bg-blue-500 px-4 py-2 text-gray-100 text-xl"
         >
-          Create a Trivia Quiz
+          Create a Quiz
         </Link>
       </div>
       <QuizList quizzes={quizzes} quizStats={quizStats} />

@@ -10,9 +10,17 @@ import ProgressTracker from './ProgressTracker';
 import { INeynarUserResponse } from "@/types/interfaces";
 import { usePrivy, getAccessToken } from "@privy-io/react-auth";
 import Contributions from './Contributions';
+import { ICrowdfund } from '@/types/crowdfund';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+interface IProps {
+  contractAddress: string;
+  crowdfund: ICrowdfund;
+}
 
-export default function CrowdfundContainer({ contractAddress }: { contractAddress: string }) {
+export default function CrowdfundContainer(props: IProps) {
+  const { contractAddress, crowdfund } = props;
   const [contributors, setContributors] = useState<string[] | null>();
   const [contributionsUSD, setContributionsUSD] = useState<number[]>([]);
   const [contractABI, setContractABI] = useState<any>(null);
@@ -28,6 +36,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
   const [isApprovingUSDC, setIsApprovingUSDC] = useState(false);
   const [donorProfiles, setDonorProfiles] = useState<Record<string, INeynarUserResponse[]> | null>(null);
   const { user } = usePrivy();
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   // Initialize clients
   const publicClient = createPublicClient({ chain: base, transport: http() });
@@ -71,7 +80,6 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
           functionName: 'getContributors',
           args: [],
         }) as string[];
-        console.log('Contributors fetched:', contributorsList); // Add this line
         setContributors(contributorsList);
       } catch (error) {
         console.error("Error fetching contributors:", error);
@@ -118,7 +126,6 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
           functionName: 'getContributorTotalInUSD',
           args: [],
         }) as bigint[];
-        console.log('Contributions in USD:', contributions);
 
         const formattedContributions = contributions.map(
           (contribution) => parseInt(contribution.toString()) / 100
@@ -248,7 +255,6 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
       });
 
       const hash = await walletClient.writeContract(request);
-      console.log('USDC approval successful:', hash);
       
       // Wait for the transaction to be mined
       await publicClient.waitForTransactionReceipt({ hash });
@@ -284,7 +290,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
 
   const handleDonate = async () => {
     if (!isConnected || !walletClient || !account || !contractABI) {
-      alert('Please connect your wallet first.');
+      toast.error('Please connect your wallet first.');
       return;
     }
 
@@ -292,7 +298,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
       if (donationCurrency === 'USDC') {
         const isApproved = await checkUSDCAllowance();
         if (!isApproved) {
-          alert('Please approve USDC spending first.');
+          toast.error('Please approve USDC spending first.');
           return;
         }
 
@@ -307,7 +313,7 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
         });
 
         const hash = await walletClient.writeContract(request);
-        console.log('USDC donation transaction sent:', hash);
+        setTxHash(hash);
       } else {
         // ETH donation
         const amountInWei = parseUnits(donationAmount, 18); // ETH has 18 decimal places
@@ -322,21 +328,56 @@ export default function CrowdfundContainer({ contractAddress }: { contractAddres
         });
 
         const hash = await walletClient.writeContract(request);
-        console.log('ETH donation transaction sent:', hash);
+        setTxHash(hash);
       }
 
+      toast.success('Donation successful!');
       // Reset donation amount and refresh data
       setDonationAmount('0');
       // Add function calls here to refresh contributors, total amount raised, etc.
     } catch (error) {
       console.error('Error during donation:', error);
-      alert('An error occurred during the donation. Please try again.');
+      toast.error('An error occurred during the donation. Please try again.');
     }
+  };
+
+  // Add this new function
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success('Link copied to clipboard!');
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold mb-6">Crowdfunding Campaign</h1>
+      {/* Add ToastContainer at the top of your JSX */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+      
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="p-6 space-y-4">
+          <h1 className="text-3xl font-bold text-gray-800">{crowdfund.name}</h1>
+          <p className="text-gray-600 leading-relaxed">{crowdfund.description}</p>
+          <div className="flex justify-around">
+            <a
+              href={`https://basescan.org/address/${contractAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-full transition duration-300 ease-in-out"
+              >
+                <span className="mr-2">View Contract</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              {/* add button to copy URL */}
+              <button 
+                onClick={handleCopyLink} 
+                className="inline-flex items-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-full transition duration-300 ease-in-out"
+              >
+                Share Frame Link
+              </button>
+            </div>
+          </div>
+      </div>
       
       <ProgressTracker
         currentAmount={parseFloat(totalAmountRaised.replace('$', ''))}
