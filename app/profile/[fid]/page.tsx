@@ -27,7 +27,7 @@ export async function generateMetadata(
   const fid = params.fid;
   const user = await getUsersByFids([fid]);
   const p = user[0];
-  if (!user) {
+  if (!p) {
     return {
       title: "Profile not found",
       openGraph: {
@@ -68,6 +68,9 @@ export default async function Page({ params }: { params: { fid: string } }) {
   // Fetch user by fid
   const user = await getUsersByFids([fid]);
   const p = user[0];
+  if (!p) {
+    return <div>Profile not found</div>;
+  }
   const icebreakerRes = await getIcebreakerProfile(fid);
   const icebreakerProfile = icebreakerRes?.profiles[0];
 
