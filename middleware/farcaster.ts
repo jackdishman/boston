@@ -9,6 +9,7 @@ export async function validateMessage(req: NextRequest): Promise<{
   castAuthorFid?: number;
   fname?: string;
   castAuthorFname?: string;
+  transaction_id?: string;
 }> {
   const HUB_URL = process.env["HUB_URL"];
   let body: any;
@@ -69,7 +70,8 @@ export async function validateMessage(req: NextRequest): Promise<{
   // Extract fid, buttonId, and inputText
   let fid = 0,
     buttonId,
-    inputText;
+    inputText,
+    transaction_id;
 
   if (data.valid) {
     buttonId = data.action.tapped_button
@@ -77,6 +79,7 @@ export async function validateMessage(req: NextRequest): Promise<{
       : undefined;
     fid = data.action.interactor.fid || 0;
     inputText = data.action.input?.text || "";
+    transaction_id = data.action.transaction_id;
   } else {
     // todo: handle invalid data
     buttonId = data.action.tapped_button.index;
@@ -93,5 +96,6 @@ export async function validateMessage(req: NextRequest): Promise<{
     castAuthorFid,
     fname,
     castAuthorFname,
+    transaction_id,
   };
 }

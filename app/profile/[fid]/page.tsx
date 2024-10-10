@@ -14,6 +14,7 @@ import {
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from 'react'
 import Skeleton from "@/app/components/Skeleton";
+import IdentityContainer from "./IdentityContainer";
 
 type Props = {
   params: { fid: string };
@@ -69,6 +70,10 @@ export default async function Page({ params }: { params: { fid: string } }) {
   const user = await getUsersByFids([fid]);
   const p = user[0];
   if (!p) {
+    // show address stuff only
+    if (fid.startsWith("0x") && /^0x[a-fA-F0-9]+$/.test(fid)) {
+      return <IdentityContainer address={fid as `0x${string}`} />;
+    }
     return <div>Profile not found</div>;
   }
   const icebreakerRes = await getIcebreakerProfile(fid);

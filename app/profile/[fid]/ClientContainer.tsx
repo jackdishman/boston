@@ -17,6 +17,8 @@ import {
 import { IOpenRankProfileResponse } from "@/middleware/openrank";
 import OpenRankData from "./OpenRankData";
 import ShareButton from "./ShareButton";
+import IdentityContainer from "./IdentityContainer";
+import Fund from "./Fund";
 
 interface ClientContainerProps {
   user: INeynarUserResponse;
@@ -70,12 +72,20 @@ const ClientContainer: React.FC<ClientContainerProps> = ({
           channels={icebreakerProfile?.channels || []}
         />
       </div>
+      <Fund account={Object.values(user.verified_addresses)[0]} />
 
       {/* Dish Token Balance */}
       {dishTokenBalance > 0 && <p>Dish token balance: {dishTokenBalance}</p>}
 
       {/* Share Button */}
       <ShareButton user={user} />
+
+      {/* Identity Container */}
+      {
+        user && Object.values(user.verified_addresses)[0] && (
+          <IdentityContainer address={Object.values(user.verified_addresses)[0]} />
+        )
+      }
 
       {/* Section Spacing */}
       <div className="mt-8 space-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4">

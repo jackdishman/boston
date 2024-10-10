@@ -3,12 +3,13 @@ const nextConfig = {
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       Object.assign(config.resolve.alias, {
-        'react-toastify/dist/ReactToastify.css': 'react-toastify/dist/ReactToastify.minimal.css',
+        "react-toastify/dist/ReactToastify.css":
+          "react-toastify/dist/ReactToastify.minimal.css",
       });
     }
     return config;
   },
-// add dotenv keys
+  // add dotenv keys
   env: {
     NEYNAR_API_KEY: process.env.NEYNAR_API_KEY,
     SUPABASE_URL: process.env.SUPABASE_URL,
@@ -23,6 +24,9 @@ const nextConfig = {
     ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
     PINATA_API_KEY: process.env.PINATA_API_KEY,
     PINATA_DEDICATED_GATEWAY: process.env.PINATA_API_SECRET,
+    FARCASTER_PUBLIC_KEY: process.env.FARCASTER_PUBLIC_KEY,
+    FARCASTER_PRIVATE_KEY: process.env.FARCASTER_PRIVATE_KEY,
+    COINBASE_API_KEY: process.env.COINBASE_API_KEY,
   },
   images: {
     remotePatterns: [
