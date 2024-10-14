@@ -334,3 +334,28 @@ export interface LeaderboardEntry {
   user_recasts: number;
   user_shares: number;
 }
+
+export interface INeynarChannelMemberDetailedResponse {
+  object: "member";
+  role: "moderator" | "member";
+  channel: {
+    object: "channel";
+    id: string;
+    url: string;
+    name: string;
+    image_url: string;
+    header_image_url: string;
+    description: string;
+    follower_count: number;
+    member_count: number;
+    pinned_cast_hash: string;
+    created_at: number;
+    parent_url: string;
+    moderator_fids: number[];
+    lead: INeynarUserResponse;
+  };
+  user: {
+    object: "user_dehydrated";
+    fid: number;
+  };
+}

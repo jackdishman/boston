@@ -5,6 +5,7 @@ import {
   INeynarUserResponse,
   INeynarCastResponse,
   INeynarChannelMemberResponse,
+  INeynarChannelMemberDetailedResponse,
 } from "@/types/interfaces";
 
 const fetchWithRetry = async (
@@ -208,5 +209,33 @@ export const getUserByEthAddress = async (
   } catch (error) {
     console.error(error);
     return null;
+  }
+};
+
+export const getChannelMemberships = async (
+  fid: string,
+  cursor?: string
+): Promise<{ members: INeynarChannelMemberDetailedResponse[], next_cursor: string | null }> => {
+  try {
+    let url = `https://api.neynar.com/v2/farcaster/user/memberships/list?fid=${fid}&limit=100`;
+    if (cursor) {
+      url += `&cursor=${cursor}`;
+    }
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY ?? ``,
+      },
+    };
+    const response = await fetchWithRetry(url, options);
+    const data = await response.json();
+    return {
+      members: data.members,
+      next_cursor: data.next?.cursor || null
+    };
+  } catch (error) {
+    console.error(error);
+    return { members: [], next_cursor: null };
   }
 };
