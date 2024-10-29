@@ -5,3 +5,11 @@ export interface ICrowdfund {
   name: string;
   description: string;
 }
+
+export interface ICrowdfundBuilder {
+  targetAmountInUSD: number;
+  deadline: string;
+  recipient: string;
+  paymentTokenAddress: string;
+  priceFeedAddress: string;
+}

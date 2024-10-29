@@ -1,7 +1,10 @@
 import React from 'react'
+import CrowdfundBuilder from './CrowdfundBuilder'
 
 export default function page() {
   return (
-    <div>Create crowdfund page</div>
+    <div>
+      <CrowdfundBuilder />
+    </div>
   )
 }
