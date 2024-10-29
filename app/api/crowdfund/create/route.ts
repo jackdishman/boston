@@ -1,7 +1,6 @@
 
-import { NextRequest, NextResponse } from "next/server";
-import { checkPrivyAuth, getPrivyUserByDid } from "@/middleware/auth";
-import { getRecentFollows } from "@/middleware/helpers";
+import { NextResponse } from "next/server";
+import { checkPrivyAuth } from "@/middleware/auth";
 import { createClient } from "@supabase/supabase-js";
 
 export async function POST(req: Request) {

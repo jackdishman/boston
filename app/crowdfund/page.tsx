@@ -18,6 +18,9 @@ export default async function page() {
 
   return (
     <div>
+      <div className="flex justify-end my-4">
+        <Link href="/crowdfund/create" className="bg-blue-500 text-white px-4 py-2 rounded-md">Create Crowdfund</Link>
+      </div>
       <h1 className="text-2xl font-bold mb-4">All Crowdfunds</h1>
       {crowdfunds && crowdfunds.length > 0 ? (
         <ul className="space-y-4">
