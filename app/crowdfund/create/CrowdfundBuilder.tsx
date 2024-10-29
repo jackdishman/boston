@@ -7,6 +7,7 @@ import { base } from 'viem/chains'; // Or whatever network you're using
 import CrowdfundABI from '@/abi/Crowdfund.json';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@privy-io/react-auth';
+import { toast } from 'react-toastify';
 
 export default function CrowdfundBuilder() {
   const router = useRouter();
@@ -82,7 +83,12 @@ export default function CrowdfundBuilder() {
         transport: custom(window.ethereum)
       });
 
-      await walletClient.switchChain({ id: base.id });
+      // check if on base chain
+      const chain = await walletClient.getChainId();
+      if (chain !== base.id) {
+        toast.error('Please switch to the Base chain');
+        return;
+      }
       const [address] = await walletClient.requestAddresses();
 
       const deadlineDate = new Date(crowdfund.deadline);

@@ -57,7 +57,6 @@ export default async function Page({ params }: { params: { id: string } }) {
   
   // get crowdfund by id
   const crowdfund = await getCrowdfund(id);
-  console.log(crowdfund);
 
   const contractAddress = crowdfund?.contract_address;
 

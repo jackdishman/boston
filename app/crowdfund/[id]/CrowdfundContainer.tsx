@@ -13,6 +13,7 @@ import Contributions from './Contributions';
 import { ICrowdfund } from '@/types/crowdfund';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
 
 interface IProps {
   contractAddress: string;
@@ -440,6 +441,10 @@ export default function CrowdfundContainer(props: IProps) {
             )}
           </div>
         )}
+        <div className='flex justify-around'>
+          <Link href="/crowdfund/create" className="text-blue-500 hover:underline mt-4">Create a Crowdfund</Link>
+          <Link href="/crowdfund" className="text-blue-500 hover:underline mt-4">View all Crowdfunds</Link>
+        </div>
       </div>
 
       {/* Success Alert - Add state to control visibility */}
