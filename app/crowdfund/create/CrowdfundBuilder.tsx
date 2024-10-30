@@ -7,7 +7,7 @@ import { base } from 'viem/chains'; // Or whatever network you're using
 import CrowdfundABI from '@/abi/Crowdfund.json';
 import { useRouter } from 'next/navigation';
 import { getAccessToken } from '@privy-io/react-auth';
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export default function CrowdfundBuilder() {
   const router = useRouter();
@@ -23,6 +23,42 @@ export default function CrowdfundBuilder() {
   });
   const [deployedAddress, setDeployedAddress] = useState<string>();
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [account, setAccount] = useState<string | null>(null);
+  const [walletClient, setWalletClient] = useState<ReturnType<typeof createWalletClient> | null>(null);
+
+  useEffect(() => {
+    if (window.ethereum) {
+      const client = createWalletClient({
+        chain: base,
+        transport: custom(window.ethereum)
+      });
+      setWalletClient(client);
+    }
+  }, []);
+
+  const connectWallet = async () => {
+    if (!walletClient) {
+      toast.error('Wallet client not initialized');
+      return;
+    }
+
+    try {
+      const [address] = await walletClient.requestAddresses();
+      setAccount(address);
+      setIsConnected(true);
+      
+      setCrowdfund(prev => ({
+        ...prev,
+        recipient: address
+      }));
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+      toast.error('Failed to connect wallet', {
+        autoClose: 3000,
+      });
+    }
+  };
 
   const validateForm = (): boolean => {
     const errors: Partial<Record<keyof ICrowdfundBuilder, string>> = {};
@@ -113,7 +149,6 @@ export default function CrowdfundBuilder() {
         transport: http()
       });
 
-
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       if (receipt.contractAddress) {
         setDeployedAddress(receipt.contractAddress);
@@ -126,8 +161,7 @@ export default function CrowdfundBuilder() {
     }
   };
 
-  useEffect(() => {
-    const storeCrowdfund = async () => {
+      const storeCrowdfund = async () => {
       if (!deployedAddress || !name || !description) return;
       
       try {
@@ -156,8 +190,9 @@ export default function CrowdfundBuilder() {
       } catch (error) {
         console.error('Error storing crowdfund:', error);
       }
-    };
+  };
 
+  useEffect(() => {
     if (deployedAddress) {
       storeCrowdfund();
     }
@@ -165,6 +200,23 @@ export default function CrowdfundBuilder() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
+      {!isConnected ? (
+        <button 
+          onClick={connectWallet}
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mb-4"
+        >
+          Connect Wallet
+        </button>
+      ) : (
+        <div className="bg-gray-100 p-3 rounded mb-4 flex justify-between items-center cursor-pointer hover:bg-gray-200" onClick={ () => {
+          navigator.clipboard.writeText(account || '');
+          toast.success('Copied to clipboard');
+        }}>
+          <span>{account?.slice(0, 6)}...{account?.slice(-4)}</span>
+          <span className="text-green-600">✓ Connected</span>
+        </div>
+      )}
+
       <form className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Name</label>
@@ -240,10 +292,14 @@ export default function CrowdfundBuilder() {
         <button
           type="button"
           onClick={deployContract}
-          disabled={isDeploying}
+          disabled={isDeploying || !isConnected}
           className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {isDeploying ? 'Deploying...' : 'Deploy Contract'}
+          {!isConnected 
+            ? 'Connect Wallet to Deploy' 
+            : isDeploying 
+              ? 'Deploying...' 
+              : 'Deploy Contract'}
         </button>
 
         {deployedAddress && (

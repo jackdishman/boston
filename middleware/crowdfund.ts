@@ -17,7 +17,7 @@ export const getCrowdfund = async (id: string): Promise<ICrowdfund | null> => {
   return data?.[0];
 };
 
-export const getAllCrowdfunds = async () => {
+export const getAllCrowdfunds = async (): Promise<ICrowdfund[] | null> => {
   const { data, error } = await supabase
     .from("crowdfunds")
     .select("*");
