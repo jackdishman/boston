@@ -94,6 +94,7 @@ export const getChannelMembers = async (
 export const getUsersByFids = async (
   fids: string[]
 ): Promise<INeynarUserResponse[]> => {
+  console.log("fids", fids);
   try {
     const fidString = fids.join("%2C");
     const url = `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidString}`;
